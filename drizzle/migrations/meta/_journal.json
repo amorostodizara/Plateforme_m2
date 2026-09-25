@@ -1,0 +1,83 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789726794271,
+      "tag": "0000_phase1_auth_utilisateurs_roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789729057441,
+      "tag": "0001_phase2_formations_sessions_inscriptions_agenda",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789729213433,
+      "tag": "0002_premier_compte_administrateur",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789735863142,
+      "tag": "0003_phase3_presence_evaluations_attestations_publications",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789737412092,
+      "tag": "0004_assistant_ia_conversations",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789740381612,
+      "tag": "0005_storage_fichiers_policies",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789741355585,
+      "tag": "0006_paiements_formateur_et_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789742792193,
+      "tag": "0007_realtime_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789745110799,
+      "tag": "0008_notif_presence_gestionnaires",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789833252963,
+      "tag": "0009_supports_formation_session",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790233903505,
+      "tag": "0010_evaluation_acces_session_et_valide_par",
+      "breakpoints": true
+    }
+  ]
+}
