@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SqueletteLignesTableau } from "@/components/app/Squelette";
 import { BadgeQr } from "@/components/app/BadgeQr";
-
+import {dateHeureFr,dateFr} from "@/components/app/AdminKit";
 
 export const Route = createFileRoute("/_authenticated/presence")({
   head: () => ({
@@ -36,6 +36,7 @@ type Methode = "QR Code" | "Manuel" | "Système";
 type PresenceLigne = {
   presence_id: number;
   date_presence: string;
+  enregistre_le: string;
   statut: Statut;
   methode: Methode;
   remarque: string | null;
@@ -61,7 +62,6 @@ type Ligne = {
 
 type SessionItem = { session_id: number; nom_session: string; date_debut: string; date_fin: string };
 
-const dateFr = (v: string) => new Date(v).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
 const jourIso = (d: Date) => d.toISOString().slice(0, 10);
 
 const couleurStatut: Record<Statut, string> = {
@@ -103,7 +103,7 @@ function Presence() {
       const { data, error } = await supabase
         .from("inscription")
         .select(
-          "inscription_id, session:session_formation(session_id, nom_session, date_debut, date_fin, formation:formation(titre)), participant:participant(participant_id, codeqr_jeton, utilisateur:utilisateur(nom, prenoms, email, telephone, url_profil), profil_professionnel:profil_professionnel(statut_actuel, institution, specialisation, niveau_education)), presence:presence(presence_id, date_presence, statut, methode, remarque)",
+          "inscription_id, session:session_formation(session_id, nom_session, date_debut, date_fin, formation:formation(titre)), participant:participant(participant_id, codeqr_jeton, utilisateur:utilisateur(nom, prenoms, email, telephone, url_profil), profil_professionnel:profil_professionnel(statut_actuel, institution, specialisation, niveau_education)), presence:presence(presence_id, date_presence,enregistre_le, statut, methode, remarque)",
         )
         .eq("session_id", sessionId!)
         .eq("statut", "Acceptée");
@@ -244,8 +244,8 @@ function Presence() {
             </select>
           </label>
           <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-            <span className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />Début : {sessionActive ? dateFr(sessionActive.date_debut) : "—"}</span>
-            <span className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />Fin : {sessionActive ? dateFr(sessionActive.date_fin) : "—"}</span>
+            <span className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />Début : {sessionActive ? dateHeureFr(sessionActive.date_debut) : "—"}</span>
+            <span className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />Fin : {sessionActive ? dateHeureFr(sessionActive.date_fin) : "—"}</span>
             <span className="flex items-center gap-2"><Users className="h-4 w-4" />Participants inscrits <b className="text-foreground">{total}</b></span>
           </div>
         </div>
@@ -334,7 +334,7 @@ function Presence() {
                         <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">{u?.email ?? "—"}</td>
                         <td className="px-3 py-3 text-muted-foreground">{l.session?.formation?.titre ?? "—"}</td>
                         <td className="px-3 py-3 text-muted-foreground">{l.session?.nom_session ?? "—"}</td>
-                        <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">{p ? dateFr(p.date_presence) : "—"}</td>
+                        <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">{p ? dateHeureFr(p.enregistre_le) : "—"}</td>
                         <td className="px-3 py-3">
                           {p ? (
                             <span className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${couleurStatut[p.statut]}`}>{p.statut}</span>
@@ -423,12 +423,12 @@ function Presence() {
           <Section titre="Formation & Session">
             <Ligne2 k="Formation" v={detail.session?.formation?.titre ?? "—"} />
             <Ligne2 k="Session" v={detail.session?.nom_session ?? "—"} />
-            <Ligne2 k="Début" v={detail.session ? dateFr(detail.session.date_debut) : "—"} />
-            <Ligne2 k="Fin" v={detail.session ? dateFr(detail.session.date_fin) : "—"} />
+            <Ligne2 k="Début" v={detail.session ? dateHeureFr(detail.session.date_debut) : "—"} />
+            <Ligne2 k="Fin" v={detail.session ? dateHeureFr(detail.session.date_fin) : "—"} />
           </Section>
 
           <Section titre="Détail de la présence">
-            <Ligne2 k="Date" v={detailPresence ? dateFr(detailPresence.date_presence) : "—"} />
+            <Ligne2 k="Date" v={detailPresence ? dateHeureFr(detailPresence.enregistre_le) : "—"} />
             <Ligne2 k="Méthode" v={detailPresence?.methode ?? "—"} />
             <div className="mt-2">
               <p className="text-xs font-semibold text-muted-foreground">Statut</p>

@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { SqueletteLignesTableau } from "@/components/app/Squelette";
-import { CarteStat, EnteteAdmin, MenuActions, RadioStatut, champClass, labelClass, selectClass } from "@/components/app/AdminKit";
-
+import { CarteStat, EnteteAdmin, MenuActions, champClass, labelClass, selectClass } from "@/components/app/AdminKit";
+import { Switch } from "@/components/ui/switch";
+import { AccesReserve } from "@/components/app/Acces";
 export const Route = createFileRoute("/_authenticated/responsables")({
   head: () => ({
     meta: [
@@ -21,7 +22,11 @@ export const Route = createFileRoute("/_authenticated/responsables")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: Page,
+    component: () => (
+      <AccesReserve roles={["ADMINISTRATEUR"]}>
+        <Page />
+      </AccesReserve>
+    ),
 });
 
 type Responsable = {
@@ -102,6 +107,8 @@ function Page() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+
 
   const supprimer = useMutation({
     mutationFn: async (id: number) => {
@@ -184,11 +191,14 @@ function Page() {
                     <td className="px-3 py-3 text-xs">{r.service ?? "—"}</td>
                     <td className="px-3 py-3 text-xs">{r.intitule_poste ?? "—"}</td>
                     <td className="px-3 py-3">
-                      <RadioStatut
-                        nom={`service-${r.responsable_id}`}
-                        valeur={r.statut_service}
-                        onChange={(v) => changerStatut.mutate({ id: r.responsable_id, statut: v as "Actif" | "Inactif" })}
-                      />
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={r.statut_service === "Actif"}
+                          disabled={changerStatut.isPending}
+                          onCheckedChange={(v) => changerStatut.mutate({ id: r.responsable_id, statut: v ? "Actif" : "Inactif" })}
+                        />
+                        <span className={`text-xs font-medium ${r.statut_service === "Actif" ? "text-[#137333]" : "text-muted-foreground"}`}>{r.statut_service}</span>
+                      </div>
                     </td>
                     <td className="px-3 py-3">
                       <MenuActions>

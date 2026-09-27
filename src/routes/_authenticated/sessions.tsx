@@ -12,7 +12,7 @@ import {
 import { SqueletteLignesTableau } from "@/components/app/Squelette";
 import {
   CarteStat, EnteteAdmin, Etiquette, LigneInfo, PanneauDetail, SectionPanneau,
-  champClass, dateFr, labelClass, selectClass,
+  champClass, dateHeureFr, labelClass, selectClass,
 } from "@/components/app/AdminKit";
 
 export const Route = createFileRoute("/_authenticated/sessions")({
@@ -207,7 +207,7 @@ function Page() {
                     <td className="px-3 py-3 font-semibold text-foreground">{s.nom_session}</td>
                     <td className="px-3 py-3 text-xs">{s.formation?.titre ?? "—"}</td>
                     <td className="px-3 py-3 text-xs">{s.formateur?.utilisateur ? `${s.formateur.utilisateur.prenoms} ${s.formateur.utilisateur.nom}` : "—"}</td>
-                    <td className="px-3 py-3 text-xs">{dateFr(s.date_debut)} → {dateFr(s.date_fin)}</td>
+                    <td className="px-3 py-3 text-xs">{dateHeureFr(s.date_debut)} -- {dateHeureFr(s.date_fin)}</td>
                     <td className="px-3 py-3 text-xs">{s.lieu ?? "—"}</td>
                     <td className="px-3 py-3 text-xs">{s.inscriptions?.length ?? 0}{s.capacite ? ` / ${s.capacite}` : ""}</td>
                     <td className="px-3 py-3"><Etiquette valeur={s.statut} /></td>
@@ -234,8 +234,8 @@ function Page() {
           <SectionPanneau titre="Informations">
             <LigneInfo libelle="Formation" valeur={detail.formation?.titre} />
             <LigneInfo libelle="Formateur" valeur={detail.formateur?.utilisateur ? `${detail.formateur.utilisateur.prenoms} ${detail.formateur.utilisateur.nom}` : "—"} />
-            <LigneInfo libelle="Début" valeur={dateFr(detail.date_debut)} />
-            <LigneInfo libelle="Fin" valeur={dateFr(detail.date_fin)} />
+            <LigneInfo libelle="Début" valeur={dateHeureFr(detail.date_debut)} />
+            <LigneInfo libelle="Fin" valeur={dateHeureFr(detail.date_fin)} />
             <LigneInfo libelle="Lieu" valeur={detail.lieu} />
             <LigneInfo libelle="Capacité" valeur={detail.capacite ?? "—"} />
             <LigneInfo libelle="Statut" valeur={<Etiquette valeur={detail.statut} />} />

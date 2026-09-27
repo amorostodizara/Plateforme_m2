@@ -16,6 +16,8 @@ import {
   User,
   X,
 } from "lucide-react";
+
+import {dateHeureFr} from "@/components/app/AdminKit";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -92,8 +94,6 @@ const couleurStatut: Record<string, string> = {
   Annulée: "bg-secondary text-muted-foreground",
 };
 
-const dateFr = (v: string) =>
-  new Date(v).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
 
 function Inscriptions() {
   const queryClient = useQueryClient();
@@ -321,7 +321,7 @@ function Inscriptions() {
                         {l.session?.nom_session ?? "—"}
                       </td>
                       <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
-                        {dateFr(l.date_inscription)}
+                        {dateHeureFr(l.date_inscription)}
                       </td>
                       <td className="px-3 py-3">
                         <span
@@ -405,7 +405,7 @@ function Inscriptions() {
             </p>
             <p className="text-sm text-muted-foreground">{detail.session?.nom_session}</p>
             <p className="text-sm text-muted-foreground">
-              {detail.session ? `${dateFr(detail.session.date_debut)} → ${dateFr(detail.session.date_fin)}` : "—"}
+              {detail.session ? `${dateHeureFr(detail.session.date_debut)} → ${dateHeureFr(detail.session.date_fin)}` : "—"}
             </p>
             <p className="text-sm text-muted-foreground">{detail.session?.lieu ?? "—"}</p>
           </section>

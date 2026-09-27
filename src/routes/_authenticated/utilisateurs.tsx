@@ -165,7 +165,7 @@ function Page() {
               {isLoading ? (
                 <SqueletteLignesTableau colonnes={7} />
               ) : affiches.length === 0 ? (
-                <tr><td colSpan={7} className="px-3 py-10 text-center text-sm text-muted-foreground">Aucun compte.</td></tr>
+                <tr><td colSpan={7} className="px-3 py-10 text-center text-sm text-muted-foreground">Aucun compte trouvé.</td></tr>
               ) : (
                 affiches.map((u) => (
                   <tr key={u.utilisateur_id} className="border-t border-border hover:bg-secondary/50">
@@ -176,7 +176,7 @@ function Page() {
                     <td className="px-3 py-3 text-xs">{u.telephone ?? "—"}</td>
                     <td className="px-3 py-3 text-xs">{u.adresse ?? "—"}</td>
                     <td className="px-3 py-3 text-xs">
-                      {u.email_verifie ? <span className="inline-flex items-center gap-1 text-[#137333]"><BadgeCheck className="h-4 w-4" /> Oui</span> : <span className="text-muted-foreground">Non</span>}
+                      {u.email_verifie ? <span className="inline-flex items-center gap-1 text-[#11700f]"><BadgeCheck className="h-4 w-4" /> Oui</span> : <span className="text-muted-foreground">Non</span>}
                     </td>
                     <td className="px-3 py-3">
                       <div className="flex flex-wrap gap-1">
