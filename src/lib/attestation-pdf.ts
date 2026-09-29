@@ -1,11 +1,13 @@
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
+import decorAttestation from "../assets/decor_attestation.png";
+import SignatureDir from "../assets/Signature_directrice.png";
 
-/** Données nécessaires à la génération d’une attestation. */
 export type DonneesAttestation = {
   numero: string;
   participant: string;
   formation: string;
+  description: string | null;
   session: string;
   dateDebut: string | null;
   dateFin: string | null;
@@ -73,17 +75,6 @@ function decors(pdf: jsPDF, L: number, H: number, accent: [number, number, numbe
   pdf.triangle(L, H, L - 20, H, L, H - 20, "F");
 }
 
-/** Dessine la médaille décorative en bas à droite. */
-function medaille(pdf: jsPDF, x: number, y: number, accent: [number, number, number]) {
-  pdf.setFillColor(255, 190, 60);
-  pdf.circle(x, y, 11, "F");
-  pdf.setFillColor(...accent);
-  pdf.circle(x, y, 6.5, "F");
-  pdf.setFillColor(244, 160, 200);
-  pdf.triangle(x - 7, y + 9, x - 2, y + 9, x - 5, y + 22, "F");
-  pdf.triangle(x + 7, y + 9, x + 2, y + 9, x + 5, y + 22, "F");
-}
-
 /** Construit l’attestation au format A4 paysage, police Helvetica, selon le modèle officiel. */
 export async function genererAttestationPdf(d: DonneesAttestation): Promise<jsPDF> {
   const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
@@ -140,13 +131,11 @@ export async function genererAttestationPdf(d: DonneesAttestation): Promise<jsPD
 
   // Corps du texte
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10.5);
+  pdf.setFontSize(11);
   pdf.setTextColor(40, 40, 40);
-  const corps = d.texte
-    .replace("{formation}", d.formation)
-    .replace("{participant}", d.participant);
+  const description = d.description ?? "les compétences et connaissances prévues par cette formation";
+  const corps = `Le présent certificat atteste que son titulaire a suivi avec succès la formation « ${d.formation} ». Au cours de cette formation, le participant a acquis ${description}.`;
   pdf.text(pdf.splitTextToSize(corps, L - 110), L / 2, 120, { align: "center" });
-
   pdf.text(
     "En foi de quoi, la présente attestation lui est délivrée pour servir et valoir ce que de droit.",
     L / 2,
@@ -177,7 +166,7 @@ export async function genererAttestationPdf(d: DonneesAttestation): Promise<jsPD
   pdf.text(organisme, x2, 151);
 
   // Date de délivrance
-  const faitLe = "Fait le : ";
+  const faitLe = "Délivré le : ";
   const valeurDate = dateFr(d.delivreeLe);
   const largeur3 = pdf.getTextWidth(faitLe) + pdf.getTextWidth(valeurDate);
   let x3 = L / 2 - largeur3 / 2;
@@ -202,36 +191,34 @@ export async function genererAttestationPdf(d: DonneesAttestation): Promise<jsPD
   // QR code de vérification
   try {
     const qr = await QRCode.toDataURL(d.lienVerification, { margin: 0, width: 300 });
-    pdf.addImage(qr, "PNG", L / 2 - 13, 169, 26, 26);
+    pdf.addImage(qr, "PNG", L / 2 - 13, 175, 25, 25);
   } catch {
     /* le QR reste facultatif */
   }
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(9);
   pdf.setTextColor(40, 40, 40);
-  pdf.text("Vérification :", L / 2, 199, { align: "center" });
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(8);
-  pdf.text(d.jeton ?? d.lienVerification, L / 2, 204, { align: "center" });
+  pdf.text("Scan to verify", L / 2, 205, { align: "center" });
 
   // Signature
+  pdf.addImage(SignatureDir, "PNG",52, 158, 30, 30);
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(11);
+  pdf.setFontSize(10);
   pdf.setTextColor(20, 20, 20);
   pdf.text(d.signataire.toUpperCase(), 62, 190, { align: "center" });
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(9);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
   pdf.setTextColor(...GRIS);
-  pdf.text(d.fonctionSignataire, 62, 196, { align: "center" });
+  pdf.text(d.fonctionSignataire, 62, 195, { align: "center" });
 
   // Médaille
-  medaille(pdf, L - 42, 176, accent);
-
+  // medaille(pdf, L - 42, 176, accent);
+  pdf.addImage(decorAttestation, "PNG",L - 82, 175, 25, 25);
   // Pied de page discret
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(7);
   pdf.setTextColor(150, 150, 150);
-  pdf.text(d.piedDePage, L - 16, 120, { align: "center", angle: 90 });
+  pdf.text(d.piedDePage, L - 5, 120, { align: "center", angle: 90 });
 
   return pdf;
 }

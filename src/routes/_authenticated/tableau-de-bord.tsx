@@ -28,7 +28,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { COULEURS } from "@/lib/images-formation";
 import { SqueletteCartes, SqueletteGraphiques } from "@/components/app/Squelette";
-
+import { AccesReserve } from "@/components/app/Acces";
 export const Route = createFileRoute("/_authenticated/tableau-de-bord")({
   head: () => ({
     meta: [
@@ -47,7 +47,11 @@ export const Route = createFileRoute("/_authenticated/tableau-de-bord")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Dashboard,
+  component: () => (
+       <AccesReserve roles={["ADMINISTRATEUR", "RESPONSABLE"]}>
+         <Dashboard />
+       </AccesReserve>
+     ),
 });
 
 const MOIS = [

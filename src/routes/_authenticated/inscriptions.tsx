@@ -80,7 +80,12 @@ type Ligne = {
       telephone: string | null;
       adresse: string | null;
     } | null;
-    profil_professionnel: { statut_actuel: string | null; institution: string | null }[] | null;
+    profil_professionnel: { 
+      statut_actuel: string | null;
+      institution: string | null ;
+      mention : string | null;
+      specialisation: string | null;
+      niveau_education: string | null } | null;
   } | null;
 };
 
@@ -110,7 +115,7 @@ function Inscriptions() {
       const { data, error } = await supabase
         .from("inscription")
         .select(
-          "inscription_id, statut, date_inscription, motivation, engagement, session:session_formation(session_id, nom_session, date_debut, date_fin, lieu, formation:formation(titre)), participant:participant(participant_id, utilisateur:utilisateur(nom, prenoms, email, telephone, adresse), profil_professionnel:profil_professionnel(statut_actuel, institution))",
+          "inscription_id, statut, date_inscription, motivation, engagement, session:session_formation(session_id, nom_session, date_debut, date_fin, lieu, formation:formation(titre)), participant:participant(participant_id, utilisateur:utilisateur(nom, prenoms, email, telephone, adresse), profil_professionnel:profil_professionnel(statut_actuel, institution, mention, specialisation ))",
         )
         .order("date_inscription", { ascending: false });
       if (error) throw error;
@@ -382,19 +387,31 @@ function Inscriptions() {
           <section className="mt-5 space-y-2">
             <p className="text-xs font-bold tracking-wide text-muted-foreground">PARTICIPANT</p>
             <p className="text-sm font-semibold text-foreground">
-              {detail.participant?.utilisateur?.prenoms} {detail.participant?.utilisateur?.nom}
+             {detail.participant?.utilisateur?.prenoms ?? ""} {detail.participant?.utilisateur?.nom ?? ""}
             </p>
             <p className="text-sm text-muted-foreground">
-              {detail.participant?.utilisateur?.telephone ?? "—"}
+             Contact : {detail.participant?.utilisateur?.telephone ?? "—"}
             </p>
             <p className="text-sm text-muted-foreground">
-              {detail.participant?.utilisateur?.email}
+             Email : {detail.participant?.utilisateur?.email ?? "—"}
             </p>
             <p className="text-sm text-muted-foreground">
-              {detail.participant?.profil_professionnel?.[0]?.statut_actuel ?? "Profil non précisé"}
-              {detail.participant?.profil_professionnel?.[0]?.institution
-                ? ` — ${detail.participant.profil_professionnel[0]?.institution}`
-                : ""}
+             Adresse : {detail.participant?.utilisateur?.adresse ?? ""}
+            </p>
+            <p className="text-sm text-muted-foreground">
+             Statut actuelle : {detail.participant?.profil_professionnel?.statut_actuel ?? "—"}
+            </p>
+            <p className="text-sm text-muted-foreground">
+             Etablissement : {detail.participant?.profil_professionnel?.institution ?? "—"}
+            </p>
+            <p className="text-sm text-muted-foreground">
+             Filière : {detail.participant?.profil_professionnel?.mention ?? "—"}
+            </p>
+            <p className="text-sm text-muted-foreground">
+             Parcours : {detail.participant?.profil_professionnel?.specialisation ?? "—"}
+            </p>
+            <p className="text-sm text-muted-foreground">
+             Niveau : {detail.participant?.profil_professionnel?.niveau_education ?? "—"}
             </p>
           </section>
 

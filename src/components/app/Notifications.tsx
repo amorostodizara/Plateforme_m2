@@ -94,8 +94,8 @@ export function Notifications() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
-          <Bell />
+        <Button variant="ghost" size="icon" className="relative text-muted-foreground" aria-label="Notifications">
+          <Bell className="!h-6 !w-6 " />
           {nonLues > 0 ? (
             <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">
               {nonLues > 99 ? "99+" : nonLues}

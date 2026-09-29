@@ -5,7 +5,7 @@ export const Route = createFileRoute("/")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    throw redirect({ to: data.user ? "/tableau-de-bord" : "/auth" });
+    throw redirect({ to: data.user ? "/catalogue" : "/auth" });
   },
   component: () => null,
 });

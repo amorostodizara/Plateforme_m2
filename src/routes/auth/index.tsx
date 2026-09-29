@@ -96,7 +96,7 @@ function Connexion() {
       return;
     }
 
-    navigate({ to: "/tableau-de-bord" });
+    navigate({ to: "/catalogue" });
   }
 
   async function connexionGoogle() {

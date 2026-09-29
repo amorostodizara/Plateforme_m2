@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Award, BookOpen, Bot, CalendarCheck, CalendarDays, ChevronDown, ChevronRight,
   ClipboardCheck, ClipboardList, FolderOpen, GraduationCap, LayoutDashboard, LogOut,
-  Menu, MessageSquareMore, PanelLeftClose, PanelLeftOpen, Settings, UserCog, UserPen,
+  Menu, Newspaper , PanelLeftClose, PanelLeftOpen, Settings, UserCog, UserPen,
   UserRound, Users, UsersRound, Wallet, X,
 } from "lucide-react";
 import logo_odc from "@/assets/logo-odc.png";
@@ -155,7 +155,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     ...(sousEvaluations.length ? [{ libelle: "Évaluations", icone: CalendarCheck, enfants: sousEvaluations } as Lien] : []),
     ...(autorise("attestation.lire") ? [{ to: "/attestations", libelle: "Mes attestations", icone: Award } as Lien] : []),
     ...(autorise("support.lire") ? [{ to: "/supports", libelle: "Supports", icone: FolderOpen } as Lien] : []),
-    ...(autorise("publication.lire") ? [{ to: "/actualites", libelle: "Fil d’actualité", icone: MessageSquareMore } as Lien] : []),
+    ...(autorise("publication.lire") ? [{ to: "/actualites", libelle: "Fil d’actualité", icone: Newspaper  } as Lien] : []),
     ...(autorise("ia.lire") ? [{ to: "/assistant-ia", libelle: "Assistant IA", icone: Bot } as Lien] : []),
   ];
 
@@ -247,8 +247,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   function rendreNavigation(compact: boolean) {
     return (
       <>
-        <div className={`flex h-16 shrink-0 items-center border-b border-border ${compact ? "justify-center px-2" : "px-4"}`}>
-          <img src={logo_odc} alt="Orange Digital Center" className={compact ? "h-8 w-auto" : "h-10 w-auto"} />
+        <div className={`flex h-16 shrink-0 items-center  ${compact ? "justify-center px-2" : "px-4"}`}>
+          <Link to="/catalogue"><img src={logo_odc} alt="Orange Digital Center" className={compact ? "h-8 w-auto" : "h-10 w-auto"} /></Link>
           <Button variant="ghost" size="icon" className="ml-auto md:hidden" onClick={() => setMobileOuvert(false)} aria-label="Fermer le menu">
             <X />
           </Button>
@@ -260,7 +260,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <div className="my-3 border-t border-border" />
               {compact ? null : (
                 <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                  {estGestionnaire ? "Administration" : "Espace formateur"}
+                  {estGestionnaire ? "Administration" : "Espace Reservé"}
                 </p>
               )}
               {rendreLiens(liensAdmin, compact)}
@@ -287,25 +287,27 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-secondary">
-      <aside className={`fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-border bg-card transition-all md:flex ${reduit ? "w-16" : "w-60"}`}>{rendreNavigation(reduit)}</aside>
+      <aside className={`fixed inset-y-0 left-0 z-30 hidden flex-col  bg-card transition-all md:flex ${reduit ? "w-16" : "w-60"}`}>{rendreNavigation(reduit)}</aside>
       {mobileOuvert ? <div className="fixed inset-0 z-50 md:hidden"><div className="absolute inset-0 bg-foreground/30" onClick={() => setMobileOuvert(false)} /><aside className="absolute inset-y-0 left-0 flex w-72 flex-col bg-card shadow-xl">{rendreNavigation(false)}</aside></div> : null}
 
       <div className={`flex min-w-0 flex-1 flex-col transition-all ${reduit ? "md:pl-16" : "md:pl-60"}`}>
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-card px-4 md:px-6">
+        <header className="sticky top-0 z-20 flex h-14 items-center justify-between  bg-card px-4 md:px-6">
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOuvert(true)} aria-label="Ouvrir le menu"><Menu /></Button>
-          <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => setReduit((v) => !v)} aria-label={reduit ? "Afficher le menu" : "Réduire le menu"}>
-            {reduit ? <PanelLeftOpen /> : <PanelLeftClose />}
+          <Button variant="ghost" size="icon" className="hidden md:inline-flex text-muted-foreground" onClick={() => setReduit((v) => !v)} aria-label={reduit ? "Afficher le menu" : "Réduire le menu"}>
+            {reduit ? <PanelLeftOpen className="!h-6 !w-6 "/> : <PanelLeftClose className="!h-6 !w-6 "/>}
           </Button>
-          <div className="ml-auto flex items-center gap-1">
-            <Button asChild variant="ghost" size="icon">
-              <Link to="/assistant-ia" aria-label="Ouvrir l’Assistant IA"><MessageSquareMore /></Link>
+          <div className="ml-auto flex items-center gap-2">
+            <Button asChild variant="ghost" size="icon" className="text-muted-foreground" >
+              <Link to="/assistant-ia" aria-label="Ouvrir l’Assistant IA" ><Bot className="!h-6 !w-6 " /></Link>
             </Button>
             <Notifications />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{initiales}</span>
-                </Button>
+                <Button variant="ghost" size="icon"  className="h-8 w-8 rounded-full p-0 hover:bg-transparent" >
+                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary via-accent to-primary p-[3px]">
+                   <span className="flex h-full w-full items-center justify-center rounded-full bg-primary text-sm  text-white">  {initiales} </span>
+                   </span>
+                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">{menuProfil}</DropdownMenuContent>
             </DropdownMenu>
@@ -317,64 +319,3 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
-
-        // {/* Actions header */}
-        // <div className="ml-auto flex items-center gap-4">
-        //   {/* Assistant IA */}
-        //   <Button
-        //     asChild
-        //     variant="ghost"
-        //     size="icon"
-        //     className="h-10 w-10 rounded-full p-0 hover:bg-transparent"
-        //   >
-        //     <Link
-        //       to="/assistant-ia"
-        //       aria-label="Ouvrir l’Assistant IA"
-        //       className="flex h-10 w-10 items-center justify-center"
-        //     >
-        //       <Bot className="h-9 w-9 stroke-[2.5] text-black" />
-        //     </Link>
-        //   </Button>
-
-        //   {/* Notifications */}
-        //   <div className="relative flex h-10 w-10 items-center justify-center">
-        //     <Notifications />
-        //   </div>
-
-        //   {/* Profil */}
-        //   <DropdownMenu>
-        //     <DropdownMenuTrigger asChild>
-        //       <Button
-        //         variant="ghost"
-        //         size="icon"
-        //         className="h-11 w-11 rounded-full p-0 hover:bg-transparent"
-        //       >
-        //         <span
-        //           className="
-        //             flex h-11 w-11 items-center justify-center
-        //             rounded-full
-        //             bg-gradient-to-br from-[#FF7900] via-[#FFB066] to-[#FF7900]
-        //             p-[5px]
-        //           "
-        //         >
-        //           <span
-        //             className="
-        //               flex h-full w-full items-center justify-center
-        //               rounded-full
-        //               bg-[#FF7900]
-        //               text-base font-semibold
-        //               text-white
-        //             "
-        //           >
-        //             {initiales}
-        //           </span>
-        //         </span>
-        //       </Button>
-        //     </DropdownMenuTrigger>
-
-        //     <DropdownMenuContent align="end" className="w-56">
-        //       {menuProfil}
-        //     </DropdownMenuContent>
-        //   </DropdownMenu>
-        // </div>

@@ -1,13 +1,14 @@
-import { useState } from "react";
+// import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Award, BadgeCheck, CalendarDays, Download, GraduationCap, ShieldCheck, X } from "lucide-react";
-import logo from "@/assets/odc-logo.png.asset.json";
-import { supabase } from "@/integrations/supabase/client";
+ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SqueletteGrilleCartes } from "@/components/app/Squelette";
-import { telechargerAttestationPdf } from "@/lib/attestation-pdf";
-
+import { dateFr } from "@/components/app/AdminKit";
+import { genererAttestationPdf, telechargerAttestationPdf } from "@/lib/attestation-pdf";
+import type { DonneesAttestation } from "@/lib/attestation-pdf";
 export const Route = createFileRoute("/_authenticated/attestations")({
   head: () => ({
     meta: [
@@ -36,7 +37,7 @@ type Attestation = {
       nom_session: string;
       date_debut: string;
       date_fin: string;
-      formation: { titre: string; duree_jours: number } | null;
+      formation: { titre: string; duree_jours: number, description: string } | null;
     } | null;
   } | null;
 };
@@ -57,8 +58,6 @@ type Modele = {
   couleur_principale: string;
 };
 
-const dateFr = (v: string) => new Date(v).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
-
 const couleur: Record<string, string> = {
   Valide: "bg-[#E6F4EA] text-[#137333]",
   Invalide: "bg-secondary text-muted-foreground",
@@ -68,6 +67,7 @@ const couleur: Record<string, string> = {
 function Attestations() {
   const [apercu, setApercu] = useState<Attestation | null>(null);
   const [verification, setVerification] = useState<Attestation | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const { data: attestations = [], isLoading } = useQuery({
     queryKey: ["mes-attestations"],
@@ -75,7 +75,7 @@ function Attestations() {
       const { data, error } = await supabase
         .from("attestation")
         .select(
-          "attestation_id, inscription_id, numero_attestation, jeton_verification, delivree_le, statut, url_fichier, inscription:inscription(participant:participant(utilisateur:utilisateur(nom, prenoms)), session:session_formation(nom_session, date_debut, date_fin, formation:formation(titre, duree_jours)))",
+          "attestation_id, inscription_id, numero_attestation, jeton_verification, delivree_le, statut, url_fichier, inscription:inscription(participant:participant(utilisateur:utilisateur(nom, prenoms)), session:session_formation(nom_session, date_debut, date_fin, formation:formation(titre, duree_jours, description)))",
         )
         .order("delivree_le", { ascending: false });
       if (error) throw error;
@@ -109,17 +109,11 @@ function Attestations() {
     },
   });
 
-  const resultatDe = (inscriptionId: number) => resultats.find((r) => r.inscription_id === inscriptionId) ?? null;
-  const estTelechargeable = (a: Attestation) => a.statut === "Valide" && resultatDe(a.inscription_id) !== null;
+function construireDonneesAttestation(a: Attestation): DonneesAttestation {
+  const r = resultatDe(a.inscription_id);
+  const u = a.inscription?.participant?.utilisateur;
 
-  async function telecharger(a: Attestation) {
-    if (!estTelechargeable(a)) {
-      toast.error("L’attestation sera téléchargeable après la réussite de l’évaluation et sa validation.");
-      return;
-    }
-    const r = resultatDe(a.inscription_id);
-    const u = a.inscription?.participant?.utilisateur;
-    await telechargerAttestationPdf({
+  return {
       numero: a.numero_attestation ?? `ATT-${a.attestation_id}`,
       participant: `${u?.prenoms ?? ""} ${u?.nom ?? ""}`.trim() || "Participant",
       formation: a.inscription?.session?.formation?.titre ?? "Formation",
@@ -132,16 +126,53 @@ function Attestations() {
       scoreRequis: r?.evaluation?.score_reussite ?? null,
       jeton: a.jeton_verification,
       titre: modele?.titre_attestation ?? "Attestation de formation",
-      texte:
-        modele?.texte_attestation ??
-        "Il est certifié que le participant dont le nom figure ci-dessous a suivi et réussi la formation suivante :",
-      signataire: modele?.nom_signataire ?? "Le responsable",
-      fonctionSignataire: modele?.fonction_signataire ?? "Orange Digital Center",
+      texte: modele?.texte_attestation ?? "Le présent certificat atteste que son titulaire a suivi avec succès cette formation chez Orange DIgital Center Madagascar.",
+      signataire: modele?.nom_signataire ?? "ANDRIANALISON HOMENTSOA Lalaina",
+      fonctionSignataire: modele?.fonction_signataire ?? "Directrice Orange Digital Center",
       piedDePage: modele?.pied_de_page ?? "Document officiel délivré par Orange Digital Center.",
       couleur: modele?.couleur_principale ?? "#FF7900",
       lienVerification: `${window.location.origin}/attestations?verification=${a.jeton_verification ?? ""}`,
-    });
-    toast.success("Attestation téléchargée au format PDF.");
+      description: a.inscription?.session?.formation?.description ?? null,
+  };
+}
+
+useEffect(() => {
+  if (!apercu) {
+    setPdfUrl(null);
+    return;
+  }
+  let currentUrl: string | null = null;
+  let cancelled = false;
+  const genererApercuPdf = async () => {
+   const donnees = construireDonneesAttestation(apercu);
+  const pdf = await genererAttestationPdf(donnees);
+   if (cancelled) return;
+    const blob = pdf.output("blob");
+    currentUrl = URL.createObjectURL(blob);
+    setPdfUrl(currentUrl);
+  };
+  void genererApercuPdf();
+  return () => {
+    cancelled = true;
+
+    if (currentUrl) {
+      URL.revokeObjectURL(currentUrl);
+    }
+  };
+}, [apercu, modele, resultats]);
+
+
+  const resultatDe = (inscriptionId: number) => resultats.find((r) => r.inscription_id === inscriptionId) ?? null;
+  const estTelechargeable = (a: Attestation) => a.statut === "Valide" && resultatDe(a.inscription_id) !== null;
+
+  async function telecharger(a: Attestation) {
+    if (!estTelechargeable(a)) {
+      toast.error("L’attestation sera téléchargeable après la réussite de l’évaluation et sa validation.");
+      return;
+    }
+  const donnees = construireDonneesAttestation(a);
+  await telechargerAttestationPdf(donnees);
+  toast.success("Attestation téléchargée au format PDF.");
   }
 
   return (
@@ -193,49 +224,23 @@ function Attestations() {
               <h2 className="text-base font-bold text-foreground">Aperçu de l’attestation</h2>
               <button onClick={() => setApercu(null)} className="rounded-md p-1 hover:bg-secondary" aria-label="Fermer"><X className="h-5 w-5" /></button>
             </div>
-
-            <div className="mt-4 border-4 border-primary p-8 text-center">
-              <img src={logo.url} alt="Orange Digital Center" className="mx-auto h-12 w-auto" />
-              <p className="mt-4 text-xl font-bold text-primary">
-                {modele?.titre_attestation ?? "Attestation de formation"}
-              </p>
-              <p className="mt-4 text-sm text-muted-foreground">
-                {modele?.texte_attestation ?? "Il est certifié que le participant ci-dessous a suivi et réussi la formation suivante :"}
-              </p>
-              <p className="mt-3 text-lg font-bold text-foreground">
-                {apercu.inscription?.participant?.utilisateur?.prenoms} {apercu.inscription?.participant?.utilisateur?.nom}
-              </p>
-              <p className="mt-2 text-sm font-semibold text-foreground">{apercu.inscription?.session?.formation?.titre}</p>
-              <p className="text-sm text-muted-foreground">{apercu.inscription?.session?.nom_session}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                 Du {apercu.inscription?.session ? dateFr(apercu.inscription.session.date_debut) : "—"} au {apercu.inscription?.session ? dateFr(apercu.inscription.session.date_fin) : "—"}
-                {apercu.inscription?.session?.formation?.duree_jours ? ` — ${apercu.inscription.session.formation.duree_jours} jour(s)` : ""}
-              </p>
-
-              <div className="mt-6 flex items-end justify-between text-left text-xs text-muted-foreground">
-                <div>
-                  <p>N° {apercu.numero_attestation ?? "—"}</p>
-                  <p>Délivrée le {dateFr(apercu.delivree_le)}</p>
-                  <p className="mt-2 flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5" />Code de vérification : {apercu.jeton_verification?.slice(0, 12) ?? "—"}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-foreground">{modele?.nom_signataire ?? "Le responsable"}</p>
-                  <p>{modele?.fonction_signataire ?? "Orange Digital Center"}</p>
-                  <p className="mt-2 flex items-center justify-end gap-1"><BadgeCheck className="h-3.5 w-3.5" />Signature</p>
-                </div>
-              </div>
-              {modele?.pied_de_page ? <p className="mt-6 text-[10px] text-muted-foreground">{modele.pied_de_page}</p> : null}
-            </div>
-
+               <div className="mt-4 flex justify-center rounded-lg bg-muted/30 p-4">
+               {pdfUrl ? (
+               <iframe src={pdfUrl} title="Aperçu de l’attestation" className="aspect-[297/210] w-full max-w-5xl rounded-md bg-white" />
+              ) : (
+               <div className="flex aspect-[297/210] w-full max-w-5xl items-center justify-center rounded-md border bg-white">
+                 <p className="text-sm text-muted-foreground"> Génération de l’aperçu... </p>
+               </div>
+             )}
+           </div>
             <div className="mt-4 flex justify-end gap-2">
               <button onClick={() => telecharger(apercu)} disabled={!estTelechargeable(apercu)} className="flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50">
-                <Download className="h-4 w-4" />Télécharger le PDF (paysage)
+                <Download className="h-4 w-4" />Télécharger le PDF
               </button>
             </div>
           </div>
         </div>
       ) : null}
-
       {verification ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4">
           <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-card">

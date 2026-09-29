@@ -204,7 +204,7 @@ function MesEvaluations() {
           <div className="flex min-h-72 flex-col items-center justify-center rounded-lg border border-dashed border-input bg-card px-6 text-center">
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-cream text-primary"><FileClock className="h-7 w-7" /></span>
             <h2 className="mt-4 text-base font-bold text-foreground">En attente d’une évaluation</h2>
-            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">Les évaluations apparaîtront ici dès qu’un responsable les aura publiées pour votre session.</p>
+            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">Les évaluations apparaîtront ici dès qu’un responsable les aura publiées ou fermés pour votre session.</p>
           </div>
         ) : !peutGerer ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

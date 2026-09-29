@@ -30,7 +30,7 @@ function AuthCallback() {
         } = await supabase.auth.getSession();
 
         if (session) {
-          navigate({ to: "/tableau-de-bord" });
+          navigate({ to: "/catalogue" });
         } else {
           navigate({ to: "/" });
         }

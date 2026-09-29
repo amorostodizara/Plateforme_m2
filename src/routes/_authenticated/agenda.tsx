@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/agenda")({
       { property: "og:title", content: "Agenda des activités" },
       {
         property: "og:description",
-        content: "Vues jour, semaine, mois et ordre du jour des activités de formation.",
+        content: "Vues jour, semaine, mois et ordre de planification des activités de formation.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -61,7 +61,7 @@ type Evenement = {
 
 const TYPES: TypeEvenement[] = ["Réunion", "Atelier", "Conférence", "Cérémonie", "Autre"];
 const STATUTS: StatutEvenement[] = ["Brouillon", "Planifié", "En cours", "Terminé", "Annulé"];
-const VUES = ["Jour", "Semaine", "Mois", "Ordre du jour"] as const;
+const VUES = ["Jour", "Semaine", "Mois", "Ordre de planification"] as const;
 
 const couleurType: Record<string, string> = {
   Réunion: "#FF7900",
@@ -243,7 +243,6 @@ function Agenda() {
                 if (d) setCurseur(d);
                 setCalendrierOuvert(false);
               }}
-              initialFocus
               className="pointer-events-auto p-3"
             />
           </PopoverContent>
@@ -301,7 +300,7 @@ function Agenda() {
         </Button>
       </div>
 
-      {vue === "Ordre du jour" ? (
+      {vue === "Ordre de planification" ? (
         <div className="space-y-2 rounded-lg border border-border bg-card p-4">
           {visibles.map((e) => (
             <button

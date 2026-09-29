@@ -33,7 +33,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SqueletteGrilleCartes } from "@/components/app/Squelette";
-
+import {dateHeureFr } from "@/components/app/AdminKit";
 export const Route = createFileRoute("/_authenticated/catalogue")({
   head: () => ({
     meta: [
@@ -90,12 +90,11 @@ type SessionCarte = Session & {
 const ENGAGEMENTS = [
   "Être présent(e) et assidu(e) durant toute la durée de la formation.",
   "Autoriser Orange Digital Center et Orange Madagascar à utiliser les photos prises pendant la formation à des fins de communication.",
-  "Garantir l’exactitude des informations fournies dans ce formulaire.",
+  "Garantir l’exactitude des informations fournies dans cette plateforme.",
   "Je reconnais avoir pris connaissance de ces engagements et les accepter.",
 ];
 
-const dateFr = (v: string) =>
-  new Date(v).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+
 
 const iconesCategorie: Record<string, LucideIcon> = {
   Développement: Code2,
@@ -160,9 +159,9 @@ function Catalogue() {
     },
   });
 
-  const formationsInscrites = new Set(
-    mesInscriptions.map((i) => i.session?.formation_id).filter(Boolean) as number[],
-  );
+  // const formationsInscrites = new Set(
+  //   mesInscriptions.map((i) => i.session?.formation_id).filter(Boolean) as number[],
+  // );
 
   const inscrire = useMutation({
     mutationFn: async ({ sessionId, texte }: { sessionId: number; texte: string }) => {
@@ -274,8 +273,8 @@ function Catalogue() {
           className="absolute bottom-0 right-[18%] hidden h-[125%] w-auto object-contain lg:block"
         />
         <blockquote className="absolute right-7 top-1/2 z-10 hidden w-48 -translate-y-1/2 text-sm xl:block">
-          <p className="font-semibold text-primary">“ Apprendre aujourd’hui, construire demain. ”</p>
-          <footer className="mt-2 text-xs text-muted-foreground">Orange Digital Center</footer>
+          <p className="font-semibold text-primary">“ Vers un numérique responsable. ”</p>
+          <footer className="mt-2 text-xs text-muted-foreground">Orange Digital Center Madagascar</footer>
         </blockquote>
       </section>
 
@@ -369,7 +368,7 @@ function Catalogue() {
                       <h3 className="text-sm font-bold text-foreground">{s.nom_session}</h3>
                       <p className="text-xs font-medium text-muted-foreground">{s.formation}</p>
                       <div className="space-y-1 border-y border-border py-2 text-xs text-muted-foreground">
-                        <p className="flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5 text-primary" />{dateFr(s.date_debut)} → {dateFr(s.date_fin)}</p>
+                        <p className="flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5 text-primary" />{dateHeureFr(s.date_debut)} — {dateHeureFr(s.date_fin)}</p>
                         <p className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-primary" />{s.lieu ?? "Lieu à préciser"}</p>
                         <p className="flex items-center gap-1">
                           <Users className="h-3.5 w-3.5 text-primary" />
@@ -440,7 +439,7 @@ function Catalogue() {
             </ul>
             <div className="mt-5 flex gap-3 rounded-md bg-cream p-3 text-xs leading-5 text-muted-foreground">
               <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-              <p>Certaines formations peuvent être publiées dans l’agenda même si elles ne sont pas encore dans le catalogue.</p>
+              <p>Restez connecté pour voir les formations disponibles. Visitez souvent la plateforme pour ne pas manquer les formations gratuites.</p>
             </div>
           </div>
         </aside>
@@ -457,7 +456,7 @@ function Catalogue() {
             <div className="grid gap-1 rounded-md border border-border bg-cream/60 p-3 text-xs text-muted-foreground">
               <p className="flex items-center gap-1">
                 <CalendarDays className="h-3.5 w-3.5 text-primary" />
-                {ouverte ? `${dateFr(ouverte.date_debut)} → ${dateFr(ouverte.date_fin)}` : ""}
+                {ouverte ? `${dateHeureFr(ouverte.date_debut)} — ${dateHeureFr(ouverte.date_fin)}` : ""}
               </p>
               <p className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5 text-primary" />

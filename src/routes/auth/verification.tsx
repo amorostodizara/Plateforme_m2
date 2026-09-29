@@ -36,7 +36,7 @@ function Verification() {
 
   useEffect(() => {
     if (!succes) return;
-    const t = setTimeout(() => navigate({ to: "/tableau-de-bord" }), 2000);
+    const t = setTimeout(() => navigate({ to: "/catalogue" }), 2000);
     return () => clearTimeout(t);
   }, [succes, navigate]);
 

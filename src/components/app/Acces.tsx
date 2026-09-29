@@ -32,7 +32,7 @@ export function AccesReserve({
           Vous n’avez pas les droits nécessaires pour consulter cette page. Contactez un administrateur si vous pensez
           qu’il s’agit d’une erreur.
         </p>
-        <Button asChild className="mt-5"><Link to="/tableau-de-bord">Retour au tableau de bord</Link></Button>
+        <Button asChild className="mt-5"><Link to="/catalogue">Retour au catalogue</Link></Button>
       </div>
     );
   }

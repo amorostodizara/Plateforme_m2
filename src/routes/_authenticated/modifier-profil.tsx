@@ -292,7 +292,7 @@ function Page() {
                 {["BEPC", "BAC", "L1", "L2", "L3", "M1", "M2", "Doctorat", "Autre"].map((n) => <option key={n}>{n}</option>)}
               </select>
             </div>
-            <div><label className={labelClass}>Établissement / employeur</label><input className={champClass} value={form.institution} onChange={(e) => setForm({ ...form, institution: e.target.value })} /></div>
+            <div><label className={labelClass}>Établissement / Institution</label><input className={champClass} value={form.institution} onChange={(e) => setForm({ ...form, institution: e.target.value })} /></div>
             <div><label className={labelClass}>Spécialisation</label><input className={champClass} value={form.specialisation} onChange={(e) => setForm({ ...form, specialisation: e.target.value })} /></div>
             <div><label className={labelClass}>Mention</label><input className={champClass} value={form.mention} onChange={(e) => setForm({ ...form, mention: e.target.value })} /></div>
           </div>
