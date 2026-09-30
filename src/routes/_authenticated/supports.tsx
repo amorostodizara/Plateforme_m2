@@ -285,7 +285,7 @@ function Page() {
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>Fichier (50 Mo maximum)</label>
+                  <label className={labelClass}>Fichier (10 Mo maximum)</label>
                   <input
                     ref={champFichier}
                     type="file"

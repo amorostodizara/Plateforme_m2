@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS public.paiement_formateur (
   session_id BIGINT REFERENCES public.session_formation(session_id) ON DELETE SET NULL,
   montant NUMERIC(12,2) NOT NULL DEFAULT 0,
   methode public.methode_paiement_enum NOT NULL DEFAULT 'Virement',
+  ref VARCHAR(100),
   date_paiement DATE NOT NULL DEFAULT CURRENT_DATE,
   statut public.statut_paiement_enum NOT NULL DEFAULT 'En attente',
   remarque TEXT,

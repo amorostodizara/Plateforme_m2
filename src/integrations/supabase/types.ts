@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: '14.5'
   }
   public: {
     Tables: {
@@ -19,30 +19,30 @@ export type Database = {
           admin_id: number
           intitule_poste: string | null
           service: string | null
-          statut_service: Database["public"]["Enums"]["statut_actif_enum"]
+          statut_service: Database['public']['Enums']['statut_actif_enum']
           utilisateur_id: number
         }
         Insert: {
           admin_id?: never
           intitule_poste?: string | null
           service?: string | null
-          statut_service?: Database["public"]["Enums"]["statut_actif_enum"]
+          statut_service?: Database['public']['Enums']['statut_actif_enum']
           utilisateur_id: number
         }
         Update: {
           admin_id?: never
           intitule_poste?: string | null
           service?: string | null
-          statut_service?: Database["public"]["Enums"]["statut_actif_enum"]
+          statut_service?: Database['public']['Enums']['statut_actif_enum']
           utilisateur_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "administrateur_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'administrateur_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: true
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -53,7 +53,7 @@ export type Database = {
           inscription_id: number
           jeton_verification: string | null
           numero_attestation: string | null
-          statut: Database["public"]["Enums"]["statut_attestation_enum"]
+          statut: Database['public']['Enums']['statut_attestation_enum']
           url_fichier: string | null
         }
         Insert: {
@@ -62,7 +62,7 @@ export type Database = {
           inscription_id: number
           jeton_verification?: string | null
           numero_attestation?: string | null
-          statut?: Database["public"]["Enums"]["statut_attestation_enum"]
+          statut?: Database['public']['Enums']['statut_attestation_enum']
           url_fichier?: string | null
         }
         Update: {
@@ -71,16 +71,16 @@ export type Database = {
           inscription_id?: number
           jeton_verification?: string | null
           numero_attestation?: string | null
-          statut?: Database["public"]["Enums"]["statut_attestation_enum"]
+          statut?: Database['public']['Enums']['statut_attestation_enum']
           url_fichier?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "attestation_inscription_id_fkey"
-            columns: ["inscription_id"]
+            foreignKeyName: 'attestation_inscription_id_fkey'
+            columns: ['inscription_id']
             isOneToOne: false
-            referencedRelation: "inscription"
-            referencedColumns: ["inscription_id"]
+            referencedRelation: 'inscription'
+            referencedColumns: ['inscription_id']
           },
         ]
       }
@@ -111,7 +111,7 @@ export type Database = {
           contenu: string
           cree_le: string
           publication_id: number
-          statut: Database["public"]["Enums"]["statut_commentaire_enum"]
+          statut: Database['public']['Enums']['statut_commentaire_enum']
           utilisateur_id: number
         }
         Insert: {
@@ -119,7 +119,7 @@ export type Database = {
           contenu: string
           cree_le?: string
           publication_id: number
-          statut?: Database["public"]["Enums"]["statut_commentaire_enum"]
+          statut?: Database['public']['Enums']['statut_commentaire_enum']
           utilisateur_id: number
         }
         Update: {
@@ -127,23 +127,23 @@ export type Database = {
           contenu?: string
           cree_le?: string
           publication_id?: number
-          statut?: Database["public"]["Enums"]["statut_commentaire_enum"]
+          statut?: Database['public']['Enums']['statut_commentaire_enum']
           utilisateur_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "commentaire_publication_publication_id_fkey"
-            columns: ["publication_id"]
+            foreignKeyName: 'commentaire_publication_publication_id_fkey'
+            columns: ['publication_id']
             isOneToOne: false
-            referencedRelation: "publication"
-            referencedColumns: ["publication_id"]
+            referencedRelation: 'publication'
+            referencedColumns: ['publication_id']
           },
           {
-            foreignKeyName: "commentaire_publication_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'commentaire_publication_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -171,11 +171,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "conversation_ia_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'conversation_ia_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -190,7 +190,7 @@ export type Database = {
           max_tentatives: number
           score_reussite: number
           session_id: number
-          statut: Database["public"]["Enums"]["statut_evaluation_enum"]
+          statut: Database['public']['Enums']['statut_evaluation_enum']
           titre_evaluation: string
         }
         Insert: {
@@ -203,7 +203,7 @@ export type Database = {
           max_tentatives?: number
           score_reussite?: number
           session_id: number
-          statut?: Database["public"]["Enums"]["statut_evaluation_enum"]
+          statut?: Database['public']['Enums']['statut_evaluation_enum']
           titre_evaluation: string
         }
         Update: {
@@ -216,23 +216,23 @@ export type Database = {
           max_tentatives?: number
           score_reussite?: number
           session_id?: number
-          statut?: Database["public"]["Enums"]["statut_evaluation_enum"]
+          statut?: Database['public']['Enums']['statut_evaluation_enum']
           titre_evaluation?: string
         }
         Relationships: [
           {
-            foreignKeyName: "evaluation_cree_par_fkey"
-            columns: ["cree_par"]
+            foreignKeyName: 'evaluation_cree_par_fkey'
+            columns: ['cree_par']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
           {
-            foreignKeyName: "evaluation_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: 'evaluation_session_id_fkey'
+            columns: ['session_id']
             isOneToOne: false
-            referencedRelation: "session_formation"
-            referencedColumns: ["session_id"]
+            referencedRelation: 'session_formation'
+            referencedColumns: ['session_id']
           },
         ]
       }
@@ -245,9 +245,9 @@ export type Database = {
           description: string | null
           evenement_id: number
           lieu: string | null
-          statut: Database["public"]["Enums"]["statut_evenement_enum"]
+          statut: Database['public']['Enums']['statut_evenement_enum']
           titre: string
-          type_evenement: Database["public"]["Enums"]["type_evenement_enum"]
+          type_evenement: Database['public']['Enums']['type_evenement_enum']
         }
         Insert: {
           cree_le?: string
@@ -257,9 +257,9 @@ export type Database = {
           description?: string | null
           evenement_id?: never
           lieu?: string | null
-          statut?: Database["public"]["Enums"]["statut_evenement_enum"]
+          statut?: Database['public']['Enums']['statut_evenement_enum']
           titre: string
-          type_evenement?: Database["public"]["Enums"]["type_evenement_enum"]
+          type_evenement?: Database['public']['Enums']['type_evenement_enum']
         }
         Update: {
           cree_le?: string
@@ -269,17 +269,17 @@ export type Database = {
           description?: string | null
           evenement_id?: never
           lieu?: string | null
-          statut?: Database["public"]["Enums"]["statut_evenement_enum"]
+          statut?: Database['public']['Enums']['statut_evenement_enum']
           titre?: string
-          type_evenement?: Database["public"]["Enums"]["type_evenement_enum"]
+          type_evenement?: Database['public']['Enums']['type_evenement_enum']
         }
         Relationships: [
           {
-            foreignKeyName: "evenement_cree_par_fkey"
-            columns: ["cree_par"]
+            foreignKeyName: 'evenement_cree_par_fkey'
+            columns: ['cree_par']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -313,11 +313,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "formateur_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'formateur_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: true
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -328,8 +328,8 @@ export type Database = {
           description: string | null
           duree_jours: number
           formation_id: number
-          niveau: Database["public"]["Enums"]["niveau_formation_enum"]
-          statut: Database["public"]["Enums"]["statut_formation_enum"]
+          niveau: Database['public']['Enums']['niveau_formation_enum']
+          statut: Database['public']['Enums']['statut_formation_enum']
           titre: string
           url_image: string | null
         }
@@ -339,8 +339,8 @@ export type Database = {
           description?: string | null
           duree_jours?: number
           formation_id?: never
-          niveau?: Database["public"]["Enums"]["niveau_formation_enum"]
-          statut?: Database["public"]["Enums"]["statut_formation_enum"]
+          niveau?: Database['public']['Enums']['niveau_formation_enum']
+          statut?: Database['public']['Enums']['statut_formation_enum']
           titre: string
           url_image?: string | null
         }
@@ -350,18 +350,18 @@ export type Database = {
           description?: string | null
           duree_jours?: number
           formation_id?: never
-          niveau?: Database["public"]["Enums"]["niveau_formation_enum"]
-          statut?: Database["public"]["Enums"]["statut_formation_enum"]
+          niveau?: Database['public']['Enums']['niveau_formation_enum']
+          statut?: Database['public']['Enums']['statut_formation_enum']
           titre?: string
           url_image?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "formation_categorie_id_fkey"
-            columns: ["categorie_id"]
+            foreignKeyName: 'formation_categorie_id_fkey'
+            columns: ['categorie_id']
             isOneToOne: false
-            referencedRelation: "categorie_formation"
-            referencedColumns: ["categorie_id"]
+            referencedRelation: 'categorie_formation'
+            referencedColumns: ['categorie_id']
           },
         ]
       }
@@ -374,7 +374,7 @@ export type Database = {
           motivation: string | null
           participant_id: number
           session_id: number
-          statut: Database["public"]["Enums"]["statut_inscription_enum"]
+          statut: Database['public']['Enums']['statut_inscription_enum']
         }
         Insert: {
           date_inscription?: string
@@ -384,7 +384,7 @@ export type Database = {
           motivation?: string | null
           participant_id: number
           session_id: number
-          statut?: Database["public"]["Enums"]["statut_inscription_enum"]
+          statut?: Database['public']['Enums']['statut_inscription_enum']
         }
         Update: {
           date_inscription?: string
@@ -394,22 +394,22 @@ export type Database = {
           motivation?: string | null
           participant_id?: number
           session_id?: number
-          statut?: Database["public"]["Enums"]["statut_inscription_enum"]
+          statut?: Database['public']['Enums']['statut_inscription_enum']
         }
         Relationships: [
           {
-            foreignKeyName: "inscription_participant_id_fkey"
-            columns: ["participant_id"]
+            foreignKeyName: 'inscription_participant_id_fkey'
+            columns: ['participant_id']
             isOneToOne: false
-            referencedRelation: "participant"
-            referencedColumns: ["participant_id"]
+            referencedRelation: 'participant'
+            referencedColumns: ['participant_id']
           },
           {
-            foreignKeyName: "inscription_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: 'inscription_session_id_fkey'
+            columns: ['session_id']
             isOneToOne: false
-            referencedRelation: "session_formation"
-            referencedColumns: ["session_id"]
+            referencedRelation: 'session_formation'
+            referencedColumns: ['session_id']
           },
         ]
       }
@@ -443,11 +443,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "jeton_creation_compte_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'jeton_creation_compte_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -481,11 +481,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "jeton_mot_de_passe_oublie_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'jeton_mot_de_passe_oublie_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -495,7 +495,7 @@ export type Database = {
           nom_fichier: string | null
           publication_id: number
           taille_fichier: number | null
-          type_media: Database["public"]["Enums"]["type_media_enum"]
+          type_media: Database['public']['Enums']['type_media_enum']
           url_media: string
         }
         Insert: {
@@ -503,7 +503,7 @@ export type Database = {
           nom_fichier?: string | null
           publication_id: number
           taille_fichier?: number | null
-          type_media?: Database["public"]["Enums"]["type_media_enum"]
+          type_media?: Database['public']['Enums']['type_media_enum']
           url_media: string
         }
         Update: {
@@ -511,16 +511,16 @@ export type Database = {
           nom_fichier?: string | null
           publication_id?: number
           taille_fichier?: number | null
-          type_media?: Database["public"]["Enums"]["type_media_enum"]
+          type_media?: Database['public']['Enums']['type_media_enum']
           url_media?: string
         }
         Relationships: [
           {
-            foreignKeyName: "media_publication_publication_id_fkey"
-            columns: ["publication_id"]
+            foreignKeyName: 'media_publication_publication_id_fkey'
+            columns: ['publication_id']
             isOneToOne: false
-            referencedRelation: "publication"
-            referencedColumns: ["publication_id"]
+            referencedRelation: 'publication'
+            referencedColumns: ['publication_id']
           },
         ]
       }
@@ -548,11 +548,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "message_ia_conversation_id_fkey"
-            columns: ["conversation_id"]
+            foreignKeyName: 'message_ia_conversation_id_fkey'
+            columns: ['conversation_id']
             isOneToOne: false
-            referencedRelation: "conversation_ia"
-            referencedColumns: ["conversation_id"]
+            referencedRelation: 'conversation_ia'
+            referencedColumns: ['conversation_id']
           },
         ]
       }
@@ -610,7 +610,7 @@ export type Database = {
           message: string
           notification_id: number
           titre: string
-          type_notification: Database["public"]["Enums"]["type_notification_enum"]
+          type_notification: Database['public']['Enums']['type_notification_enum']
           utilisateur_id: number
         }
         Insert: {
@@ -621,7 +621,7 @@ export type Database = {
           message: string
           notification_id?: never
           titre: string
-          type_notification?: Database["public"]["Enums"]["type_notification_enum"]
+          type_notification?: Database['public']['Enums']['type_notification_enum']
           utilisateur_id: number
         }
         Update: {
@@ -632,16 +632,16 @@ export type Database = {
           message?: string
           notification_id?: never
           titre?: string
-          type_notification?: Database["public"]["Enums"]["type_notification_enum"]
+          type_notification?: Database['public']['Enums']['type_notification_enum']
           utilisateur_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "notification_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'notification_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -669,11 +669,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "option_question_question_evaluation_id_fkey"
-            columns: ["question_evaluation_id"]
+            foreignKeyName: 'option_question_question_evaluation_id_fkey'
+            columns: ['question_evaluation_id']
             isOneToOne: false
-            referencedRelation: "question_evaluation"
-            referencedColumns: ["question_evaluation_id"]
+            referencedRelation: 'question_evaluation'
+            referencedColumns: ['question_evaluation_id']
           },
         ]
       }
@@ -682,59 +682,62 @@ export type Database = {
           cree_le: string
           date_paiement: string
           formateur_id: number
-          methode: Database["public"]["Enums"]["methode_paiement_enum"]
+          methode: Database['public']['Enums']['methode_paiement_enum']
           montant: number
+          ref: string | null
           paiement_id: number
           remarque: string | null
           session_id: number | null
-          statut: Database["public"]["Enums"]["statut_paiement_enum"]
+          statut: Database['public']['Enums']['statut_paiement_enum']
           valide_par: number | null
         }
         Insert: {
           cree_le?: string
           date_paiement?: string
           formateur_id: number
-          methode?: Database["public"]["Enums"]["methode_paiement_enum"]
+          methode?: Database['public']['Enums']['methode_paiement_enum']
+          ref?: string | null
           montant?: number
           paiement_id?: never
           remarque?: string | null
           session_id?: number | null
-          statut?: Database["public"]["Enums"]["statut_paiement_enum"]
+          statut?: Database['public']['Enums']['statut_paiement_enum']
           valide_par?: number | null
         }
         Update: {
           cree_le?: string
           date_paiement?: string
           formateur_id?: number
-          methode?: Database["public"]["Enums"]["methode_paiement_enum"]
+          methode?: Database['public']['Enums']['methode_paiement_enum']
+          ref?: string | null
           montant?: number
           paiement_id?: never
           remarque?: string | null
           session_id?: number | null
-          statut?: Database["public"]["Enums"]["statut_paiement_enum"]
+          statut?: Database['public']['Enums']['statut_paiement_enum']
           valide_par?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "paiement_formateur_formateur_id_fkey"
-            columns: ["formateur_id"]
+            foreignKeyName: 'paiement_formateur_formateur_id_fkey'
+            columns: ['formateur_id']
             isOneToOne: false
-            referencedRelation: "formateur"
-            referencedColumns: ["formateur_id"]
+            referencedRelation: 'formateur'
+            referencedColumns: ['formateur_id']
           },
           {
-            foreignKeyName: "paiement_formateur_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: 'paiement_formateur_session_id_fkey'
+            columns: ['session_id']
             isOneToOne: false
-            referencedRelation: "session_formation"
-            referencedColumns: ["session_id"]
+            referencedRelation: 'session_formation'
+            referencedColumns: ['session_id']
           },
           {
-            foreignKeyName: "paiement_formateur_valide_par_fkey"
-            columns: ["valide_par"]
+            foreignKeyName: 'paiement_formateur_valide_par_fkey'
+            columns: ['valide_par']
             isOneToOne: false
-            referencedRelation: "responsable"
-            referencedColumns: ["responsable_id"]
+            referencedRelation: 'responsable'
+            referencedColumns: ['responsable_id']
           },
         ]
       }
@@ -759,11 +762,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "participant_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'participant_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: true
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -793,39 +796,39 @@ export type Database = {
           date_presence: string
           enregistre_le: string
           inscription_id: number
-          methode: Database["public"]["Enums"]["methode_presence_enum"]
+          methode: Database['public']['Enums']['methode_presence_enum']
           presence_id: number
           present: boolean
           remarque: string | null
-          statut: Database["public"]["Enums"]["statut_presence_enum"]
+          statut: Database['public']['Enums']['statut_presence_enum']
         }
         Insert: {
           date_presence?: string
           enregistre_le?: string
           inscription_id: number
-          methode?: Database["public"]["Enums"]["methode_presence_enum"]
+          methode?: Database['public']['Enums']['methode_presence_enum']
           presence_id?: never
           present?: boolean
           remarque?: string | null
-          statut?: Database["public"]["Enums"]["statut_presence_enum"]
+          statut?: Database['public']['Enums']['statut_presence_enum']
         }
         Update: {
           date_presence?: string
           enregistre_le?: string
           inscription_id?: number
-          methode?: Database["public"]["Enums"]["methode_presence_enum"]
+          methode?: Database['public']['Enums']['methode_presence_enum']
           presence_id?: never
           present?: boolean
           remarque?: string | null
-          statut?: Database["public"]["Enums"]["statut_presence_enum"]
+          statut?: Database['public']['Enums']['statut_presence_enum']
         }
         Relationships: [
           {
-            foreignKeyName: "presence_inscription_id_fkey"
-            columns: ["inscription_id"]
+            foreignKeyName: 'presence_inscription_id_fkey'
+            columns: ['inscription_id']
             isOneToOne: false
-            referencedRelation: "inscription"
-            referencedColumns: ["inscription_id"]
+            referencedRelation: 'inscription'
+            referencedColumns: ['inscription_id']
           },
         ]
       }
@@ -834,48 +837,42 @@ export type Database = {
           institution: string | null
           mention: string | null
           niveau_education:
-            | Database["public"]["Enums"]["niveau_education_enum"]
-            | null
+            Database['public']['Enums']['niveau_education_enum'] | null
           participant_id: number
           profil_id: number
           specialisation: string | null
           statut_actuel:
-            | Database["public"]["Enums"]["statut_actuel_enum"]
-            | null
+            Database['public']['Enums']['statut_actuel_enum'] | null
         }
         Insert: {
           institution?: string | null
           mention?: string | null
           niveau_education?:
-            | Database["public"]["Enums"]["niveau_education_enum"]
-            | null
+            Database['public']['Enums']['niveau_education_enum'] | null
           participant_id: number
           profil_id?: never
           specialisation?: string | null
           statut_actuel?:
-            | Database["public"]["Enums"]["statut_actuel_enum"]
-            | null
+            Database['public']['Enums']['statut_actuel_enum'] | null
         }
         Update: {
           institution?: string | null
           mention?: string | null
           niveau_education?:
-            | Database["public"]["Enums"]["niveau_education_enum"]
-            | null
+            Database['public']['Enums']['niveau_education_enum'] | null
           participant_id?: number
           profil_id?: never
           specialisation?: string | null
           statut_actuel?:
-            | Database["public"]["Enums"]["statut_actuel_enum"]
-            | null
+            Database['public']['Enums']['statut_actuel_enum'] | null
         }
         Relationships: [
           {
-            foreignKeyName: "profil_professionnel_participant_id_fkey"
-            columns: ["participant_id"]
+            foreignKeyName: 'profil_professionnel_participant_id_fkey'
+            columns: ['participant_id']
             isOneToOne: true
-            referencedRelation: "participant"
-            referencedColumns: ["participant_id"]
+            referencedRelation: 'participant'
+            referencedColumns: ['participant_id']
           },
         ]
       }
@@ -885,35 +882,35 @@ export type Database = {
           contenu: string | null
           publication_id: number
           publie_le: string
-          statut: Database["public"]["Enums"]["statut_publication_enum"]
+          statut: Database['public']['Enums']['statut_publication_enum']
           titre: string
-          visibilite: Database["public"]["Enums"]["visibilite_publication_enum"]
+          visibilite: Database['public']['Enums']['visibilite_publication_enum']
         }
         Insert: {
           auteur_id?: number | null
           contenu?: string | null
           publication_id?: never
           publie_le?: string
-          statut?: Database["public"]["Enums"]["statut_publication_enum"]
+          statut?: Database['public']['Enums']['statut_publication_enum']
           titre: string
-          visibilite?: Database["public"]["Enums"]["visibilite_publication_enum"]
+          visibilite?: Database['public']['Enums']['visibilite_publication_enum']
         }
         Update: {
           auteur_id?: number | null
           contenu?: string | null
           publication_id?: never
           publie_le?: string
-          statut?: Database["public"]["Enums"]["statut_publication_enum"]
+          statut?: Database['public']['Enums']['statut_publication_enum']
           titre?: string
-          visibilite?: Database["public"]["Enums"]["visibilite_publication_enum"]
+          visibilite?: Database['public']['Enums']['visibilite_publication_enum']
         }
         Relationships: [
           {
-            foreignKeyName: "publication_auteur_id_fkey"
-            columns: ["auteur_id"]
+            foreignKeyName: 'publication_auteur_id_fkey'
+            columns: ['auteur_id']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -925,7 +922,7 @@ export type Database = {
           points: number
           question_evaluation_id: number
           texte_question: string
-          type_question: Database["public"]["Enums"]["type_question_enum"]
+          type_question: Database['public']['Enums']['type_question_enum']
         }
         Insert: {
           est_requis?: boolean
@@ -934,7 +931,7 @@ export type Database = {
           points?: number
           question_evaluation_id?: never
           texte_question: string
-          type_question?: Database["public"]["Enums"]["type_question_enum"]
+          type_question?: Database['public']['Enums']['type_question_enum']
         }
         Update: {
           est_requis?: boolean
@@ -943,15 +940,15 @@ export type Database = {
           points?: number
           question_evaluation_id?: never
           texte_question?: string
-          type_question?: Database["public"]["Enums"]["type_question_enum"]
+          type_question?: Database['public']['Enums']['type_question_enum']
         }
         Relationships: [
           {
-            foreignKeyName: "question_evaluation_evaluation_id_fkey"
-            columns: ["evaluation_id"]
+            foreignKeyName: 'question_evaluation_evaluation_id_fkey'
+            columns: ['evaluation_id']
             isOneToOne: false
-            referencedRelation: "evaluation"
-            referencedColumns: ["evaluation_id"]
+            referencedRelation: 'evaluation'
+            referencedColumns: ['evaluation_id']
           },
         ]
       }
@@ -960,37 +957,37 @@ export type Database = {
           cree_le: string
           publication_id: number
           reaction_id: number
-          type_reaction: Database["public"]["Enums"]["type_reaction_enum"]
+          type_reaction: Database['public']['Enums']['type_reaction_enum']
           utilisateur_id: number
         }
         Insert: {
           cree_le?: string
           publication_id: number
           reaction_id?: never
-          type_reaction?: Database["public"]["Enums"]["type_reaction_enum"]
+          type_reaction?: Database['public']['Enums']['type_reaction_enum']
           utilisateur_id: number
         }
         Update: {
           cree_le?: string
           publication_id?: number
           reaction_id?: never
-          type_reaction?: Database["public"]["Enums"]["type_reaction_enum"]
+          type_reaction?: Database['public']['Enums']['type_reaction_enum']
           utilisateur_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "reaction_publication_publication_id_fkey"
-            columns: ["publication_id"]
+            foreignKeyName: 'reaction_publication_publication_id_fkey'
+            columns: ['publication_id']
             isOneToOne: false
-            referencedRelation: "publication"
-            referencedColumns: ["publication_id"]
+            referencedRelation: 'publication'
+            referencedColumns: ['publication_id']
           },
           {
-            foreignKeyName: "reaction_publication_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'reaction_publication_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -1024,25 +1021,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "reponse_participant_option_question_id_fkey"
-            columns: ["option_question_id"]
+            foreignKeyName: 'reponse_participant_option_question_id_fkey'
+            columns: ['option_question_id']
             isOneToOne: false
-            referencedRelation: "option_question"
-            referencedColumns: ["option_question_id"]
+            referencedRelation: 'option_question'
+            referencedColumns: ['option_question_id']
           },
           {
-            foreignKeyName: "reponse_participant_question_evaluation_id_fkey"
-            columns: ["question_evaluation_id"]
+            foreignKeyName: 'reponse_participant_question_evaluation_id_fkey'
+            columns: ['question_evaluation_id']
             isOneToOne: false
-            referencedRelation: "question_evaluation"
-            referencedColumns: ["question_evaluation_id"]
+            referencedRelation: 'question_evaluation'
+            referencedColumns: ['question_evaluation_id']
           },
           {
-            foreignKeyName: "reponse_participant_tentative_evaluation_id_fkey"
-            columns: ["tentative_evaluation_id"]
+            foreignKeyName: 'reponse_participant_tentative_evaluation_id_fkey'
+            columns: ['tentative_evaluation_id']
             isOneToOne: false
-            referencedRelation: "tentative_evaluation"
-            referencedColumns: ["tentative_evaluation_id"]
+            referencedRelation: 'tentative_evaluation'
+            referencedColumns: ['tentative_evaluation_id']
           },
         ]
       }
@@ -1051,30 +1048,30 @@ export type Database = {
           intitule_poste: string | null
           responsable_id: number
           service: string | null
-          statut_service: Database["public"]["Enums"]["statut_actif_enum"]
+          statut_service: Database['public']['Enums']['statut_actif_enum']
           utilisateur_id: number
         }
         Insert: {
           intitule_poste?: string | null
           responsable_id?: never
           service?: string | null
-          statut_service?: Database["public"]["Enums"]["statut_actif_enum"]
+          statut_service?: Database['public']['Enums']['statut_actif_enum']
           utilisateur_id: number
         }
         Update: {
           intitule_poste?: string | null
           responsable_id?: never
           service?: string | null
-          statut_service?: Database["public"]["Enums"]["statut_actif_enum"]
+          statut_service?: Database['public']['Enums']['statut_actif_enum']
           utilisateur_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "responsable_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'responsable_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: true
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -1083,61 +1080,61 @@ export type Database = {
           cree_le: string
           message_id: number
           retour_id: number
-          type_retour: Database["public"]["Enums"]["type_retour_ia_enum"]
+          type_retour: Database['public']['Enums']['type_retour_ia_enum']
           utilisateur_id: number
         }
         Insert: {
           cree_le?: string
           message_id: number
           retour_id?: never
-          type_retour: Database["public"]["Enums"]["type_retour_ia_enum"]
+          type_retour: Database['public']['Enums']['type_retour_ia_enum']
           utilisateur_id: number
         }
         Update: {
           cree_le?: string
           message_id?: number
           retour_id?: never
-          type_retour?: Database["public"]["Enums"]["type_retour_ia_enum"]
+          type_retour?: Database['public']['Enums']['type_retour_ia_enum']
           utilisateur_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "retour_ia_message_id_fkey"
-            columns: ["message_id"]
+            foreignKeyName: 'retour_ia_message_id_fkey'
+            columns: ['message_id']
             isOneToOne: false
-            referencedRelation: "message_ia"
-            referencedColumns: ["message_id"]
+            referencedRelation: 'message_ia'
+            referencedColumns: ['message_id']
           },
           {
-            foreignKeyName: "retour_ia_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'retour_ia_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
       role: {
         Row: {
-          code_role: Database["public"]["Enums"]["code_role_enum"]
+          code_role: Database['public']['Enums']['code_role_enum']
           description: string | null
           nom_role: string
           role_id: number
-          statut: Database["public"]["Enums"]["statut_actif_enum"]
+          statut: Database['public']['Enums']['statut_actif_enum']
         }
         Insert: {
-          code_role: Database["public"]["Enums"]["code_role_enum"]
+          code_role: Database['public']['Enums']['code_role_enum']
           description?: string | null
           nom_role: string
           role_id?: never
-          statut?: Database["public"]["Enums"]["statut_actif_enum"]
+          statut?: Database['public']['Enums']['statut_actif_enum']
         }
         Update: {
-          code_role?: Database["public"]["Enums"]["code_role_enum"]
+          code_role?: Database['public']['Enums']['code_role_enum']
           description?: string | null
           nom_role?: string
           role_id?: never
-          statut?: Database["public"]["Enums"]["statut_actif_enum"]
+          statut?: Database['public']['Enums']['statut_actif_enum']
         }
         Relationships: []
       }
@@ -1159,18 +1156,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "role_permission_permission_id_fkey"
-            columns: ["permission_id"]
+            foreignKeyName: 'role_permission_permission_id_fkey'
+            columns: ['permission_id']
             isOneToOne: false
-            referencedRelation: "permission"
-            referencedColumns: ["permission_id"]
+            referencedRelation: 'permission'
+            referencedColumns: ['permission_id']
           },
           {
-            foreignKeyName: "role_permission_role_id_fkey"
-            columns: ["role_id"]
+            foreignKeyName: 'role_permission_role_id_fkey'
+            columns: ['role_id']
             isOneToOne: false
-            referencedRelation: "role"
-            referencedColumns: ["role_id"]
+            referencedRelation: 'role'
+            referencedColumns: ['role_id']
           },
         ]
       }
@@ -1192,18 +1189,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "role_utilisateur_role_id_fkey"
-            columns: ["role_id"]
+            foreignKeyName: 'role_utilisateur_role_id_fkey'
+            columns: ['role_id']
             isOneToOne: false
-            referencedRelation: "role"
-            referencedColumns: ["role_id"]
+            referencedRelation: 'role'
+            referencedColumns: ['role_id']
           },
           {
-            foreignKeyName: "role_utilisateur_utilisateur_id_fkey"
-            columns: ["utilisateur_id"]
+            foreignKeyName: 'role_utilisateur_utilisateur_id_fkey'
+            columns: ['utilisateur_id']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
         ]
       }
@@ -1218,7 +1215,7 @@ export type Database = {
           lieu: string | null
           nom_session: string
           session_id: number
-          statut: Database["public"]["Enums"]["statut_session_enum"]
+          statut: Database['public']['Enums']['statut_session_enum']
         }
         Insert: {
           capacite?: number | null
@@ -1230,7 +1227,7 @@ export type Database = {
           lieu?: string | null
           nom_session: string
           session_id?: never
-          statut?: Database["public"]["Enums"]["statut_session_enum"]
+          statut?: Database['public']['Enums']['statut_session_enum']
         }
         Update: {
           capacite?: number | null
@@ -1242,22 +1239,22 @@ export type Database = {
           lieu?: string | null
           nom_session?: string
           session_id?: never
-          statut?: Database["public"]["Enums"]["statut_session_enum"]
+          statut?: Database['public']['Enums']['statut_session_enum']
         }
         Relationships: [
           {
-            foreignKeyName: "session_formation_formateur_id_fkey"
-            columns: ["formateur_id"]
+            foreignKeyName: 'session_formation_formateur_id_fkey'
+            columns: ['formateur_id']
             isOneToOne: false
-            referencedRelation: "formateur"
-            referencedColumns: ["formateur_id"]
+            referencedRelation: 'formateur'
+            referencedColumns: ['formateur_id']
           },
           {
-            foreignKeyName: "session_formation_formation_id_fkey"
-            columns: ["formation_id"]
+            foreignKeyName: 'session_formation_formation_id_fkey'
+            columns: ['formation_id']
             isOneToOne: false
-            referencedRelation: "formation"
-            referencedColumns: ["formation_id"]
+            referencedRelation: 'formation'
+            referencedColumns: ['formation_id']
           },
         ]
       }
@@ -1300,25 +1297,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "support_formation_cree_par_fkey"
-            columns: ["cree_par"]
+            foreignKeyName: 'support_formation_cree_par_fkey'
+            columns: ['cree_par']
             isOneToOne: false
-            referencedRelation: "utilisateur"
-            referencedColumns: ["utilisateur_id"]
+            referencedRelation: 'utilisateur'
+            referencedColumns: ['utilisateur_id']
           },
           {
-            foreignKeyName: "support_formation_formation_id_fkey"
-            columns: ["formation_id"]
+            foreignKeyName: 'support_formation_formation_id_fkey'
+            columns: ['formation_id']
             isOneToOne: false
-            referencedRelation: "formation"
-            referencedColumns: ["formation_id"]
+            referencedRelation: 'formation'
+            referencedColumns: ['formation_id']
           },
           {
-            foreignKeyName: "support_formation_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: 'support_formation_session_id_fkey'
+            columns: ['session_id']
             isOneToOne: false
-            referencedRelation: "session_formation"
-            referencedColumns: ["session_id"]
+            referencedRelation: 'session_formation'
+            referencedColumns: ['session_id']
           },
         ]
       }
@@ -1331,7 +1328,7 @@ export type Database = {
           reussi: boolean
           score: number | null
           soumis_le: string | null
-          statut: Database["public"]["Enums"]["statut_tentative_enum"]
+          statut: Database['public']['Enums']['statut_tentative_enum']
           tentative_evaluation_id: number
         }
         Insert: {
@@ -1342,7 +1339,7 @@ export type Database = {
           reussi?: boolean
           score?: number | null
           soumis_le?: string | null
-          statut?: Database["public"]["Enums"]["statut_tentative_enum"]
+          statut?: Database['public']['Enums']['statut_tentative_enum']
           tentative_evaluation_id?: never
         }
         Update: {
@@ -1353,23 +1350,23 @@ export type Database = {
           reussi?: boolean
           score?: number | null
           soumis_le?: string | null
-          statut?: Database["public"]["Enums"]["statut_tentative_enum"]
+          statut?: Database['public']['Enums']['statut_tentative_enum']
           tentative_evaluation_id?: never
         }
         Relationships: [
           {
-            foreignKeyName: "tentative_evaluation_evaluation_id_fkey"
-            columns: ["evaluation_id"]
+            foreignKeyName: 'tentative_evaluation_evaluation_id_fkey'
+            columns: ['evaluation_id']
             isOneToOne: false
-            referencedRelation: "evaluation"
-            referencedColumns: ["evaluation_id"]
+            referencedRelation: 'evaluation'
+            referencedColumns: ['evaluation_id']
           },
           {
-            foreignKeyName: "tentative_evaluation_inscription_id_fkey"
-            columns: ["inscription_id"]
+            foreignKeyName: 'tentative_evaluation_inscription_id_fkey'
+            columns: ['inscription_id']
             isOneToOne: false
-            referencedRelation: "inscription"
-            referencedColumns: ["inscription_id"]
+            referencedRelation: 'inscription'
+            referencedColumns: ['inscription_id']
           },
         ]
       }
@@ -1380,11 +1377,11 @@ export type Database = {
           cree_le: string
           email: string
           email_verifie: boolean
-          genre: Database["public"]["Enums"]["genre_enum"] | null
+          genre: Database['public']['Enums']['genre_enum'] | null
           maj_le: string
           nom: string
           prenoms: string
-          statut: Database["public"]["Enums"]["statut_actif_enum"]
+          statut: Database['public']['Enums']['statut_actif_enum']
           telephone: string | null
           url_profil: string | null
           utilisateur_id: number
@@ -1395,11 +1392,11 @@ export type Database = {
           cree_le?: string
           email: string
           email_verifie?: boolean
-          genre?: Database["public"]["Enums"]["genre_enum"] | null
+          genre?: Database['public']['Enums']['genre_enum'] | null
           maj_le?: string
           nom?: string
           prenoms?: string
-          statut?: Database["public"]["Enums"]["statut_actif_enum"]
+          statut?: Database['public']['Enums']['statut_actif_enum']
           telephone?: string | null
           url_profil?: string | null
           utilisateur_id?: never
@@ -1410,11 +1407,11 @@ export type Database = {
           cree_le?: string
           email?: string
           email_verifie?: boolean
-          genre?: Database["public"]["Enums"]["genre_enum"] | null
+          genre?: Database['public']['Enums']['genre_enum'] | null
           maj_le?: string
           nom?: string
           prenoms?: string
-          statut?: Database["public"]["Enums"]["statut_actif_enum"]
+          statut?: Database['public']['Enums']['statut_actif_enum']
           telephone?: string | null
           url_profil?: string | null
           utilisateur_id?: never
@@ -1433,7 +1430,7 @@ export type Database = {
       a_role: {
         Args: {
           _auth_user_id: string
-          _code: Database["public"]["Enums"]["code_role_enum"]
+          _code: Database['public']['Enums']['code_role_enum']
         }
         Returns: boolean
       }
@@ -1442,7 +1439,7 @@ export type Database = {
           _lien?: string
           _message: string
           _titre: string
-          _type: Database["public"]["Enums"]["type_notification_enum"]
+          _type: Database['public']['Enums']['type_notification_enum']
           _utilisateur_id: number
         }
         Returns: undefined
@@ -1452,7 +1449,7 @@ export type Database = {
           _lien?: string
           _message: string
           _titre: string
-          _type: Database["public"]["Enums"]["type_notification_enum"]
+          _type: Database['public']['Enums']['type_notification_enum']
         }
         Returns: undefined
       }
@@ -1464,82 +1461,59 @@ export type Database = {
     }
     Enums: {
       code_role_enum:
-        | "PARTICIPANT"
-        | "FORMATEUR"
-        | "RESPONSABLE"
-        | "ADMINISTRATEUR"
-      genre_enum: "Homme" | "Femme"
-      methode_paiement_enum: "Espèces" | "Mobile Money" | "Virement" | "Chèque"
-      methode_presence_enum: "QR Code" | "Manuel" | "Système"
+        'PARTICIPANT' | 'FORMATEUR' | 'RESPONSABLE' | 'ADMINISTRATEUR'
+      genre_enum: 'Homme' | 'Femme'
+      methode_paiement_enum: 'Espèces' | 'Mobile Money' | 'Virement' | 'Chèque'
+      methode_presence_enum: 'QR Code' | 'Manuel' | 'Système'
       niveau_education_enum:
-        | "BEPC"
-        | "BAC"
-        | "L1"
-        | "L2"
-        | "L3"
-        | "M1"
-        | "M2"
-        | "Doctorat"
-        | "Autre"
-      niveau_formation_enum: "Débutant" | "Intermédiaire" | "Avancé"
-      statut_actif_enum: "Actif" | "Inactif"
+        'BEPC' | 'BAC' | 'L1' | 'L2' | 'L3' | 'M1' | 'M2' | 'Doctorat' | 'Autre'
+      niveau_formation_enum: 'Débutant' | 'Intermédiaire' | 'Avancé'
+      statut_actif_enum: 'Actif' | 'Inactif'
       statut_actuel_enum:
-        | "Étudiant"
-        | "Employé"
-        | "Fonctionnaire"
-        | "Chômeur"
-        | "Indépendant"
-        | "Entrepreneur"
-        | "Autre"
-      statut_attestation_enum: "Valide" | "Invalide" | "Annulée"
-      statut_commentaire_enum: "Visible" | "Masqué"
-      statut_evaluation_enum: "Brouillon" | "Publiée" | "Fermée"
+        | 'Étudiant'
+        | 'Employé'
+        | 'Fonctionnaire'
+        | 'Chômeur'
+        | 'Indépendant'
+        | 'Entrepreneur'
+        | 'Autre'
+      statut_attestation_enum: 'Valide' | 'Invalide' | 'Annulée'
+      statut_commentaire_enum: 'Visible' | 'Masqué'
+      statut_evaluation_enum: 'Brouillon' | 'Publiée' | 'Fermée'
       statut_evenement_enum:
-        | "Brouillon"
-        | "Planifié"
-        | "En cours"
-        | "Terminé"
-        | "Annulé"
-      statut_formation_enum: "Brouillon" | "Publiée" | "Archivée"
+        'Brouillon' | 'Planifié' | 'En cours' | 'Terminé' | 'Annulé'
+      statut_formation_enum: 'Brouillon' | 'Publiée' | 'Archivée'
       statut_inscription_enum:
-        | "En attente"
-        | "Acceptée"
-        | "Refusée"
-        | "Liste d'attente"
-        | "Annulée"
-      statut_paiement_enum: "En attente" | "Payé" | "Annulé"
-      statut_presence_enum: "Présent" | "Absent"
-      statut_publication_enum: "Brouillon" | "Publiée" | "Archivée"
-      statut_session_enum: "Planifiée" | "En cours" | "Terminée" | "Annulée"
-      statut_tentative_enum: "En cours" | "Soumise" | "Corrigée"
+        'En attente' | 'Acceptée' | 'Refusée' | "Liste d'attente" | 'Annulée'
+      statut_paiement_enum: 'En attente' | 'Payé' | 'Annulé'
+      statut_presence_enum: 'Présent' | 'Absent'
+      statut_publication_enum: 'Brouillon' | 'Publiée' | 'Archivée'
+      statut_session_enum: 'Planifiée' | 'En cours' | 'Terminée' | 'Annulée'
+      statut_tentative_enum: 'En cours' | 'Soumise' | 'Corrigée'
       type_evenement_enum:
-        | "Réunion"
-        | "Atelier"
-        | "Conférence"
-        | "Cérémonie"
-        | "Autre"
-      type_media_enum: "Image" | "Vidéo" | "Document"
+        'Réunion' | 'Atelier' | 'Conférence' | 'Cérémonie' | 'Autre'
+      type_media_enum: 'Image' | 'Vidéo' | 'Document'
       type_notification_enum:
-        | "INSCRIPTION"
-        | "FORMATION"
-        | "SESSION"
-        | "PRESENCE"
-        | "EVALUATION"
-        | "ATTESTATION"
-        | "AGENDA"
-        | "PUBLICATION"
-        | "PAIEMENT"
-        | "ADMINISTRATION"
-        | "SYSTEME"
-      type_question_enum: "Choix unique" | "Choix multiple" | "Vrai/Faux"
-      type_reaction_enum: "J'aime" | "J'adore" | "Bravo" | "Intéressant"
-      type_retour_ia_enum: "Positive" | "Négative"
+        | 'INSCRIPTION'
+        | 'FORMATION'
+        | 'SESSION'
+        | 'PRESENCE'
+        | 'EVALUATION'
+        | 'ATTESTATION'
+        | 'AGENDA'
+        | 'PUBLICATION'
+        | 'PAIEMENT'
+        | 'ADMINISTRATION'
+        | 'SYSTEME'
+      type_question_enum: 'Choix unique' | 'Choix multiple' | 'Vrai/Faux'
+      type_reaction_enum: "J'aime" | "J'adore" | 'Bravo' | 'Intéressant'
+      type_retour_ia_enum: 'Positive' | 'Négative'
       visibilite_publication_enum:
-        | "Public"
-        | "Participant"
-        | "Responsable"
-        | "Administrateur"
-        | "Formateur"
+        | 'Public'
+        | 'Participant'
+        | 'Responsable'
+        | 'Administrateur'
+        | 'Formateur'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1547,33 +1521,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1582,23 +1556,22 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1607,23 +1580,22 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1632,125 +1604,124 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema['Enums'] | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
+    | keyof DefaultSchema['CompositeTypes']
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
   public: {
     Enums: {
       code_role_enum: [
-        "PARTICIPANT",
-        "FORMATEUR",
-        "RESPONSABLE",
-        "ADMINISTRATEUR",
+        'PARTICIPANT',
+        'FORMATEUR',
+        'RESPONSABLE',
+        'ADMINISTRATEUR',
       ],
-      genre_enum: ["Homme", "Femme"],
-      methode_paiement_enum: ["Espèces", "Mobile Money", "Virement", "Chèque"],
-      methode_presence_enum: ["QR Code", "Manuel", "Système"],
+      genre_enum: ['Homme', 'Femme'],
+      methode_paiement_enum: ['Espèces', 'Mobile Money', 'Virement', 'Chèque'],
+      methode_presence_enum: ['QR Code', 'Manuel', 'Système'],
       niveau_education_enum: [
-        "BEPC",
-        "BAC",
-        "L1",
-        "L2",
-        "L3",
-        "M1",
-        "M2",
-        "Doctorat",
-        "Autre",
+        'BEPC',
+        'BAC',
+        'L1',
+        'L2',
+        'L3',
+        'M1',
+        'M2',
+        'Doctorat',
+        'Autre',
       ],
-      niveau_formation_enum: ["Débutant", "Intermédiaire", "Avancé"],
-      statut_actif_enum: ["Actif", "Inactif"],
+      niveau_formation_enum: ['Débutant', 'Intermédiaire', 'Avancé'],
+      statut_actif_enum: ['Actif', 'Inactif'],
       statut_actuel_enum: [
-        "Étudiant",
-        "Employé",
-        "Fonctionnaire",
-        "Chômeur",
-        "Indépendant",
-        "Entrepreneur",
-        "Autre",
+        'Étudiant',
+        'Employé',
+        'Fonctionnaire',
+        'Chômeur',
+        'Indépendant',
+        'Entrepreneur',
+        'Autre',
       ],
-      statut_attestation_enum: ["Valide", "Invalide", "Annulée"],
-      statut_commentaire_enum: ["Visible", "Masqué"],
-      statut_evaluation_enum: ["Brouillon", "Publiée", "Fermée"],
+      statut_attestation_enum: ['Valide', 'Invalide', 'Annulée'],
+      statut_commentaire_enum: ['Visible', 'Masqué'],
+      statut_evaluation_enum: ['Brouillon', 'Publiée', 'Fermée'],
       statut_evenement_enum: [
-        "Brouillon",
-        "Planifié",
-        "En cours",
-        "Terminé",
-        "Annulé",
+        'Brouillon',
+        'Planifié',
+        'En cours',
+        'Terminé',
+        'Annulé',
       ],
-      statut_formation_enum: ["Brouillon", "Publiée", "Archivée"],
+      statut_formation_enum: ['Brouillon', 'Publiée', 'Archivée'],
       statut_inscription_enum: [
-        "En attente",
-        "Acceptée",
-        "Refusée",
+        'En attente',
+        'Acceptée',
+        'Refusée',
         "Liste d'attente",
-        "Annulée",
+        'Annulée',
       ],
-      statut_paiement_enum: ["En attente", "Payé", "Annulé"],
-      statut_presence_enum: ["Présent", "Absent"],
-      statut_publication_enum: ["Brouillon", "Publiée", "Archivée"],
-      statut_session_enum: ["Planifiée", "En cours", "Terminée", "Annulée"],
-      statut_tentative_enum: ["En cours", "Soumise", "Corrigée"],
+      statut_paiement_enum: ['En attente', 'Payé', 'Annulé'],
+      statut_presence_enum: ['Présent', 'Absent'],
+      statut_publication_enum: ['Brouillon', 'Publiée', 'Archivée'],
+      statut_session_enum: ['Planifiée', 'En cours', 'Terminée', 'Annulée'],
+      statut_tentative_enum: ['En cours', 'Soumise', 'Corrigée'],
       type_evenement_enum: [
-        "Réunion",
-        "Atelier",
-        "Conférence",
-        "Cérémonie",
-        "Autre",
+        'Réunion',
+        'Atelier',
+        'Conférence',
+        'Cérémonie',
+        'Autre',
       ],
-      type_media_enum: ["Image", "Vidéo", "Document"],
+      type_media_enum: ['Image', 'Vidéo', 'Document'],
       type_notification_enum: [
-        "INSCRIPTION",
-        "FORMATION",
-        "SESSION",
-        "PRESENCE",
-        "EVALUATION",
-        "ATTESTATION",
-        "AGENDA",
-        "PUBLICATION",
-        "PAIEMENT",
-        "ADMINISTRATION",
-        "SYSTEME",
+        'INSCRIPTION',
+        'FORMATION',
+        'SESSION',
+        'PRESENCE',
+        'EVALUATION',
+        'ATTESTATION',
+        'AGENDA',
+        'PUBLICATION',
+        'PAIEMENT',
+        'ADMINISTRATION',
+        'SYSTEME',
       ],
-      type_question_enum: ["Choix unique", "Choix multiple", "Vrai/Faux"],
-      type_reaction_enum: ["J'aime", "J'adore", "Bravo", "Intéressant"],
-      type_retour_ia_enum: ["Positive", "Négative"],
+      type_question_enum: ['Choix unique', 'Choix multiple', 'Vrai/Faux'],
+      type_reaction_enum: ["J'aime", "J'adore", 'Bravo', 'Intéressant'],
+      type_retour_ia_enum: ['Positive', 'Négative'],
       visibilite_publication_enum: [
-        "Public",
-        "Participant",
-        "Responsable",
-        "Administrateur",
-        "Formateur",
+        'Public',
+        'Participant',
+        'Responsable',
+        'Administrateur',
+        'Formateur',
       ],
     },
   },
