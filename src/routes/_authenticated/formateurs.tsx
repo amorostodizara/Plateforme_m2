@@ -54,7 +54,7 @@ async function televerserCv(fichier: File) {
     fichier.type === 'application/pdf' ||
     fichier.name.toLowerCase().endsWith('.pdf')
   if (!ok) throw new Error('Le CV doit être un fichier PDF.')
-  return televerserFichier('cv-formateurs', fichier, 10)
+  return televerserFichier('cv-formateurs', fichier, 1)
 }
 
 export const Route = createFileRoute('/_authenticated/formateurs')({
@@ -873,7 +873,7 @@ function Page() {
             </div>
             <div className="sm:col-span-2">
               <label className={labelClass}>
-                Curriculum vitae (fichier PDF, 10 Mo maximum)
+                Curriculum vitae (fichier PDF, 1 Mo maximum)
               </label>
               <input
                 type="file"
@@ -1110,7 +1110,7 @@ function Page() {
             </div>
             <div className="sm:col-span-2">
               <label className={labelClass}>
-                Curriculum vitae (fichier PDF, 10 Mo maximum)
+                Curriculum vitae (fichier PDF, 1 Mo maximum)
               </label>
               <input
                 type="file"

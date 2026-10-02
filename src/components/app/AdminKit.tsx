@@ -244,3 +244,62 @@ export const quand = (v: string) => {
     year: 'numeric',
   })
 }
+
+export function formaterPeriodeCatalogue(
+  dateDebut: string,
+  dateFin: string,
+): string {
+  const debut = new Date(dateDebut)
+  const fin = new Date(dateFin)
+  const debutJour = new Date(
+    debut.getFullYear(),
+    debut.getMonth(),
+    debut.getDate(),
+  )
+  const finJour = new Date(fin.getFullYear(), fin.getMonth(), fin.getDate())
+  const difference = finJour.getTime() - debutJour.getTime()
+  const nombreJours = Math.floor(difference / (1000 * 60 * 60 * 24)) + 1
+  const heureDebut = debut.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  const heureFin = fin.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  return `${heureDebut} - ${heureFin} • ${nombreJours} jours`
+}
+
+export function formaternombrejours(
+  dateDebut: string,
+  dateFin: string,
+): string {
+  const debut = new Date(dateDebut)
+  const fin = new Date(dateFin)
+  const debutJour = new Date(
+    debut.getFullYear(),
+    debut.getMonth(),
+    debut.getDate(),
+  )
+  const finJour = new Date(fin.getFullYear(), fin.getMonth(), fin.getDate())
+  const difference = finJour.getTime() - debutJour.getTime()
+  const nombreJours = Math.floor(difference / (1000 * 60 * 60 * 24)) + 1
+
+  return ` ${nombreJours} `
+}
+
+export function calculerAge(dateNaissance: string) {
+  const naissance = new Date(dateNaissance)
+  const aujourdHui = new Date()
+
+  let age = aujourdHui.getFullYear() - naissance.getFullYear()
+
+  const mois = aujourdHui.getMonth() - naissance.getMonth()
+
+  if (mois < 0 || (mois === 0 && aujourdHui.getDate() < naissance.getDate())) {
+    age--
+  }
+
+  return age
+}

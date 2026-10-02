@@ -35,6 +35,7 @@ import {
   champClass,
   labelClass,
   selectClass,
+  LabelObligatoire,
 } from '@/components/app/AdminKit'
 import { AccesReserve } from '@/components/app/Acces'
 import { ImageFormation } from '@/components/app/ImageFormation'
@@ -83,7 +84,6 @@ type Formation = {
   description: string | null
   niveau: Niveau
   url_image: string | null
-  duree_jours: number
   statut: StatutF
   categorie_id: number | null
   categorie: { nom: string } | null
@@ -95,7 +95,6 @@ const vide = {
   description: '',
   niveau: 'Débutant' as Niveau,
   url_image: '',
-  duree_jours: 1,
   statut: 'Brouillon' as StatutF,
   categorie_id: '' as string,
 }
@@ -115,7 +114,7 @@ function Page() {
       const { data, error } = await supabase
         .from('formation')
         .select(
-          'formation_id, titre, description, niveau, url_image, duree_jours, statut, categorie_id, categorie:categorie_formation(nom), sessions:session_formation(session_id)',
+          'formation_id, titre, description, niveau, url_image, statut, categorie_id, categorie:categorie_formation(nom), sessions:session_formation(session_id)',
         )
         .order('titre')
       if (error) throw error
@@ -138,18 +137,20 @@ function Page() {
   const enregistrer = useMutation({
     mutationFn: async () => {
       if (!form.titre.trim()) throw new Error('Le titre est obligatoire.')
+      if (!form.niveau.trim()) throw new Error('Le niveau est obligatoire.')
+      if (!form.statut.trim()) throw new Error('Le statut est obligatoire.')
       let chemin = form.url_image || null
+
       if (image) {
         if (!image.type.startsWith('image/'))
           throw new Error('Choisissez une image (JPG, PNG, WEBP).')
-        chemin = await televerserFichier('formations', image, 10)
+        chemin = await televerserFichier('formations', image, 1)
       }
       const valeurs = {
         titre: form.titre.trim(),
         description: form.description || null,
         niveau: form.niveau,
         url_image: chemin,
-        duree_jours: Number(form.duree_jours) || 1,
         statut: form.statut,
         categorie_id: form.categorie_id ? Number(form.categorie_id) : null,
       }
@@ -228,7 +229,6 @@ function Page() {
       description: f.description ?? '',
       niveau: f.niveau,
       url_image: f.url_image ?? '',
-      duree_jours: f.duree_jours,
       statut: f.statut,
       categorie_id: f.categorie_id ? String(f.categorie_id) : '',
     })
@@ -301,7 +301,6 @@ function Page() {
                   'Formation',
                   'Catégorie',
                   'Niveau',
-                  'Durée',
                   'Sessions',
                   'Statut',
                   'Actions',
@@ -343,7 +342,6 @@ function Page() {
                       {f.categorie?.nom ?? '—'}
                     </td>
                     <td className="px-3 py-3 text-xs">{f.niveau}</td>
-                    <td className="px-3 py-3 text-xs">{f.duree_jours} j</td>
                     <td className="px-3 py-3 text-xs">
                       {f.sessions?.length ?? 0}
                     </td>
@@ -412,23 +410,16 @@ function Page() {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className={labelClass}>Titre</label>
+              <label className={labelClass}>
+                Titre <LabelObligatoire />
+              </label>
               <input
                 className={champClass}
                 value={form.titre}
                 onChange={(e) => setForm({ ...form, titre: e.target.value })}
               />
             </div>
-            <div>
-              <label className={labelClass}>Description</label>
-              <textarea
-                className="min-h-20 w-full rounded-md border border-input bg-card p-3 text-sm focus:border-primary focus:outline-none"
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-              />
-            </div>
+
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className={labelClass}>Catégorie</label>
@@ -448,7 +439,10 @@ function Page() {
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Niveau</label>
+                <label className={labelClass}>
+                  Niveau
+                  <LabelObligatoire />
+                </label>
                 <select
                   className={`${selectClass} w-full`}
                   value={form.niveau}
@@ -461,36 +455,37 @@ function Page() {
                   ))}
                 </select>
               </div>
-              <div>
-                <label className={labelClass}>Durée (jours)</label>
-                <input
-                  type="number"
-                  min={1}
-                  className={champClass}
-                  value={form.duree_jours}
-                  onChange={(e) =>
-                    setForm({ ...form, duree_jours: Number(e.target.value) })
-                  }
-                />
-              </div>
-              <div>
-                <label className={labelClass}>Statut</label>
-                <select
-                  className={`${selectClass} w-full`}
-                  value={form.statut}
-                  onChange={(e) =>
-                    setForm({ ...form, statut: e.target.value as StatutF })
-                  }
-                >
-                  {['Brouillon', 'Publiée', 'Archivée'].map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
             </div>
             <div>
               <label className={labelClass}>
-                Image de présentation (fichier, 10 Mo maximum)
+                Statut
+                <LabelObligatoire />
+              </label>
+              <select
+                className={`${selectClass} w-full`}
+                value={form.statut}
+                onChange={(e) =>
+                  setForm({ ...form, statut: e.target.value as StatutF })
+                }
+              >
+                {['Brouillon', 'Publiée', 'Archivée'].map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={labelClass}>Description</label>
+              <textarea
+                className="min-h-20 w-full rounded-md border border-input bg-card p-3 text-sm focus:border-primary focus:outline-none"
+                value={form.description}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label className={labelClass}>
+                Image de présentation (fichier, 1 Mo maximum)
               </label>
               <input
                 type="file"

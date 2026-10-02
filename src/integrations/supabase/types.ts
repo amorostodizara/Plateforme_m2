@@ -326,7 +326,6 @@ export type Database = {
           categorie_id: number | null
           cree_le: string
           description: string | null
-          duree_jours: number
           formation_id: number
           niveau: Database['public']['Enums']['niveau_formation_enum']
           statut: Database['public']['Enums']['statut_formation_enum']
@@ -337,7 +336,6 @@ export type Database = {
           categorie_id?: number | null
           cree_le?: string
           description?: string | null
-          duree_jours?: number
           formation_id?: never
           niveau?: Database['public']['Enums']['niveau_formation_enum']
           statut?: Database['public']['Enums']['statut_formation_enum']
@@ -348,7 +346,6 @@ export type Database = {
           categorie_id?: number | null
           cree_le?: string
           description?: string | null
-          duree_jours?: number
           formation_id?: never
           niveau?: Database['public']['Enums']['niveau_formation_enum']
           statut?: Database['public']['Enums']['statut_formation_enum']

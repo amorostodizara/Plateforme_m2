@@ -31,6 +31,8 @@ import {
   dateHeureFr,
   labelClass,
   selectClass,
+  formaternombrejours,
+  LabelObligatoire,
 } from '@/components/app/AdminKit'
 import { AccesReserve } from '@/components/app/Acces'
 export const Route = createFileRoute('/_authenticated/sessions')({
@@ -158,9 +160,12 @@ function Page() {
         !form.nom_session.trim() ||
         !form.formation_id ||
         !form.date_debut ||
-        !form.date_fin
+        !form.date_fin ||
+        !form.lieu
       )
-        throw new Error('Nom, formation et dates sont obligatoires.')
+        throw new Error(
+          'Nom session, formation , dates et lieu sont obligatoires.',
+        )
       const valeurs = {
         nom_session: form.nom_session.trim(),
         formation_id: Number(form.formation_id),
@@ -296,6 +301,7 @@ function Page() {
                   'Formation',
                   'Formateur',
                   'Dates',
+                  'Durée(s) ',
                   'Lieu',
                   'Inscrits',
                   'Statut',
@@ -341,7 +347,10 @@ function Page() {
                         : '—'}
                     </td>
                     <td className="px-3 py-3 text-xs">
-                      {dateHeureFr(s.date_debut)} -- {dateHeureFr(s.date_fin)}
+                      {dateHeureFr(s.date_debut)} - {dateHeureFr(s.date_fin)}
+                    </td>
+                    <td className="px-3 py-3 text-xs">
+                      {formaternombrejours(s.date_debut, s.date_fin)} jours
                     </td>
                     <td className="px-3 py-3 text-xs">{s.lieu ?? '—'}</td>
                     <td className="px-3 py-3 text-xs">
@@ -462,7 +471,9 @@ function Page() {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className={labelClass}>Nom de la session</label>
+              <label className={labelClass}>
+                Nom de la session <LabelObligatoire />
+              </label>
               <input
                 className={champClass}
                 value={form.nom_session}
@@ -473,7 +484,10 @@ function Page() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className={labelClass}>Formation</label>
+                <label className={labelClass}>
+                  Formation
+                  <LabelObligatoire />
+                </label>
                 <select
                   className={`${selectClass} w-full`}
                   value={form.formation_id}
@@ -509,7 +523,10 @@ function Page() {
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Début</label>
+                <label className={labelClass}>
+                  Début
+                  <LabelObligatoire />
+                </label>
                 <input
                   type="datetime-local"
                   className={champClass}
@@ -520,7 +537,10 @@ function Page() {
                 />
               </div>
               <div>
-                <label className={labelClass}>Fin</label>
+                <label className={labelClass}>
+                  Fin
+                  <LabelObligatoire />
+                </label>
                 <input
                   type="datetime-local"
                   className={champClass}
@@ -531,7 +551,10 @@ function Page() {
                 />
               </div>
               <div>
-                <label className={labelClass}>Lieu</label>
+                <label className={labelClass}>
+                  Lieu
+                  <LabelObligatoire />
+                </label>
                 <input
                   className={champClass}
                   value={form.lieu}
