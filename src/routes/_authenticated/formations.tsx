@@ -360,10 +360,14 @@ function Page() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => ouvrirEdition(f)}>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => ouvrirEdition(f)}
+                          >
                             <Pencil /> Modifier
                           </DropdownMenuItem>
                           <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={() =>
                               changerStatut.mutate({
                                 id: f.formation_id,
@@ -374,6 +378,7 @@ function Page() {
                             <Send /> Publier
                           </DropdownMenuItem>
                           <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={() =>
                               changerStatut.mutate({
                                 id: f.formation_id,
@@ -386,7 +391,7 @@ function Page() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => supprimer.mutate(f.formation_id)}
-                            className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                            className="background-delete cursor-pointer"
                           >
                             <Trash2 /> Supprimer
                           </DropdownMenuItem>

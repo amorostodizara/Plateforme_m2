@@ -50,7 +50,7 @@ export const Route = createFileRoute('/_authenticated/inscriptions')({
     ],
   }),
   component: () => (
-    <AccesReserve roles={['ADMINISTRATEUR', 'RESPONSABLE', 'FORMATEUR']}>
+    <AccesReserve roles={['ADMINISTRATEUR', 'RESPONSABLE']}>
       <Inscriptions />
     </AccesReserve>
   ),
@@ -398,6 +398,7 @@ function Inscriptions() {
                             <DropdownMenuLabel>Statut</DropdownMenuLabel>
                             {STATUTS.map((s) => (
                               <DropdownMenuItem
+                                className="cursor-pointer"
                                 key={s}
                                 onClick={() =>
                                   changerStatut.mutate({
@@ -410,14 +411,17 @@ function Inscriptions() {
                               </DropdownMenuItem>
                             ))}
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setDetail(l)}>
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onClick={() => setDetail(l)}
+                            >
                               Modifier
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-destructive"
+                              className="background-delete cursor-pointer"
                               onClick={() => supprimer.mutate(l.inscription_id)}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 />
                               Supprimer
                             </DropdownMenuItem>
                           </DropdownMenuContent>

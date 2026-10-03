@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { CheckCircle2, Clock, XCircle } from 'lucide-react'
@@ -8,6 +8,15 @@ import {
   SqueletteEntete,
   SqueletteGrilleCartes,
 } from '@/components/app/Squelette'
+
+import { useProfilCourant } from '@/components/app/AppShell'
+import {
+  raisonAccesEvaluation,
+  trouverInscriptionEvaluation,
+  type Evaluation,
+} from '@/lib/evaluations'
+
+import { useMesInscriptionsEvaluations } from '@/hooks/useMesInscriptionsEvaluations'
 
 export const Route = createFileRoute(
   '/_authenticated/evaluations/passer/$evaluationId',
@@ -51,16 +60,20 @@ type Question = {
 }
 
 function Passage() {
+  const navigate = useNavigate()
+  const [reponses, setReponses] = useState<Record<number, number[]>>({})
+  const [enCours, setEnCours] = useState(false)
+  const { data: profil } = useProfilCourant()
   const { evaluationId } = useParams({
     from: '/_authenticated/evaluations/passer/$evaluationId',
   })
-  const navigate = useNavigate()
-  const [reponses, setReponses] = useState<Record<number, number[]>>({})
   const [resultat, setResultat] = useState<{
     score: number
     reussi: boolean
   } | null>(null)
-  const [enCours, setEnCours] = useState(false)
+
+  const { data: inscriptions = [], isLoading: isLoadingInscriptions } =
+    useMesInscriptionsEvaluations(profil?.participant_id)
 
   const { data, isLoading } = useQuery({
     queryKey: ['evaluation', evaluationId],
@@ -68,7 +81,32 @@ function Passage() {
       const { data, error } = await supabase
         .from('evaluation')
         .select(
-          'evaluation_id, titre_evaluation, duree_minutes, score_reussite, session_id, session:session_formation(nom_session), question_evaluation(question_evaluation_id, texte_question, type_question, points, est_requis, ordre_question, option_question(option_question_id, texte_option, est_correct))',
+          `
+           evaluation_id,
+           titre_evaluation,
+           duree_minutes,
+           max_tentatives,
+           score_reussite,
+           session_id,
+           statut,
+           date_publication,
+           date_fermeture,
+           session:session_formation(nom_session,
+           formation:formation(titre)),
+           question_evaluation(
+             question_evaluation_id,
+             texte_question,
+             type_question,
+             points,
+             est_requis,
+             ordre_question,
+             option_question(
+               option_question_id,
+               texte_option,
+               est_correct
+             )
+           )
+         `,
         )
         .eq('evaluation_id', Number(evaluationId))
         .single()
@@ -98,6 +136,17 @@ function Passage() {
 
   async function soumettre() {
     if (!data) return
+
+    const evaluation = data as Evaluation
+    const raison = raisonAccesEvaluation(evaluation, inscriptions)
+    if (raison) {
+      throw new Error(raison)
+    }
+    const inscription = trouverInscriptionEvaluation(evaluation, inscriptions)
+    if (!inscription) {
+      throw new Error("Votre inscription à cette session n'est pas acceptée.")
+    }
+
     const manquantes = questions.filter(
       (q) => q.est_requis && !(reponses[q.question_evaluation_id] ?? []).length,
     )
@@ -107,33 +156,6 @@ function Passage() {
     }
     setEnCours(true)
     try {
-      const { data: auth } = await supabase.auth.getUser()
-      const { data: moi } = await supabase
-        .from('utilisateur')
-        .select('utilisateur_id, participant:participant(participant_id)')
-        .eq('auth_user_id', auth.user?.id ?? '')
-        .maybeSingle()
-      const brut = moi?.participant as
-        | { participant_id: number }
-        | { participant_id: number }[]
-        | null
-        | undefined
-      const participantId = Array.isArray(brut)
-        ? brut[0]?.participant_id
-        : brut?.participant_id
-      if (!participantId)
-        throw new Error('Aucun profil participant associé à votre compte.')
-
-      const { data: inscription } = await supabase
-        .from('inscription')
-        .select('inscription_id')
-        .eq('participant_id', participantId)
-        .eq('session_id', data.session_id)
-        .eq('statut', 'Acceptée')
-        .maybeSingle()
-      if (!inscription)
-        throw new Error('Votre inscription à cette session n’est pas acceptée.')
-
       let obtenus = 0
       let total = 0
       const lignes: {
@@ -179,14 +201,12 @@ function Passage() {
       if (error) throw error
 
       if (lignes.length) {
-        const { error: e2 } = await supabase
-          .from('reponse_participant')
-          .insert(
-            lignes.map((l) => ({
-              ...l,
-              tentative_evaluation_id: tentative.tentative_evaluation_id,
-            })),
-          )
+        const { error: e2 } = await supabase.from('reponse_participant').insert(
+          lignes.map((l) => ({
+            ...l,
+            tentative_evaluation_id: tentative.tentative_evaluation_id,
+          })),
+        )
         if (e2) throw e2
       }
 
@@ -227,14 +247,26 @@ function Passage() {
       setEnCours(false)
     }
   }
+  useEffect(() => {
+    if (!data || isLoading || isLoadingInscriptions) return
 
-  if (isLoading)
+    const raison = raisonAccesEvaluation(data as Evaluation, inscriptions)
+    if (raison) {
+      toast.error(raison)
+      navigate({
+        to: '/evaluations/mes-evaluations',
+      })
+    }
+  }, [data, inscriptions, isLoading, isLoadingInscriptions, navigate])
+
+  if (isLoading || isLoadingInscriptions)
     return (
       <div className="space-y-4">
         <SqueletteEntete />
         <SqueletteGrilleCartes nombre={3} />
       </div>
     )
+
   if (!data)
     return (
       <p className="text-sm text-muted-foreground">Évaluation introuvable.</p>

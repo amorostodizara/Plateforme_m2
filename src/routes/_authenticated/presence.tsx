@@ -577,6 +577,7 @@ function Presence() {
                               </DropdownMenuLabel>
                               {(['Présent', 'Absent'] as Statut[]).map((s) => (
                                 <DropdownMenuItem
+                                  className="cursor-pointer"
                                   key={s}
                                   onClick={() =>
                                     enregistrer.mutate({

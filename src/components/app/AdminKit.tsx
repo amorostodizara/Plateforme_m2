@@ -7,7 +7,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-/** Menu « ⋯ » d’actions présent dans chaque tableau. */
 export function MenuActions({ children }: { children: ReactNode }) {
   return (
     <DropdownMenu>
@@ -22,39 +21,6 @@ export function MenuActions({ children }: { children: ReactNode }) {
     </DropdownMenu>
   )
 }
-
-/** Choix Actif / Inactif par boutons radio, appliqué immédiatement. */
-// export function RadioStatut({
-//   valeur,
-//   onChange,
-//   nom,
-//   options = ["Actif", "Inactif"],
-//   desactive,
-// }: {
-//   valeur: string;
-//   onChange: (v: string) => void;
-//   nom: string;
-//   options?: string[];
-//   desactive?: boolean;
-// }) {
-//   return (
-//     <div className="flex items-center gap-3">
-//       {options.map((o) => (
-//         <label key={o} className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-foreground">
-//           <input
-//             type="radio"
-//             name={nom}
-//             className="h-3.5 w-3.5 accent-[#FF7900]"
-//             checked={valeur === o}
-//             disabled={desactive}
-//             onChange={() => onChange(o)}
-//           />
-//           {o}
-//         </label>
-//       ))}
-//     </div>
-//   );
-// }
 
 export const champClass =
   'h-10 w-full rounded-md border border-input bg-card px-3 text-sm text-foreground focus:border-primary focus:outline-none'

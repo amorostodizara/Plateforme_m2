@@ -341,13 +341,16 @@ function Page() {
                     </td>
                     <td className="px-3 py-3">
                       <MenuActions>
-                        <DropdownMenuItem onClick={() => ouvrirEdition(r)}>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => ouvrirEdition(r)}
+                        >
                           <Pencil /> Modifier
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() => supprimer.mutate(r.responsable_id)}
-                          className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                          className="background-delete cursor-pointer"
                         >
                           <Trash2 /> Supprimer
                         </DropdownMenuItem>

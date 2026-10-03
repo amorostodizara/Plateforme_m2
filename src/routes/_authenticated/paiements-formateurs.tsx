@@ -529,14 +529,21 @@ function Page() {
                     >
                       {estGestionnaire ? (
                         <MenuActions>
-                          <DropdownMenuItem onClick={() => pdf(p)}>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => pdf(p)}
+                          >
                             <FileDown /> Télécharger le PDF
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => ouvrirEdition(p)}>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => ouvrirEdition(p)}
+                          >
                             <Pencil /> Modifier le paiement
                           </DropdownMenuItem>
                           {p.statut !== 'Payé' ? (
                             <DropdownMenuItem
+                              className="cursor-pointer"
                               onClick={() =>
                                 changerStatut.mutate({
                                   id: p.paiement_id,
@@ -549,6 +556,7 @@ function Page() {
                           ) : null}
                           {p.statut !== 'Annulé' ? (
                             <DropdownMenuItem
+                              className="cursor-pointer"
                               onClick={() =>
                                 changerStatut.mutate({
                                   id: p.paiement_id,
@@ -562,7 +570,7 @@ function Page() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => supprimer.mutate(p.paiement_id)}
-                            className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                            className="background-delete cursor-pointer"
                           >
                             <Trash2 /> Supprimer
                           </DropdownMenuItem>

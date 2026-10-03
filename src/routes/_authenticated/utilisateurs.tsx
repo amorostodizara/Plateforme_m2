@@ -355,6 +355,7 @@ function Page() {
                     <td className="px-3 py-3">
                       <MenuActions>
                         <DropdownMenuItem
+                          className="cursor-pointer"
                           onClick={() => {
                             setEdite(u)
                             setForm({
@@ -368,10 +369,14 @@ function Page() {
                         >
                           <Pencil /> Modifier le compte
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setRoles(u)}>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => setRoles(u)}
+                        >
                           <ShieldCheck /> Gérer les rôles
                         </DropdownMenuItem>
                         <DropdownMenuItem
+                          className="cursor-pointer"
                           onClick={() =>
                             changerStatut.mutate({
                               id: u.utilisateur_id,

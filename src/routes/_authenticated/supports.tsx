@@ -342,6 +342,7 @@ function Page() {
                 {peutGerer ? (
                   <MenuActions>
                     <DropdownMenuItem
+                      className="cursor-pointer"
                       onClick={() => {
                         setEdite(s)
                         setForm({
@@ -353,12 +354,15 @@ function Page() {
                     >
                       <Pencil /> Renommer le support
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => telecharger(s)}>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => telecharger(s)}
+                    >
                       <Download /> Télécharger
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => supprimer.mutate(s)}
-                      className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                      className="background-delete cursor-pointer"
                     >
                       <Trash2 /> Supprimer
                     </DropdownMenuItem>

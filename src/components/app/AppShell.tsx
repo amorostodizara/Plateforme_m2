@@ -472,13 +472,13 @@ export function AppShell({ children }: { children: ReactNode }) {
     <>
       <DropdownMenuLabel>Mon profil</DropdownMenuLabel>
       <DropdownMenuSeparator />
-      <DropdownMenuItem asChild>
+      <DropdownMenuItem asChild className="cursor-pointer">
         <Link to="/profil">
           <UserRound />
           Mon profil
         </Link>
       </DropdownMenuItem>
-      <DropdownMenuItem asChild>
+      <DropdownMenuItem asChild className="cursor-pointer">
         <Link to="/modifier-profil">
           <UserPen />
           Modifier profil
@@ -487,7 +487,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <DropdownMenuSeparator />
       <DropdownMenuItem
         onClick={seDeconnecter}
-        className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+        className="background-delete cursor-pointer"
       >
         <LogOut />
         Déconnexion

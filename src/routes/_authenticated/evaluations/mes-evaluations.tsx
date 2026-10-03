@@ -1,36 +1,28 @@
 import { useMemo, useState, useEffect } from 'react'
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   BadgeCheck,
   CalendarDays,
   Clock,
-  Copy,
-  FileClock,
   Lock,
-  MoreHorizontal,
   PlayCircle,
   Send,
-  Pencil,
   Target,
-  Trash2,
   X,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/integrations/supabase/client'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { useProfilCourant } from '@/components/app/AppShell'
+import { dateHeureFr } from '@/components/app/AdminKit'
+import { VueParticipant } from '@/components/app/VueParticipant'
+import { VueGestionnaire } from '@/components/app/VueGestionnaire'
 import {
-  SqueletteGrilleCartes,
-  SqueletteLignesTableau,
-} from '@/components/app/Squelette'
-import { dateHeureFr } from '#/components/app/AdminKit'
+  peutPasserEvaluation,
+  type Evaluation,
+  type Statut,
+} from '@/lib/evaluations'
+import { useMesInscriptionsEvaluations } from '@/hooks/useMesInscriptionsEvaluations'
 
 export const Route = createFileRoute(
   '/_authenticated/evaluations/mes-evaluations',
@@ -56,34 +48,6 @@ export const Route = createFileRoute(
   }),
   component: MesEvaluations,
 })
-
-type Statut = 'Brouillon' | 'Publiée' | 'Fermée'
-
-type Evaluation = {
-  evaluation_id: number
-  session_id: number
-  titre_evaluation: string
-  date_publication: string | null
-  date_fermeture: string | null
-  duree_minutes: number
-  max_tentatives: number
-  score_reussite: number
-  statut: Statut
-  session: { nom_session: string; formation: { titre: string } | null } | null
-  question_evaluation: { question_evaluation_id: number }[] | null
-}
-
-type InscriptionAvecPresences = {
-  inscription_id: number
-  session_id: number
-  statut: string
-  presence: {
-    presence_id: number
-    present: boolean
-    statut: string
-  }[]
-}
-
 const couleur: Record<Statut, string> = {
   Brouillon: 'bg-secondary text-muted-foreground',
   Publiée: 'bg-[#E6F4EA] text-[#137333]',
@@ -92,11 +56,12 @@ const couleur: Record<Statut, string> = {
 
 function MesEvaluations() {
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
   const [filtre, setFiltre] = useState<'Tous' | Statut>('Tous')
   const [detail, setDetail] = useState<Evaluation | null>(null)
   const { data: profil } = useProfilCourant()
 
+  const { data: inscriptions = [], isLoading: isLoadingInscriptions } =
+    useMesInscriptionsEvaluations(profil?.participant_id)
   const peutGerer =
     profil?.roles?.includes('ADMINISTRATEUR') ||
     profil?.roles?.includes('RESPONSABLE') ||
@@ -116,80 +81,6 @@ function MesEvaluations() {
       return (data ?? []) as unknown as Evaluation[]
     },
   })
-
-  const { data: inscriptions = [], isLoading: isLoadingInscriptions } =
-    useQuery({
-      queryKey: ['mes-inscriptions-evaluations'],
-      queryFn: async (): Promise<InscriptionAvecPresences[]> => {
-        const { data: auth, error: erreurAuth } = await supabase.auth.getUser()
-
-        if (erreurAuth) throw erreurAuth
-
-        const authId = auth.user?.id
-
-        if (!authId) {
-          return []
-        }
-        const { data: utilisateur, error: erreurUtilisateur } = await supabase
-          .from('utilisateur')
-          .select('utilisateur_id')
-          .eq('auth_user_id', authId)
-          .single()
-
-        if (erreurUtilisateur) throw erreurUtilisateur
-        const { data: participant, error: erreurParticipant } = await supabase
-          .from('participant')
-          .select('participant_id')
-          .eq('utilisateur_id', utilisateur.utilisateur_id)
-          .single()
-        if (erreurParticipant) throw erreurParticipant
-        const { data, error } = await supabase
-          .from('inscription')
-          .select(
-            `inscription_id, session_id, statut,
-          presence ( presence_id, present,statut ) `,
-          )
-          .eq('participant_id', participant.participant_id)
-          .eq('statut', 'Acceptée')
-        if (error) throw error
-        return (data ?? []) as InscriptionAvecPresences[]
-      },
-      enabled: profil?.roles?.includes('PARTICIPANT') === true,
-    })
-
-  function evaluationExpiree(e: Evaluation) {
-    if (e.statut !== 'Publiée') return false
-    if (!e.date_fermeture) return false
-
-    return new Date() >= new Date(e.date_fermeture)
-  }
-
-  function peutPasserEvaluation(evaluation: Evaluation) {
-    // Une évaluation fermée ou en brouillon ne peut jamais être passée
-    if (evaluation.statut !== 'Publiée') {
-      return false
-    }
-
-    // Une évaluation publiée dont la date de fermeture est dépassée
-    // ne peut plus être passée
-    if (evaluationExpiree(evaluation)) {
-      return false
-    }
-    const inscription = inscriptions.find(
-      (i) => i.session_id === evaluation.session_id,
-    )
-    if (!inscription) {
-      return false
-    }
-    const presences = inscription.presence ?? []
-    return (
-      presences.length > 0 &&
-      presences.every(
-        (presence) =>
-          presence.present === true && presence.statut === 'Présent',
-      )
-    )
-  }
 
   const fermerEvaluationsExpirees = useMutation({
     mutationFn: async () => {
@@ -249,7 +140,7 @@ function MesEvaluations() {
       const { data: complet, error: e0 } = await supabase
         .from('evaluation')
         .select(
-          'session_id, duree_minutes, max_tentatives, score_reussite, question_evaluation(texte_question, type_question, ordre_question, points, est_requis, option_question(texte_option, est_correct, ordre_option))',
+          'session_id,date_publication, date_fermeture, duree_minutes, max_tentatives, score_reussite, question_evaluation(texte_question, type_question, ordre_question, points, est_requis, option_question(texte_option, est_correct, ordre_option))',
         )
         .eq('evaluation_id', source.evaluation_id)
         .single()
@@ -259,6 +150,8 @@ function MesEvaluations() {
         .insert({
           session_id: complet.session_id,
           titre_evaluation: `${source.titre_evaluation} (copie)`,
+          date_publication: complet.date_publication,
+          date_fermeture: complet.date_fermeture,
           duree_minutes: complet.duree_minutes,
           max_tentatives: complet.max_tentatives,
           score_reussite: complet.score_reussite,
@@ -329,287 +222,6 @@ function MesEvaluations() {
 
   const chargement = isLoading || isLoadingInscriptions
 
-  function VueParticipant() {
-    return (
-      <>
-        {chargement ? (
-          <div className="space-y-4">
-            <SqueletteGrilleCartes nombre={2} />
-          </div>
-        ) : affichees.length === 0 ? (
-          <div className="flex min-h-72 flex-col items-center justify-center rounded-lg border border-dashed border-input bg-card px-6 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-cream text-primary">
-              <FileClock className="h-7 w-7" />
-            </span>
-            <h2 className="mt-4 text-base font-bold text-foreground">
-              En attente d’une évaluation
-            </h2>
-            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Les évaluations apparaîtront ici dès qu’un responsable les aura
-              publiées ou fermés pour votre session.
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {affichees.map((e) => (
-              <article
-                key={e.evaluation_id}
-                className="group overflow-hidden rounded-lg border border-border bg-card shadow-sm transition hover:shadow-card"
-              >
-                <div className="flex h-1.5 bg-primary" />
-                <button
-                  onClick={() =>
-                    peutPasserEvaluation(e)
-                      ? navigate({
-                          to: '/evaluations/passer/$evaluationId',
-                          params: { evaluationId: String(e.evaluation_id) },
-                        })
-                      : setDetail(e)
-                  }
-                  className="block w-full p-4 text-left"
-                  aria-label={`Ouvrir ${e.titre_evaluation}`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="truncate text-base font-bold text-foreground">
-                        {e.titre_evaluation}
-                      </h3>
-                      <p className="mt-0.5 truncate text-sm text-muted-foreground">
-                        {e.session?.formation?.titre ?? '—'} ·{' '}
-                        {e.session?.nom_session ?? '—'}
-                      </p>
-                    </div>
-                    <span
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${couleur[e.statut]}`}
-                    >
-                      {e.statut}
-                    </span>
-                  </div>
-                  <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-md bg-secondary/70 px-2 py-1.5">
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        Questions
-                      </p>
-                      <p className="text-sm font-bold text-foreground">
-                        {e.question_evaluation?.length ?? 0}
-                      </p>
-                    </div>
-                    <div className="rounded-md bg-secondary/70 px-2 py-1.5">
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        Durée
-                      </p>
-                      <p className="text-sm font-bold text-foreground">
-                        {e.duree_minutes} min
-                      </p>
-                    </div>
-                    <div className="rounded-md bg-secondary/70 px-2 py-1.5">
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        Réussite
-                      </p>
-                      <p className="text-sm font-bold text-foreground">
-                        {e.score_reussite} %
-                      </p>
-                    </div>
-                  </div>
-                </button>
-                <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
-                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Lock className="h-3.5 w-3.5" />
-                    {dateHeureFr(e.date_fermeture)}
-                  </span>
-                  {peutPasserEvaluation(e) ? (
-                    <Link
-                      to="/evaluations/passer/$evaluationId"
-                      params={{ evaluationId: String(e.evaluation_id) }}
-                      className="flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
-                    >
-                      <PlayCircle className="h-4 w-4" />
-                      Commencer
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={() => setDetail(e)}
-                      className="text-sm font-semibold text-muted-foreground hover:text-foreground"
-                    >
-                      Détails
-                    </button>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </>
-    )
-  }
-
-  function VueGestionnaire() {
-    return (
-      <div className="rounded-lg border border-border bg-card">
-        <div className="max-h-[560px] overflow-auto">
-          <table className="w-full min-w-[900px] text-left text-sm">
-            <thead className="sticky top-0 bg-secondary">
-              <tr>
-                {[
-                  'Évaluation',
-                  'Session',
-                  'Publication',
-                  'Fermeture',
-                  'Durée',
-                  'Score requis',
-                  'Statut',
-                  'Actions',
-                ].map((t) => (
-                  <th
-                    key={t}
-                    className="whitespace-nowrap px-3 py-3 text-xs font-bold tracking-wide text-muted-foreground"
-                  >
-                    {t}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {chargement ? (
-                <SqueletteLignesTableau colonnes={8} />
-              ) : affichees.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-3 py-6 text-muted-foreground">
-                    Aucune évaluation pour le moment.
-                  </td>
-                </tr>
-              ) : (
-                affichees.map((e) => (
-                  <tr
-                    key={e.evaluation_id}
-                    onClick={() => setDetail(e)}
-                    className="cursor-pointer border-t border-border hover:bg-secondary/60"
-                  >
-                    <td className="px-3 py-3 font-medium text-foreground">
-                      {e.titre_evaluation}
-                    </td>
-                    <td className="px-3 py-3 text-muted-foreground">
-                      {e.session?.nom_session ?? '—'}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
-                      {dateHeureFr(e.date_publication)}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
-                      {dateHeureFr(e.date_fermeture)}
-                    </td>
-                    <td className="px-3 py-3 text-muted-foreground">
-                      {e.duree_minutes} min
-                    </td>
-                    <td className="px-3 py-3 text-muted-foreground">
-                      {e.score_reussite} %
-                    </td>
-                    <td className="px-3 py-3">
-                      <span
-                        className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${couleur[e.statut]}`}
-                      >
-                        {e.statut}
-                      </span>
-                    </td>
-                    <td
-                      className="px-3 py-3"
-                      onClick={(ev) => ev.stopPropagation()}
-                    >
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="rounded-md p-1.5 hover:bg-secondary">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setDetail(e)}>
-                            Consulter
-                          </DropdownMenuItem>
-                          {peutPasserEvaluation(e) ? (
-                            <DropdownMenuItem asChild>
-                              <Link
-                                to="/evaluations/passer/$evaluationId"
-                                params={{
-                                  evaluationId: String(e.evaluation_id),
-                                }}
-                              >
-                                <PlayCircle />
-                                Passer l’évaluation
-                              </Link>
-                            </DropdownMenuItem>
-                          ) : null}
-                          {peutGerer ? (
-                            <>
-                              <DropdownMenuItem
-                                onClick={() => dupliquer.mutate(e)}
-                              >
-                                <Copy />
-                                Dupliquer
-                              </DropdownMenuItem>
-                              {peutPublierEvaluation(e) ? (
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    changerStatut.mutate({
-                                      id: e.evaluation_id,
-                                      statut: 'Publiée',
-                                    })
-                                  }
-                                >
-                                  <Send />
-                                  Publier
-                                </DropdownMenuItem>
-                              ) : null}
-                              {peutFermerEvaluation(e) ? (
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    changerStatut.mutate({
-                                      id: e.evaluation_id,
-                                      statut: 'Fermée',
-                                    })
-                                  }
-                                >
-                                  <Lock />
-                                  Fermer
-                                </DropdownMenuItem>
-                              ) : null}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                disabled={!peutModifierEvaluation(e)}
-                                onClick={() => {
-                                  if (!peutModifierEvaluation(e)) return
-
-                                  navigate({
-                                    to: '/evaluations/creation',
-                                    search: {
-                                      evaluationId: String(e.evaluation_id),
-                                    },
-                                  })
-                                }}
-                              >
-                                <Pencil />
-                                Modifier
-                              </DropdownMenuItem>{' '}
-                              <DropdownMenuItem
-                                className="text-destructive"
-                                onClick={() =>
-                                  supprimer.mutate(e.evaluation_id)
-                                }
-                              >
-                                <Trash2 />
-                                Supprimer
-                              </DropdownMenuItem>
-                            </>
-                          ) : null}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="flex gap-4">
       <div className="min-w-0 flex-1 space-y-4">
@@ -627,6 +239,7 @@ function MesEvaluations() {
           {peutGerer ? (
             <Link
               to="/evaluations/creation"
+              search={{ evaluationId: undefined }}
               className="flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
               Nouvelle évaluation
@@ -647,7 +260,32 @@ function MesEvaluations() {
             </button>
           ))}
         </div>
-        {!peutGerer ? <VueParticipant /> : <VueGestionnaire />}
+        {!peutGerer ? (
+          <VueParticipant
+            chargement={chargement}
+            affichees={affichees}
+            inscriptions={inscriptions}
+            couleur={couleur}
+            setDetail={setDetail}
+            dateHeureFr={dateHeureFr}
+          />
+        ) : (
+          <VueGestionnaire
+            chargement={chargement}
+            affichees={affichees}
+            inscriptions={inscriptions}
+            couleur={couleur}
+            peutGerer={peutGerer}
+            setDetail={setDetail}
+            dateHeureFr={dateHeureFr}
+            dupliquer={dupliquer}
+            changerStatut={changerStatut}
+            supprimer={supprimer}
+            peutPublierEvaluation={peutPublierEvaluation}
+            peutFermerEvaluation={peutFermerEvaluation}
+            peutModifierEvaluation={peutModifierEvaluation}
+          />
+        )}
       </div>
 
       {detail ? (
@@ -716,7 +354,7 @@ function MesEvaluations() {
             />
           </div>
 
-          {peutPasserEvaluation(detail) ? (
+          {peutPasserEvaluation(detail, inscriptions) ? (
             <Link
               to="/evaluations/passer/$evaluationId"
               params={{ evaluationId: String(detail.evaluation_id) }}

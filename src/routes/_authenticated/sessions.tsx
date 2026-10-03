@@ -375,13 +375,16 @@ function Page() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => ouvrirEdition(s)}>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => ouvrirEdition(s)}
+                          >
                             <Pencil /> Modifier
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => supprimer.mutate(s.session_id)}
-                            className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                            className="background-delete cursor-pointer"
                           >
                             <Trash2 /> Supprimer
                           </DropdownMenuItem>

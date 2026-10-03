@@ -559,6 +559,7 @@ function Page() {
                     >
                       <MenuActions>
                         <DropdownMenuItem
+                          className="cursor-pointer"
                           onClick={() => {
                             setDetail(f)
                             setOnglet('historique')
@@ -567,6 +568,7 @@ function Page() {
                           <Eye /> Voir la fiche
                         </DropdownMenuItem>
                         <DropdownMenuItem
+                          className="cursor-pointer"
                           onClick={() => {
                             setDetail(f)
                             ouvrirProfil(f)
@@ -579,6 +581,7 @@ function Page() {
                             setDetail(f)
                             setOnglet('paiements')
                           }}
+                          className="cursor-pointer"
                         >
                           <Wallet /> Paiements
                         </DropdownMenuItem>
@@ -587,7 +590,7 @@ function Page() {
                           onClick={() =>
                             supprimerFormateur.mutate(f.formateur_id)
                           }
-                          className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                          className="background-delete cursor-pointer"
                         >
                           <Trash2 /> Supprimer
                         </DropdownMenuItem>
@@ -749,6 +752,7 @@ function Page() {
                         </p>
                         <MenuActions>
                           <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={() => {
                               setPaiementEdite(p.paiement_id)
                               setPaiement({
@@ -766,6 +770,7 @@ function Page() {
                           </DropdownMenuItem>
                           {p.statut !== 'Payé' ? (
                             <DropdownMenuItem
+                              className="cursor-pointer"
                               onClick={() =>
                                 changerStatutPaiement.mutate({
                                   id: p.paiement_id,
@@ -781,7 +786,7 @@ function Page() {
                             onClick={() =>
                               supprimerPaiement.mutate(p.paiement_id)
                             }
-                            className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                            className="background-delete cursor-pointer"
                           >
                             <Trash2 /> Supprimer
                           </DropdownMenuItem>

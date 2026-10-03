@@ -703,13 +703,16 @@ function Actualites() {
                       <MoreHorizontal className="h-5 w-5" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => ouvrirEdition(p)}>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => ouvrirEdition(p)}
+                      >
                         <Pencil />
                         Modifier la publication
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        className="text-destructive"
+                        className="cursor-pointer background-delete"
                         onClick={() => supprimerPublication.mutate(p)}
                       >
                         <Trash2 />

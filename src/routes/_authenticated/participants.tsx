@@ -508,6 +508,7 @@ function Page() {
                       >
                         <MenuActions>
                           <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={() => {
                               setDetail(p)
                               setOnglet('synthese')
@@ -515,17 +516,23 @@ function Page() {
                           >
                             <Eye /> Voir le parcours
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => ouvrirEdition(p)}>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => ouvrirEdition(p)}
+                          >
                             <Pencil /> Modifier le profil
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setBadge(p)}>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => setBadge(p)}
+                          >
                             <QrCode /> Voir le badge QR
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
 
                           <DropdownMenuItem
                             onClick={() => supprimer.mutate(p.participant_id)}
-                            className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                            className="background-delete cursor-pointer"
                           >
                             <Trash2 /> Supprimer
                           </DropdownMenuItem>
