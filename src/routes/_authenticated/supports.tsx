@@ -266,12 +266,27 @@ function Page() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <CarteStat libelle="Supports disponibles" valeur={supports.length} />
         <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Supports disponibles"
+          valeur={supports.length}
+        />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
           libelle="Sessions concernées"
           valeur={new Set(supports.map((s) => s.session_id)).size}
         />
-        <CarteStat libelle="Volume total" valeur={tailleLisible(volume)} />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Volume total"
+          valeur={tailleLisible(volume)}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-card p-4 sm:grid-cols-[minmax(0,1fr)_auto]">

@@ -145,11 +145,6 @@ function Presence() {
     },
   })
 
-  useEffect(() => {
-    if (sessionId === null && sessions.length > 0)
-      setSessionId(sessions[0]!.session_id)
-  }, [sessions, sessionId])
-
   const { data: lignes = [], isLoading } = useQuery({
     queryKey: ['presences', sessionId],
     enabled: sessionId !== null,
@@ -192,13 +187,17 @@ function Presence() {
     return out
   }, [sessionActive])
 
+  useEffect(() => {
+    if (jours.length > 0 && jour === 'Toutes') {
+      setJour(jours[0]!)
+    }
+  }, [jours, jour])
+
   const presenceDe = useCallback(
     (l: Ligne): PresenceLigne | null => {
-      const liste = (l.presence ?? [])
-        .slice()
-        .sort((a, b) => b.date_presence.localeCompare(a.date_presence))
-      if (jour === 'Toutes') return liste[0] ?? null
-      return liste.find((p) => p.date_presence === jour) ?? null
+      if (jour === 'Toutes') return null
+
+      return (l.presence ?? []).find((p) => p.date_presence === jour) ?? null
     },
     [jour],
   )
@@ -215,6 +214,11 @@ function Presence() {
       methode: Methode
       remarque?: string
     }) => {
+      if (jour === 'Toutes') {
+        throw new Error(
+          'Sélectionnez une date de séance avant d’enregistrer une présence.',
+        )
+      }
       const date = jour === 'Toutes' ? jourIso(new Date()) : jour
       const { data: existante } = await supabase
         .from('presence')
@@ -371,58 +375,76 @@ function Presence() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            {
-              titre: 'Total participants',
-              valeur: total,
-              sous: '',
-              icone: Users,
-              couleur: 'bg-secondary text-muted-foreground',
-            },
-            {
-              titre: 'Présents',
-              valeur: presents,
-              sous: pct(presents),
-              icone: UserCheck,
-              couleur: 'bg-[#E6F4EA] text-[#137333]',
-            },
-            {
-              titre: 'Absents',
-              valeur: absents,
-              sous: pct(absents),
-              icone: UserX,
-              couleur: 'bg-[#FCE8E6] text-[#C5221F]',
-            },
-            {
-              titre: 'Non enregistrés',
-              valeur: nonEnregistres,
-              sous: pct(nonEnregistres),
-              icone: ClipboardCheck,
-              couleur: 'bg-cream text-primary',
-            },
-          ].map(({ titre, valeur, sous, icone: Icone, couleur }) => (
-            <div
-              key={titre}
-              className="flex items-center gap-3 rounded-lg border border-border bg-card p-4"
-            >
-              <span
-                className={`flex h-10 w-10 items-center justify-center rounded-full ${couleur}`}
-              >
-                <Icone className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-xs font-semibold tracking-wide text-muted-foreground">
-                  {titre}
-                </p>
-                <p className="text-2xl font-bold text-foreground">{valeur}</p>
-                {sous ? (
-                  <p className="text-xs font-semibold text-muted-foreground">
-                    {sous}
-                  </p>
-                ) : null}
-              </div>
+          {/* Total participants */}
+          <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-muted-foreground">
+              <Users className="h-5 w-5" />
+            </span>
+
+            <div>
+              <p className="text-xs font-semibold tracking-wide text-muted-foreground">
+                Total participants
+              </p>
+
+              <p className="text-2xl font-bold text-foreground">{total}</p>
             </div>
-          ))}
+          </div>
+
+          {/* Présents */}
+          <div className="flex items-center gap-3 rounded-lg border border-[#137333]/20 bg-[#E6F4EA] text-[#137333] p-4">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full  ">
+              <UserCheck className="h-5 w-5" />
+            </span>
+
+            <div>
+              <p className="text-xs font-semibold tracking-wide  text-[#137333]">
+                Présents
+              </p>
+
+              <p className="text-2xl font-bold text-[#137333]">{presents}</p>
+
+              <p className="text-xs font-semibold  text-[#137333]">
+                {pct(presents)}
+              </p>
+            </div>
+          </div>
+
+          {/* Absents */}
+          <div className="flex items-center gap-3 rounded-lg border border-[#C5221F]/20 bg-[#FCE8E6] p-4">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FCE8E6] text-[#C5221F]">
+              <UserX className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="text-xs font-semibold tracking-wide text-[#C5221F]">
+                Absents
+              </p>
+              <p className="text-2xl font-bold text-[#C5221F]">{absents}</p>
+              <p className="text-xs font-semibold text-[#C5221F]">
+                {pct(absents)}
+              </p>
+            </div>
+          </div>
+
+          {/* Non enregistrés */}
+          <div className="flex items-center gap-3 rounded-lg border border-border bg-secondary p-4">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-muted-foreground">
+              <ClipboardCheck className="h-5 w-5" />
+            </span>
+
+            <div>
+              <p className="text-xs font-semibold tracking-wide text-muted-foreground">
+                Non enregistrés
+              </p>
+
+              <p className="text-2xl font-bold text-foreground">
+                {nonEnregistres}
+              </p>
+
+              <p className="text-xs font-semibold text-muted-foreground">
+                {pct(nonEnregistres)}
+              </p>
+            </div>
+          </div>
         </div>
 
         <ScannerQr onCode={surCode} />

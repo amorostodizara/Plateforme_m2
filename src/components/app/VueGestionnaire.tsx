@@ -1,4 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import {
   Copy,
   Lock,
@@ -12,6 +12,7 @@ import {
 import { SqueletteLignesTableau } from '@/components/app/Squelette'
 import {
   peutPasserEvaluation,
+  useCommencerEvaluation,
   type Evaluation,
   type InscriptionAvecPresences,
 } from '@/lib/evaluations'
@@ -61,6 +62,7 @@ export function VueGestionnaire({
   peutModifierEvaluation,
 }: Props) {
   const navigate = useNavigate()
+  const commencerEvaluation = useCommencerEvaluation(inscriptions, navigate)
 
   return (
     <div className="rounded-lg border border-border bg-card">
@@ -152,18 +154,19 @@ export function VueGestionnaire({
                         >
                           Consulter
                         </DropdownMenuItem>
-
                         {peutPasserEvaluation(e, inscriptions) ? (
-                          <DropdownMenuItem className="cursor-pointer" asChild>
-                            <Link
-                              to="/evaluations/passer/$evaluationId"
-                              params={{
-                                evaluationId: String(e.evaluation_id),
-                              }}
-                            >
-                              <PlayCircle />
-                              Passer l’évaluation
-                            </Link>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onSelect={(event) => {
+                              event.preventDefault()
+                              commencerEvaluation.mutate(e)
+                            }}
+                            disabled={commencerEvaluation.isPending}
+                          >
+                            <PlayCircle />
+                            {commencerEvaluation.isPending
+                              ? 'Démarrage...'
+                              : 'Passer l’évaluation'}
                           </DropdownMenuItem>
                         ) : null}
 

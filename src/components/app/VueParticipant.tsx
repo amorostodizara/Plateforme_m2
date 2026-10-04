@@ -1,15 +1,13 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { FileClock, Lock, PlayCircle } from 'lucide-react'
-
-import { Bloc } from '@/components/app/Squelette'
 import {
   peutPasserEvaluation,
+  useCommencerEvaluation,
   type Evaluation,
   type InscriptionAvecPresences,
 } from '@/lib/evaluations'
 
 type Props = {
-  chargement: boolean
   affichees: Evaluation[]
   inscriptions: InscriptionAvecPresences[]
   couleur: Record<string, string>
@@ -18,7 +16,6 @@ type Props = {
 }
 
 export function VueParticipant({
-  chargement,
   affichees,
   inscriptions,
   couleur,
@@ -26,23 +23,11 @@ export function VueParticipant({
   dateHeureFr,
 }: Props) {
   const navigate = useNavigate()
+  const commencerEvaluation = useCommencerEvaluation(inscriptions, navigate)
 
   return (
     <>
-      {chargement ? (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-lg border border-border bg-card p-4"
-            >
-              <Bloc className="h-6 w-6" />
-              <Bloc className="mt-3 h-4 w-32" />
-              <Bloc className="mt-2 h-3 w-24" />
-            </div>
-          ))}
-        </div>
-      ) : affichees.length === 0 ? (
+      {affichees.length === 0 ? (
         <div className="flex min-h-72 flex-col items-center justify-center rounded-lg border border-dashed border-input bg-card px-6 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-cream text-primary">
             <FileClock className="h-7 w-7" />
@@ -69,12 +54,7 @@ export function VueParticipant({
               <button
                 onClick={() =>
                   peutPasserEvaluation(e, inscriptions)
-                    ? navigate({
-                        to: '/evaluations/passer/$evaluationId',
-                        params: {
-                          evaluationId: String(e.evaluation_id),
-                        },
-                      })
+                    ? commencerEvaluation.mutate(e)
                     : setDetail(e)
                 }
                 className="block w-full p-4 text-left"
@@ -132,20 +112,22 @@ export function VueParticipant({
               <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Lock className="h-3.5 w-3.5" />
-                  {dateHeureFr(e.date_fermeture)}
+                  Fermée le {dateHeureFr(e.date_fermeture)}
                 </span>
 
                 {peutPasserEvaluation(e, inscriptions) ? (
-                  <Link
-                    to="/evaluations/passer/$evaluationId"
-                    params={{
-                      evaluationId: String(e.evaluation_id),
-                    }}
-                    className="flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
+                  <button
+                    type="button"
+                    disabled={commencerEvaluation.isPending}
+                    onClick={() => commencerEvaluation.mutate(e)}
+                    className="flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
                   >
                     <PlayCircle className="h-4 w-4" />
-                    Commencer
-                  </Link>
+
+                    {commencerEvaluation.isPending
+                      ? 'Démarrage...'
+                      : 'Commencer'}
+                  </button>
                 ) : (
                   <button
                     onClick={() => setDetail(e)}

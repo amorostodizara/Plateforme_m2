@@ -1,11 +1,31 @@
 import type { ReactNode } from 'react'
-import { MoreHorizontal, X } from 'lucide-react'
+import { MoreHorizontal, X, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+
+const couleurs: Record<string, string> = {
+  Publiée: 'bg-[#E6F4EA] text-[#137333]',
+  Acceptée: 'bg-[#E6F4EA] text-[#137333]',
+  Valide: 'bg-[#E6F4EA] text-[#137333]',
+  Actif: 'bg-[#E6F4EA] text-[#137333]',
+  Présent: 'bg-[#E6F4EA] text-[#137333]',
+  Payé: 'bg-[#E6F4EA] text-[#137333]',
+  Terminée: 'bg-secondary text-muted-foreground',
+  Archivée: 'bg-secondary text-muted-foreground',
+  Inactif: 'bg-secondary text-muted-foreground',
+  Brouillon: 'bg-cream text-primary',
+  'En attente': 'bg-cream text-primary',
+  'En cours': 'bg-cream text-primary',
+  Planifiée: 'bg-[#E8F0FE] text-[#1A73E8]',
+  Annulée: 'bg-[#FCE8E6] text-[#C5221F]',
+  Annulé: 'bg-[#FCE8E6] text-[#C5221F]',
+  Refusée: 'bg-[#FCE8E6] text-[#C5221F]',
+  Absent: 'bg-[#FCE8E6] text-[#C5221F]',
+}
 
 export function MenuActions({ children }: { children: ReactNode }) {
   return (
@@ -52,16 +72,28 @@ export function EnteteAdmin({
 export function CarteStat({
   libelle,
   valeur,
+  className = '',
+  libelleClassName = '',
+  valeurClassName = '',
 }: {
   libelle: string
   valeur: ReactNode
+  className?: string
+  libelleClassName?: string
+  valeurClassName?: string
 }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <p className="text-xs font-semibold tracking-wide text-muted-foreground">
+    <div className={`rounded-lg border border-border bg-card p-4 ${className}`}>
+      <p
+        className={`text-xs font-semibold tracking-wide text-muted-foreground ${libelleClassName}`}
+      >
         {libelle}
       </p>
-      <p className="mt-2 text-2xl font-bold text-foreground">{valeur}</p>
+      <p
+        className={`mt-2 text-2xl font-bold text-foreground ${valeurClassName}`}
+      >
+        {valeur}
+      </p>
     </div>
   )
 }
@@ -136,26 +168,6 @@ export function LigneInfo({
   )
 }
 
-const couleurs: Record<string, string> = {
-  Publiée: 'bg-[#E6F4EA] text-[#137333]',
-  Acceptée: 'bg-[#E6F4EA] text-[#137333]',
-  Valide: 'bg-[#E6F4EA] text-[#137333]',
-  Actif: 'bg-[#E6F4EA] text-[#137333]',
-  Présent: 'bg-[#E6F4EA] text-[#137333]',
-  Payé: 'bg-[#E6F4EA] text-[#137333]',
-  Terminée: 'bg-secondary text-muted-foreground',
-  Archivée: 'bg-secondary text-muted-foreground',
-  Inactif: 'bg-secondary text-muted-foreground',
-  Brouillon: 'bg-cream text-primary',
-  'En attente': 'bg-cream text-primary',
-  'En cours': 'bg-cream text-primary',
-  Planifiée: 'bg-[#E8F0FE] text-[#1A73E8]',
-  Annulée: 'bg-[#FCE8E6] text-[#C5221F]',
-  Annulé: 'bg-[#FCE8E6] text-[#C5221F]',
-  Refusée: 'bg-[#FCE8E6] text-[#C5221F]',
-  Absent: 'bg-[#FCE8E6] text-[#C5221F]',
-}
-
 export function Etiquette({ valeur }: { valeur: string | null | undefined }) {
   if (!valeur) return <span className="text-xs text-muted-foreground">—</span>
   return (
@@ -172,6 +184,30 @@ export function LabelObligatoire() {
     <span className="font-bold text-red-500" aria-hidden="true">
       *
     </span>
+  )
+}
+
+export function CarteDash({
+  titre,
+  valeur,
+  icone: Icone,
+}: {
+  titre: string
+  valeur: number
+  icone: typeof Users
+}) {
+  return (
+    <div className="rounded-lg !bg-cream border border-primary/20 p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold tracking-wide text-primary">
+          {titre}
+        </p>
+        <span className="flex h-9 w-9 items-center justify-center rounded-md text-primary">
+          <Icone className="h-[18px] w-[18px]" />
+        </span>
+      </div>
+      <p className="mt-3 text-2xl font-bold text-primary">{valeur}</p>
+    </div>
   )
 }
 

@@ -451,14 +451,26 @@ function Page() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <CarteStat libelle="Formateurs" valeur={formateurs.length} />
         <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Formateurs"
+          valeur={formateurs.length}
+        />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
           libelle="Actifs"
           valeur={
             formateurs.filter((f) => f.utilisateur?.statut === 'Actif').length
           }
         />
         <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
           libelle="Spécialisations"
           valeur={
             new Set(formateurs.map((f) => f.specialisation).filter(Boolean))

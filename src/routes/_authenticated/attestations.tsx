@@ -19,6 +19,7 @@ import {
   genererAttestationPdf,
   telechargerAttestationPdf,
 } from '@/lib/attestation-pdf'
+import { useProfilCourant } from '@/components/app/AppShell'
 
 import type { DonneesAttestation } from '@/lib/attestation-pdf'
 
@@ -91,20 +92,38 @@ function Attestations() {
   const [apercu, setApercu] = useState<Attestation | null>(null)
   const [verification, setVerification] = useState<Attestation | null>(null)
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+  const { data: profil, isLoading: chargementProfil } = useProfilCourant()
 
-  const { data: attestations = [], isLoading } = useQuery({
-    queryKey: ['mes-attestations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('attestation')
-        .select(
-          'attestation_id, inscription_id, numero_attestation, jeton_verification, delivree_le, statut, url_fichier, inscription:inscription(participant:participant(utilisateur:utilisateur(nom, prenoms)), session:session_formation(nom_session, date_debut, date_fin, formation:formation(titre, description)))',
-        )
-        .order('delivree_le', { ascending: false })
-      if (error) throw error
-      return (data ?? []) as unknown as Attestation[]
-    },
-  })
+  const { data: attestations = [], isLoading: chargementAttestations } =
+    useQuery({
+      queryKey: ['mes-attestations', profil?.participant_id],
+      enabled: profil?.participant_id != null,
+      queryFn: async () => {
+        if (!profil?.participant_id) return []
+
+        const { data, error } = await supabase
+          .from('attestation')
+          .select(
+            `
+        attestation_id,
+        inscription_id,
+        numero_attestation,
+        jeton_verification,
+        delivree_le,
+        statut,
+        url_fichier,
+        inscription:inscription!inner(
+          participant_id,
+          participant:participant(
+            utilisateur:utilisateur(nom, prenoms ) ), session:session_formation( nom_session,date_debut, date_fin,formation:formation(titre,description)  ) ) `,
+          )
+          .eq('inscription.participant_id', profil.participant_id)
+          .order('delivree_le', { ascending: false })
+
+        if (error) throw error
+        return (data ?? []) as unknown as Attestation[]
+      },
+    })
 
   const { data: modele } = useQuery({
     queryKey: ['modele-attestation'],
@@ -122,16 +141,32 @@ function Attestations() {
 
   // Notes obtenues : l’attestation n’est téléchargeable qu’après une évaluation réussie.
   const { data: resultats = [] } = useQuery({
-    queryKey: ['mes-resultats-evaluations'],
+    queryKey: ['mes-resultats-evaluations', profil?.participant_id],
+    enabled: profil?.participant_id != null,
     queryFn: async () => {
+      if (!profil?.participant_id) return []
+
       const { data, error } = await supabase
         .from('tentative_evaluation')
         .select(
-          'inscription_id, score, reussi, evaluation:evaluation(score_reussite)',
+          `
+        inscription_id,
+        score,
+        reussi,
+        evaluation:evaluation(
+          score_reussite
+        ),
+        inscription:inscription!inner(
+          participant_id
         )
+      `,
+        )
+        .eq('inscription.participant_id', profil.participant_id)
         .eq('reussi', true)
         .order('score', { ascending: false })
+
       if (error) throw error
+
       return (data ?? []) as unknown as Resultat[]
     },
   })
@@ -219,7 +254,7 @@ function Attestations() {
         </p>
       </div>
 
-      {isLoading ? (
+      {chargementProfil || chargementAttestations ? (
         <SqueletteGrilleCartes nombre={3} />
       ) : attestations.length === 0 ? (
         <div className="flex min-h-72 flex-col items-center justify-center rounded-lg border border-dashed border-input bg-card p-10 text-center">

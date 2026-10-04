@@ -262,7 +262,6 @@ function MesEvaluations() {
         </div>
         {!peutGerer ? (
           <VueParticipant
-            chargement={chargement}
             affichees={affichees}
             inscriptions={inscriptions}
             couleur={couleur}

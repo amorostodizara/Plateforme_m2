@@ -4,10 +4,6 @@ import { useQuery } from '@tanstack/react-query'
 import { CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/integrations/supabase/client'
-import {
-  SqueletteEntete,
-  SqueletteGrilleCartes,
-} from '@/components/app/Squelette'
 
 import { useProfilCourant } from '@/components/app/AppShell'
 import {
@@ -63,6 +59,15 @@ function Passage() {
   const navigate = useNavigate()
   const [reponses, setReponses] = useState<Record<number, number[]>>({})
   const [enCours, setEnCours] = useState(false)
+
+  const [secondesRestantes, setSecondesRestantes] = useState<number | null>(
+    null,
+  )
+  const [tentativeId, setTentativeId] = useState<number | null>(null)
+  const [commenceLe, setCommenceLe] = useState<string | null>(null)
+  const [pleinEcran, setPleinEcran] = useState(false)
+  const [soumissionAutomatique, setSoumissionAutomatique] = useState(false)
+
   const { data: profil } = useProfilCourant()
   const { evaluationId } = useParams({
     from: '/_authenticated/evaluations/passer/$evaluationId',
@@ -72,10 +77,10 @@ function Passage() {
     reussi: boolean
   } | null>(null)
 
-  const { data: inscriptions = [], isLoading: isLoadingInscriptions } =
+  const { data: inscriptions = [], isLoading: chargementInscriptions } =
     useMesInscriptionsEvaluations(profil?.participant_id)
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['evaluation', evaluationId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -134,8 +139,11 @@ function Passage() {
     })
   }
 
-  async function soumettre() {
+  async function soumettre(automatique = false) {
     if (!data) return
+    if (secondesRestantes !== null && secondesRestantes <= 0 && !automatique) {
+      return
+    }
 
     const evaluation = data as Evaluation
     const raison = raisonAccesEvaluation(evaluation, inscriptions)
@@ -150,7 +158,7 @@ function Passage() {
     const manquantes = questions.filter(
       (q) => q.est_requis && !(reponses[q.question_evaluation_id] ?? []).length,
     )
-    if (manquantes.length) {
+    if (manquantes.length && !automatique) {
       toast.error('Répondez à toutes les questions requises.')
       return
     }
@@ -186,28 +194,38 @@ function Passage() {
       const score = total ? Math.round((obtenus / total) * 100) : 0
       const reussi = score >= Number(data.score_reussite)
 
-      const { data: tentative, error } = await supabase
+      if (!tentativeId) {
+        throw new Error('Tentative introuvable.')
+      }
+
+      if (lignes.length) {
+        const { error: erreurReponses } = await supabase
+          .from('reponse_participant')
+          .insert(
+            lignes.map((l) => ({
+              ...l,
+              tentative_evaluation_id: tentativeId,
+            })),
+          )
+
+        if (erreurReponses) {
+          throw erreurReponses
+        }
+      }
+
+      const { error: erreurTentative } = await supabase
         .from('tentative_evaluation')
-        .insert({
-          evaluation_id: data.evaluation_id,
-          inscription_id: inscription.inscription_id,
+        .update({
           soumis_le: new Date().toISOString(),
           score,
           statut: 'Corrigée',
           reussi,
         })
-        .select('tentative_evaluation_id')
-        .single()
-      if (error) throw error
+        .eq('tentative_evaluation_id', tentativeId)
+        .eq('statut', 'En cours')
 
-      if (lignes.length) {
-        const { error: e2 } = await supabase.from('reponse_participant').insert(
-          lignes.map((l) => ({
-            ...l,
-            tentative_evaluation_id: tentative.tentative_evaluation_id,
-          })),
-        )
-        if (e2) throw e2
+      if (erreurTentative) {
+        throw erreurTentative
       }
 
       if (reussi) {
@@ -247,25 +265,158 @@ function Passage() {
       setEnCours(false)
     }
   }
+
   useEffect(() => {
-    if (!data || isLoading || isLoadingInscriptions) return
+    if (!data || !commenceLe || !tentativeId) return
+
+    const dureeSecondes = Number(data.duree_minutes) * 60
+    const debutMs = new Date(commenceLe).getTime()
+
+    function mettreAJour() {
+      const ecoule = Math.floor((Date.now() - debutMs) / 1000)
+
+      const restantes = Math.max(dureeSecondes - ecoule, 0)
+
+      setSecondesRestantes(restantes)
+    }
+
+    mettreAJour()
+
+    const intervalle = window.setInterval(mettreAJour, 1000)
+
+    return () => {
+      window.clearInterval(intervalle)
+    }
+  }, [data, commenceLe, tentativeId])
+
+  useEffect(() => {
+    async function chargerTentativeEnCours() {
+      if (!data) return
+      if (chargementInscriptions) return
+      const inscription = trouverInscriptionEvaluation(
+        data as Evaluation,
+        inscriptions,
+      )
+
+      if (!inscription) return
+
+      const { data: tentative, error } = await supabase
+        .from('tentative_evaluation')
+        .select(
+          `
+        tentative_evaluation_id,
+        commence_le,
+        statut
+      `,
+        )
+        .eq('evaluation_id', data.evaluation_id)
+        .eq('inscription_id', inscription.inscription_id)
+        .eq('statut', 'En cours')
+        .order('commence_le', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (error) {
+        toast.error('Impossible de récupérer votre tentative.')
+        return
+      }
+
+      if (!tentative) {
+        toast.error('Aucune tentative en cours.')
+        navigate({
+          to: '/evaluations/mes-evaluations',
+        })
+        return
+      }
+
+      setTentativeId(tentative.tentative_evaluation_id)
+      setCommenceLe(tentative.commence_le)
+    }
+
+    void chargerTentativeEnCours()
+  }, [data, inscriptions, chargementInscriptions, navigate])
+
+  useEffect(() => {
+    if (!data) return
+    if (chargementInscriptions) return
 
     const raison = raisonAccesEvaluation(data as Evaluation, inscriptions)
+
     if (raison) {
       toast.error(raison)
+
       navigate({
         to: '/evaluations/mes-evaluations',
       })
     }
-  }, [data, inscriptions, isLoading, isLoadingInscriptions, navigate])
+  }, [data, inscriptions, chargementInscriptions, navigate])
 
-  if (isLoading || isLoadingInscriptions)
-    return (
-      <div className="space-y-4">
-        <SqueletteEntete />
-        <SqueletteGrilleCartes nombre={3} />
-      </div>
+  useEffect(() => {
+    if (secondesRestantes !== 0) return
+    if (enCours) return
+    if (resultat) return
+    if (!data) return
+    if (!tentativeId) return
+    if (soumissionAutomatique) return
+    setSoumissionAutomatique(true)
+    toast.warning(
+      'Le temps est écoulé. Vos réponses vont être soumises automatiquement.',
     )
+    void soumettre(true)
+  }, [secondesRestantes, enCours, resultat, data, soumissionAutomatique])
+
+  useEffect(() => {
+    function bloquerRaccourcis(e: KeyboardEvent) {
+      const touche = e.key.toLowerCase()
+
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        ['c', 'v', 'x', 'a', 'u', 's', 'p'].includes(touche)
+      ) {
+        e.preventDefault()
+      }
+      if (e.key === 'F12') {
+        e.preventDefault()
+      }
+
+      if (e.ctrlKey && e.shiftKey && ['i', 'j', 'c'].includes(touche)) {
+        e.preventDefault()
+      }
+    }
+    document.addEventListener('keydown', bloquerRaccourcis)
+    return () => {
+      document.removeEventListener('keydown', bloquerRaccourcis)
+    }
+  }, [])
+
+  async function basculerPleinEcran() {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen({
+          navigationUI: 'hide',
+        })
+
+        setPleinEcran(true)
+      } else {
+        await document.exitFullscreen()
+        setPleinEcran(false)
+      }
+    } catch {
+      toast.error('Le mode plein écran n’est pas disponible sur ce navigateur.')
+    }
+  }
+
+  useEffect(() => {
+    function gererPleinEcran() {
+      setPleinEcran(document.fullscreenElement !== null)
+    }
+
+    document.addEventListener('fullscreenchange', gererPleinEcran)
+
+    return () => {
+      document.removeEventListener('fullscreenchange', gererPleinEcran)
+    }
+  }, [])
 
   if (!data)
     return (
@@ -275,6 +426,14 @@ function Passage() {
   if (resultat) {
     return (
       <div className="mx-auto max-w-lg rounded-lg border border-border bg-card p-8 text-center">
+        <button
+          type="button"
+          onClick={() => void basculerPleinEcran()}
+          className="rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-secondary"
+        >
+          {pleinEcran ? 'Quitter le plein écran' : 'Plein écran'}
+        </button>
+
         {resultat.reussi ? (
           <CheckCircle2 className="mx-auto h-12 w-12 text-[#137333]" />
         ) : (
@@ -304,19 +463,70 @@ function Passage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 pb-8">
+    <div
+      className="mx-auto max-w-2xl select-none space-y-4 pb-8"
+      onContextMenu={(e) => e.preventDefault()}
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onPaste={(e) => e.preventDefault()}
+    >
       <div className="rounded-lg border-t-4 border-primary bg-card p-5">
-        <h1 className="text-xl font-bold text-foreground">
-          {data.titre_evaluation}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {data.session?.nom_session}
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold text-foreground">
+              {data.titre_evaluation}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {data.session?.nom_session}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void basculerPleinEcran()}
+            className="rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-secondary"
+          >
+            {pleinEcran ? 'Quitter le plein écran' : 'Plein écran'}
+          </button>
+        </div>
         <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
           Durée conseillée : {data.duree_minutes} minutes — score requis{' '}
           {data.score_reussite} %
         </p>
+
+        <div
+          className={`mt-4 flex items-center justify-between rounded-lg border px-3 py-2 ${
+            secondesRestantes !== null && secondesRestantes < 60
+              ? 'animate-pulse border-red-500/20 bg-[#FCE8E6]'
+              : 'border-border bg-secondary'
+          }`}
+        >
+          <span
+            className={`text-sm font-semibold ${
+              secondesRestantes !== null && secondesRestantes < 60
+                ? 'text-red-500'
+                : 'text-muted-foreground'
+            }`}
+          >
+            Temps restant
+          </span>
+
+          <span
+            className={`text-lg font-bold tabular-nums ${
+              secondesRestantes !== null && secondesRestantes < 60
+                ? 'text-red-500'
+                : 'text-foreground'
+            }`}
+          >
+            {secondesRestantes !== null
+              ? `${Math.floor(secondesRestantes / 60)
+                  .toString()
+                  .padStart(2, '0')}:${(secondesRestantes % 60)
+                  .toString()
+                  .padStart(2, '0')}`
+              : '--:--'}
+          </span>
+        </div>
       </div>
 
       {questions.map((q, i) => (
@@ -353,6 +563,39 @@ function Passage() {
           </div>
         </div>
       ))}
+      <div
+        className={`mt-4 flex items-center justify-between rounded-lg border px-3 py-2 ${
+          secondesRestantes !== null && secondesRestantes < 60
+            ? 'animate-pulse border-red-500/20 bg-[#FCE8E6]'
+            : 'border-border bg-secondary'
+        }`}
+      >
+        <span
+          className={`text-sm font-semibold ${
+            secondesRestantes !== null && secondesRestantes < 60
+              ? 'text-red-500'
+              : 'text-muted-foreground'
+          }`}
+        >
+          Temps restant
+        </span>
+
+        <span
+          className={`text-lg font-bold tabular-nums ${
+            secondesRestantes !== null && secondesRestantes < 60
+              ? 'text-red-500'
+              : 'text-foreground'
+          }`}
+        >
+          {secondesRestantes !== null
+            ? `${Math.floor(secondesRestantes / 60)
+                .toString()
+                .padStart(2, '0')}:${(secondesRestantes % 60)
+                .toString()
+                .padStart(2, '0')}`
+            : '--:--'}
+        </span>
+      </div>
 
       <button
         disabled={enCours}

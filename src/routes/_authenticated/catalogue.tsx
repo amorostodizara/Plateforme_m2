@@ -294,7 +294,7 @@ function Catalogue() {
         <img
           src={post_bienvenue}
           alt="Apprenant travaillant sur son ordinateur"
-          className="absolute bottom-0 right-[18%] hidden h-[125%] w-auto object-contain lg:block"
+          className="absolute bottom-0 right-[18%] hidden h-[110%] w-auto object-contain lg:block"
         />
         <blockquote className="absolute right-7 top-1/2 z-10 hidden w-48 -translate-y-1/2 text-sm xl:block">
           <p className="font-semibold text-primary">

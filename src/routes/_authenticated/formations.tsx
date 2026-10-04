@@ -9,6 +9,7 @@ import {
   Search,
   Send,
   Trash2,
+  FilePenLine,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/integrations/supabase/client'
@@ -258,14 +259,23 @@ function Page() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <CarteStat libelle="Total" valeur={formations.length} />
         <CarteStat
+          className="!bg-[#E6F4EA] border !border-[#137333]/20"
+          libelleClassName="!text-[#137333]"
+          valeurClassName="!text-[#137333]"
           libelle="Publiées"
           valeur={formations.filter((f) => f.statut === 'Publiée').length}
         />
         <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
           libelle="Brouillons"
           valeur={formations.filter((f) => f.statut === 'Brouillon').length}
         />
         <CarteStat
+          className="!bg-secondary"
+          libelleClassName="!text-muted-foreground"
+          valeurClassName="!text-muted-foreground"
           libelle="Archivées"
           valeur={formations.filter((f) => f.statut === 'Archivée').length}
         />
@@ -366,28 +376,50 @@ function Page() {
                           >
                             <Pencil /> Modifier
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={() =>
-                              changerStatut.mutate({
-                                id: f.formation_id,
-                                statut: 'Publiée',
-                              })
-                            }
-                          >
-                            <Send /> Publier
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={() =>
-                              changerStatut.mutate({
-                                id: f.formation_id,
-                                statut: 'Archivée',
-                              })
-                            }
-                          >
-                            <Archive /> Archiver
-                          </DropdownMenuItem>
+                          {f.statut !== 'Publiée' && (
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onClick={() =>
+                                changerStatut.mutate({
+                                  id: f.formation_id,
+                                  statut: 'Publiée',
+                                })
+                              }
+                            >
+                              <Send className="mr-2 h-4 w-4" />
+                              Publier
+                            </DropdownMenuItem>
+                          )}
+
+                          {f.statut !== 'Archivée' && (
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onClick={() =>
+                                changerStatut.mutate({
+                                  id: f.formation_id,
+                                  statut: 'Archivée',
+                                })
+                              }
+                            >
+                              <Archive className="mr-2 h-4 w-4" />
+                              Archiver
+                            </DropdownMenuItem>
+                          )}
+
+                          {f.statut !== 'Brouillon' && (
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onClick={() =>
+                                changerStatut.mutate({
+                                  id: f.formation_id,
+                                  statut: 'Brouillon',
+                                })
+                              }
+                            >
+                              <FilePenLine className="mr-2 h-4 w-4" />
+                              Brouillon
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => supprimer.mutate(f.formation_id)}

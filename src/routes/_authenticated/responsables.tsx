@@ -236,17 +236,29 @@ function Page() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <CarteStat libelle="Responsables" valeur={responsables.length} />
         <CarteStat
-          libelle="En service"
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Responsables"
+          valeur={responsables.length}
+        />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Actifs"
           valeur={
             responsables.filter((r) => r.statut_service === 'Actif').length
           }
         />
         <CarteStat
-          libelle="Services"
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Inactifs"
           valeur={
-            new Set(responsables.map((r) => r.service).filter(Boolean)).size
+            responsables.filter((r) => r.statut_service === 'Inactif').length
           }
         />
       </div>

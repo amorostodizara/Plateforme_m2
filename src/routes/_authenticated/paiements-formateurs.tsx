@@ -335,6 +335,9 @@ function Page() {
       .filter((p) => p.statut === statut)
       .reduce((t, p) => t + Number(p.montant), 0)
 
+  const compte = (statut: Paiement['statut']) =>
+    paiements.filter((p) => p.statut === statut).length
+
   function ouvrirNouveau() {
     setEdite(null)
     setForm(vide)
@@ -392,10 +395,34 @@ function Page() {
       ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <CarteStat libelle="Paiements" valeur={paiements.length} />
-        <CarteStat libelle="Total payé" valeur={ariary(somme('Payé'))} />
-        <CarteStat libelle="En attente" valeur={ariary(somme('En attente'))} />
-        <CarteStat libelle="Annulé" valeur={ariary(somme('Annulé'))} />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Paiements"
+          valeur={paiements.length}
+        />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Total payé"
+          valeur={ariary(somme('Payé'))}
+        />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="En attente"
+          valeur={compte('En attente')}
+        />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Annulé"
+          valeur={compte('Annulé')}
+        />
       </div>
 
       <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4">
@@ -463,7 +490,7 @@ function Page() {
                   'Formation / Session',
                   'Montant',
                   'Méthode',
-                  'Date',
+                  'Date de paiement',
                   'Statut',
                   'Actions',
                 ].map((t) => (
@@ -607,7 +634,10 @@ function Page() {
             <LigneInfo libelle="Montant" valeur={ariary(detail.montant)} />
             <LigneInfo libelle="Méthode" valeur={detail.methode} />
             <LigneInfo libelle="Réference" valeur={detail.ref ?? '_'} />
-            <LigneInfo libelle="Date" valeur={dateFr(detail.date_paiement)} />
+            <LigneInfo
+              libelle="Date de paiement"
+              valeur={dateFr(detail.date_paiement)}
+            />
             <LigneInfo
               libelle="Statut"
               valeur={<Etiquette valeur={detail.statut} />}

@@ -1,4 +1,9 @@
 // import type { Evaluation } from '@/routes/_authenticated/evaluations/mes-evaluations'
+
+import { useMutation } from '@tanstack/react-query'
+import { supabase } from '@/integrations/supabase/client'
+import { toast } from 'sonner'
+
 export type Statut = 'Brouillon' | 'Publiée' | 'Fermée'
 
 export type Evaluation = {
@@ -127,13 +132,98 @@ export function raisonAccesEvaluation(
 
   const inscription = trouverInscriptionEvaluation(evaluation, inscriptions)
 
-  if (!inscription) {
-    return "Votre inscription à cette session n'est pas acceptée."
-  }
-
   if (!presenceEvaluationValide(inscription)) {
     return 'Vous devez avoir une présence complète et validée pour passer cette évaluation.'
   }
 
   return null
+}
+
+export function useCommencerEvaluation(
+  inscriptions: InscriptionAvecPresences[],
+
+  navigate: (options: {
+    to: '/evaluations/passer/$evaluationId'
+    params: { evaluationId: string }
+  }) => void,
+) {
+  return useMutation({
+    mutationFn: async (evaluation: Evaluation) => {
+      const inscription = trouverInscriptionEvaluation(evaluation, inscriptions)
+      if (!inscription) {
+        throw new Error("Votre inscription à cette session n'est pas acceptée.")
+      }
+      // 1. Vérifier s'il existe déjà une tentative en cours
+      const { data: tentativeEnCours, error: erreurEnCours } = await supabase
+        .from('tentative_evaluation')
+        .select('tentative_evaluation_id')
+        .eq('evaluation_id', evaluation.evaluation_id)
+        .eq('inscription_id', inscription.inscription_id)
+        .eq('statut', 'En cours')
+        .order('commence_le', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (erreurEnCours) {
+        throw erreurEnCours
+      }
+
+      // Une tentative existe déjà : on la reprend
+      if (tentativeEnCours) {
+        return tentativeEnCours
+      }
+
+      // 2. Compter les tentatives déjà effectuées
+      const { count, error: erreurTentatives } = await supabase
+        .from('tentative_evaluation')
+        .select('tentative_evaluation_id', {
+          count: 'exact',
+          head: true,
+        })
+        .eq('evaluation_id', evaluation.evaluation_id)
+        .eq('inscription_id', inscription.inscription_id)
+
+      if (erreurTentatives) {
+        throw erreurTentatives
+      }
+
+      // 3. Vérifier la limite
+      if ((count ?? 0) >= Number(evaluation.max_tentatives)) {
+        throw new Error(
+          'Vous avez atteint le nombre maximum de tentatives pour cette évaluation.',
+        )
+      }
+
+      // 4. Créer la nouvelle tentative
+      const { data: tentative, error: erreurCreation } = await supabase
+        .from('tentative_evaluation')
+        .insert({
+          evaluation_id: evaluation.evaluation_id,
+          inscription_id: inscription.inscription_id,
+          commence_le: new Date().toISOString(),
+          statut: 'En cours',
+        })
+        .select('tentative_evaluation_id')
+        .single()
+
+      if (erreurCreation) {
+        throw erreurCreation
+      }
+
+      return tentative
+    },
+
+    onSuccess: (_, evaluation) => {
+      navigate({
+        to: '/evaluations/passer/$evaluationId',
+        params: {
+          evaluationId: String(evaluation.evaluation_id),
+        },
+      })
+    },
+
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
 }

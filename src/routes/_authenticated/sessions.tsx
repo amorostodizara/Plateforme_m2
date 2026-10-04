@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { MoreHorizontal, Pencil, Plus, Search, Trash2 } from 'lucide-react'
@@ -236,6 +236,50 @@ function Page() {
     setOuvert(true)
   }
 
+  const actualiserStatutsSessions = useMutation({
+    mutationFn: async () => {
+      const maintenant = new Date().toISOString()
+
+      // Sessions à venir → Planifiée
+      const { error: erreurPlanifiee } = await supabase
+        .from('session_formation')
+        .update({ statut: 'Planifiée' })
+        .neq('statut', 'Annulée')
+        .gt('date_debut', maintenant)
+
+      if (erreurPlanifiee) throw erreurPlanifiee
+
+      // Sessions actuellement en cours → En cours
+      const { error: erreurEnCours } = await supabase
+        .from('session_formation')
+        .update({ statut: 'En cours' })
+        .neq('statut', 'Annulée')
+        .lte('date_debut', maintenant)
+        .gt('date_fin', maintenant)
+
+      if (erreurEnCours) throw erreurEnCours
+
+      // Sessions terminées → Terminée
+      const { error: erreurTerminee } = await supabase
+        .from('session_formation')
+        .update({ statut: 'Terminée' })
+        .neq('statut', 'Annulée')
+        .lte('date_fin', maintenant)
+
+      if (erreurTerminee) throw erreurTerminee
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['sessions'],
+      })
+    },
+  })
+
+  useEffect(() => {
+    void actualiserStatutsSessions.mutateAsync()
+  }, [])
+
   return (
     <div className="space-y-5">
       <EnteteAdmin
@@ -257,14 +301,23 @@ function Page() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <CarteStat libelle="Total" valeur={sessions.length} />
         <CarteStat
+          className="!bg-[#E8F0FE] border !border-[#1A73E8]/20"
+          libelleClassName="!text-[#1A73E8]"
+          valeurClassName="!text-[#1A73E8]"
           libelle="Planifiées"
           valeur={sessions.filter((s) => s.statut === 'Planifiée').length}
         />
         <CarteStat
+          className="!bg-cream border border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
           libelle="En cours"
           valeur={sessions.filter((s) => s.statut === 'En cours').length}
         />
         <CarteStat
+          className="!bg-secondary"
+          libelleClassName="!text-muted-foreground"
+          valeurClassName="!text-muted-foreground"
           libelle="Terminées"
           valeur={sessions.filter((s) => s.statut === 'Terminée').length}
         />

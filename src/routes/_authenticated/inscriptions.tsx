@@ -17,7 +17,7 @@ import {
   X,
 } from 'lucide-react'
 import { AccesReserve } from '@/components/app/Acces'
-import { dateHeureFr } from '@/components/app/AdminKit'
+import { dateHeureFr, CarteStat } from '@/components/app/AdminKit'
 import { toast } from 'sonner'
 import { supabase } from '@/integrations/supabase/client'
 import {
@@ -178,6 +178,14 @@ function Inscriptions() {
     [lignes],
   )
 
+  const inscriptionsSession = useMemo(() => {
+    if (session === 'Toutes les sessions') {
+      return lignes
+    }
+
+    return lignes.filter((l) => l.session?.nom_session === session)
+  }, [lignes, session])
+
   const affichees = useMemo(() => {
     const filtrees = lignes.filter((l) => {
       if (
@@ -204,8 +212,8 @@ function Inscriptions() {
     })
   }, [lignes, session, statut, recherche, tri])
 
-  const compte = (valeur: string) =>
-    lignes.filter((l) => l.statut === valeur).length
+  const compte = (valeur: StatutInscription) =>
+    inscriptionsSession.filter((l) => l.statut === valeur).length
 
   const selectClass =
     'h-10 rounded-md border border-input bg-card px-3 text-sm text-foreground focus:border-primary focus:outline-none'
@@ -232,23 +240,43 @@ function Inscriptions() {
           Validez ou refusez les demandes d’inscription aux formations.
         </p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          ['Total', lignes.length],
-          ['Acceptés', compte('Acceptée')],
-          ["Liste d'attente", compte("Liste d'attente")],
-          ['Refusés', compte('Refusée')],
-        ].map(([titre, valeur]) => (
-          <div
-            key={titre as string}
-            className="rounded-lg border border-border bg-card p-4"
-          >
-            <p className="text-xs font-semibold tracking-wide text-muted-foreground">
-              {titre}
-            </p>
-            <p className="mt-2 text-2xl font-bold text-foreground">{valeur}</p>
-          </div>
-        ))}
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <CarteStat libelle="Total" valeur={inscriptionsSession.length} />
+        <CarteStat
+          className="!bg-[#E6F4EA] border !border-[#137333]/20"
+          libelleClassName="!text-[#137333]"
+          valeurClassName="!text-[#137333]"
+          libelle="Acceptés"
+          valeur={compte('Acceptée')}
+        />
+        <CarteStat
+          className="!bg-secondary "
+          libelleClassName="!text-muted-foreground"
+          valeurClassName="!text-muted-foreground"
+          libelle="Liste d'attente"
+          valeur={compte("Liste d'attente")}
+        />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="En attente"
+          valeur={compte('En attente')}
+        />
+        <CarteStat
+          className="!bg-secondary "
+          libelleClassName="!text-muted-foreground"
+          valeurClassName="!text-muted-foreground"
+          libelle="Annulés"
+          valeur={compte('Annulée')}
+        />
+        <CarteStat
+          className="!bg-[#FCE8E6] border !border-[#C5221F]/20"
+          libelleClassName="!text-[#C5221F]"
+          valeurClassName="!text-[#C5221F]"
+          libelle="Refusés"
+          valeur={compte('Refusée')}
+        />
       </div>
 
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">

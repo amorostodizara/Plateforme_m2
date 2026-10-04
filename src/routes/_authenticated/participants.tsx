@@ -397,14 +397,26 @@ function Page() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <CarteStat libelle="Participants" valeur={participants.length} />
         <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
+          libelle="Participants"
+          valeur={participants.length}
+        />
+        <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
           libelle="Comptes actifs"
           valeur={
             participants.filter((p) => p.utilisateur?.statut === 'Actif').length
           }
         />
         <CarteStat
+          className="!bg-cream border !border-primary/20"
+          libelleClassName="!text-primary"
+          valeurClassName="!text-primary"
           libelle="Profils professionnels"
           valeur={
             participants.filter(
