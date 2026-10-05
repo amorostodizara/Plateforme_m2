@@ -23,7 +23,9 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
     const cle = process.env['OPENAI_API_KEY']
     // const cle = process.env["GEMINI_API_KEY"];
     if (!cle)
-      throw new Error('Assistant indisponible : configuration manquante.')
+      throw new Error(
+        'Assistant  ne repond pas pour le moment. Veuillez patienter...',
+      )
 
     const supabase = context.supabase
 
@@ -58,7 +60,6 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
         roles: codesRole,
       },
     }
-
     const [formations, evenements] = await Promise.all([
       supabase
         .from('formation')
@@ -79,7 +80,7 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
       const { data: inscriptions } = await supabase
         .from('inscription')
         .select(
-          'inscription_id, date_inscription, statut, session:session_formation(nom_session, date_debut, date_fin, lieu, statut, formation:formation(titre, niveau)), presence(date_presence, statut, methode), attestation(numero_attestation, delivree_le, statut)',
+          'inscription_id, date_inscription, statut, session:session_formation(nom_session, date_debut, date_fin, lieu, statut,formateur_id,formateur:formateur(utilisateur:utilisateur(nom, prenoms)), formation:formation(titre, niveau)), presence(date_presence, statut, methode), attestation(numero_attestation, delivree_le, statut)',
         )
         .eq('participant_id', participant.participant_id)
       contexte['mes_inscriptions'] = inscriptions ?? []
@@ -117,59 +118,6 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
       `Contexte JSON : ${JSON.stringify(contexte).slice(0, 60000)}`,
     ].join('\n')
 
-    //-------------------------------------------------------------------------------------------------------------------
-    // if (!cle) {
-    //   throw new Error("Assistant indisponible : configuration Gemini manquante.");
-    // }
-
-    // const ai = new GoogleGenAI({
-    //   apiKey: cle,
-    // });
-
-    // // Historique compatible Gemini
-    // const historique = data.historique.map((m) => ({
-    //   role: m.role === "assistant" ? "model" : "user",
-    //   parts: [
-    //     {
-    //       text: m.contenu,
-    //     },
-    //   ],
-    // }));
-
-    // const stream = await ai.models.generateContentStream({
-    //   model: "gemini-3.5-flash-lite",
-
-    //   config: {
-    //     systemInstruction: consignes,
-    //   },
-
-    //   contents: [
-    //     ...historique,
-    //     {
-    //       role: "user",
-    //       parts: [
-    //         {
-    //           text: data.question,
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // });
-
-    // let texte = "";
-
-    // for await (const evenement of stream) {
-    //   if (typeof evenement.text === "string") {
-    //     texte += evenement.text;
-    //   }
-    // }
-
-    // return {
-    //   reponse:
-    //     texte.trim() ||
-    //     "Je n'ai pas trouvé d'information fiable pour répondre à cette question avec les données disponibles.",
-    // };
-    //--------------------------------------------------------------------------------------------------------------------------------
     const messages: ResponseInputItem[] = [
       {
         role: 'system',

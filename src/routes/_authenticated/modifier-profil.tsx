@@ -243,33 +243,42 @@ function Page() {
         !form.genre
       )
         throw new Error(
-          'Le nom, prénom(s), telephone, adresse, genre ne doit pas être vides.',
+          'Le nom, prénom(s), telephone, adresse, genre ne doivent pas être vides.',
         )
-      // Téléphone : exactement 10 chiffres et commence par 03
+
       if (!/^03\d{8}$/.test(form.telephone)) {
         throw new Error(
           'Le numéro doit contenir exactement 10 chiffres et commencer par 03.',
         )
       }
-      if (
-        !form.date_naissance ||
-        !form.statut_actuel ||
-        !form.niveau_education ||
-        !form.institution ||
-        !form.specialisation
-      )
-        throw new Error(
-          'Date de naissance, statut actuel, niveau etude, Institution ou établissement, et le specialisation sont obligatoires.',
+
+      if (profil.participant) {
+        if (
+          !form.date_naissance ||
+          !form.statut_actuel ||
+          !form.niveau_education ||
+          !form.institution ||
+          !form.specialisation
         )
+          throw new Error(
+            "Date de naissance, statut actuel, niveau d'etude, Institution ou établissement, et le specialisation sont obligatoires.",
+          )
 
-      // Âge minimum : 10 ans
-      if (calculerAge(form.date_naissance) < 10) {
-        throw new Error('Le participant doit avoir au minimum 10 ans.')
+        // Âge minimum : 10 ans
+        if (calculerAge(form.date_naissance) < 10) {
+          throw new Error('Le participant doit avoir au minimum 10 ans.')
+        }
       }
-      if (!form.f_institution || !form.f_specialisation)
-        throw new Error('Organisation ou Entité  sont obligatoires.')
-
-      if (!form.r_service) throw new Error('Le service est obligatoire.')
+      if (profil.formateur) {
+        if (!form.f_institution || !form.f_specialisation)
+          throw new Error(
+            'Organisation ou Entité et spécialisation sont obligatoires.',
+          )
+      }
+      if (profil.responsable) {
+        if (!form.r_service || !form.r_poste)
+          throw new Error('Le service et poste occupé sont obligatoire.')
+      }
 
       const { error: e1 } = await supabase
         .from('utilisateur')
@@ -708,7 +717,10 @@ function Page() {
               />
             </div>
             <div>
-              <label className={labelClass}>Intitulé du poste</label>
+              <label className={labelClass}>
+                Intitulé du poste
+                <LabelObligatoire />
+              </label>
               <input
                 className={champClass}
                 value={form.r_poste}

@@ -1,89 +1,106 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { AuthShell } from "@/components/auth/AuthShell";
-import { BoutonPrincipal } from "@/components/auth/Field";
-import { verifierCode, renvoyerCode } from "@/backend/functions/email-auth.functions";
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useRef, useState } from 'react'
+import { AuthShell } from '@/components/auth/AuthShell'
+import { BoutonPrincipal } from '@/components/auth/Field'
+import {
+  verifierCode,
+  renvoyerCode,
+} from '@/backend/functions/email-auth.functions'
 
-export const Route = createFileRoute("/auth/verification")({
+export const Route = createFileRoute('/auth/verification')({
   validateSearch: (search: Record<string, unknown>) => ({
-    email: typeof search['email'] === "string" ? search['email'] : "",
+    email: typeof search['email'] === 'string' ? search['email'] : '',
   }),
   head: () => ({
     meta: [
-      { title: "Vérifier votre email — Plateforme de formation" },
+      { title: 'Vérifier votre email — Plateforme de formation' },
       {
-        name: "description",
-        content: "Saisissez le code à 6 chiffres reçu par e-mail pour activer votre compte.",
+        name: 'description',
+        content:
+          'Saisissez le code à 6 chiffres reçu par e-mail pour activer votre compte.',
       },
-      { property: "og:title", content: "Vérifier votre email — Plateforme de formation" },
-      { property: "og:description", content: "Validation de votre adresse e-mail." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      {
+        property: 'og:title',
+        content: 'Vérifier votre email — Plateforme de formation',
+      },
+      {
+        property: 'og:description',
+        content: 'Validation de votre adresse e-mail.',
+      },
+      { property: 'og:type', content: 'website' },
+      { name: 'twitter:card', content: 'summary_large_image' },
     ],
   }),
   component: Verification,
-});
+})
 
 function Verification() {
-  const { email } = Route.useSearch();
-  const navigate = useNavigate();
-  const [chiffres, setChiffres] = useState<string[]>(Array(6).fill(""));
-  const [erreur, setErreur] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
-  const [chargement, setChargement] = useState(false);
-  const [succes, setSucces] = useState(false);
-  const refs = useRef<Array<HTMLInputElement | null>>([]);
+  const { email } = Route.useSearch()
+  const navigate = useNavigate()
+  const [chiffres, setChiffres] = useState<string[]>(Array(6).fill(''))
+  const [erreur, setErreur] = useState<string | null>(null)
+  const [info, setInfo] = useState<string | null>(null)
+  const [chargement, setChargement] = useState(false)
+  const [succes, setSucces] = useState(false)
+  const refs = useRef<Array<HTMLInputElement | null>>([])
 
   useEffect(() => {
-    if (!succes) return;
-    const t = setTimeout(() => navigate({ to: "/catalogue" }), 2000);
-    return () => clearTimeout(t);
-  }, [succes, navigate]);
+    if (!succes) return
+    const t = setTimeout(() => navigate({ to: '/catalogue' }), 2000)
+    return () => clearTimeout(t)
+  }, [succes, navigate])
 
   function saisir(index: number, valeur: string) {
-    const v = valeur.replace(/\D/g, "").slice(-1);
+    const v = valeur.replace(/\D/g, '').slice(-1)
     setChiffres((prev) => {
-      const suivant = [...prev];
-      suivant[index] = v;
-      return suivant;
-    });
-    if (v && index < 5) refs.current[index + 1]?.focus();
+      const suivant = [...prev]
+      suivant[index] = v
+      return suivant
+    })
+    if (v && index < 5) refs.current[index + 1]?.focus()
   }
 
   async function verifier(ev: React.FormEvent) {
-    ev.preventDefault();
-    setErreur(null);
-    const code = chiffres.join("");
+    ev.preventDefault()
+    setErreur(null)
+    const code = chiffres.join('')
     if (code.length !== 6) {
-      setErreur("Veuillez saisir les 6 chiffres du code.");
-      return;
+      setErreur('Veuillez saisir les 6 chiffres du code.')
+      return
     }
-    setChargement(true);
-    const r = await verifierCode({ data: { email, code } }).catch(() => ({ ok: false }));
-    const error = !r.ok;
-    setChargement(false);
+    setChargement(true)
+    const r = await verifierCode({ data: { email, code } }).catch(() => ({
+      ok: false,
+    }))
+    const error = !r.ok
+    setChargement(false)
     if (error) {
-      setErreur("Code invalide ou expiré. Demandez un nouveau code.");
-      return;
+      setErreur('Code invalide ou expiré. Demandez un nouveau code.')
+      return
     }
-    setSucces(true);
+    setSucces(true)
   }
 
   async function renvoyer() {
-    setErreur(null);
-    setInfo(null);
-    const r = await renvoyerCode({ data: { email } }).catch(() => ({ ok: false }));
-    const error = !r.ok;
-    if (error) setErreur("Impossible de renvoyer le code pour le moment.");
-    else setInfo("Un nouveau code vient d'être envoyé.");
+    setErreur(null)
+    setInfo(null)
+    const r = await renvoyerCode({ data: { email } }).catch(() => ({
+      ok: false,
+    }))
+    const error = !r.ok
+    if (error) setErreur('Impossible de renvoyer le code pour le moment.')
+    else setInfo("Un nouveau code vient d'être envoyé.")
   }
 
   if (succes) {
     return (
-      <AuthShell titre="Vérification succès" sousTitre="Nous vous autorisons à entrer" />
-    );
+      <AuthShell
+        titre="Vérification succès"
+        sousTitre="Nous vous autorisons à entrer"
+      />
+    )
   }
-
+  const invalid = Boolean(erreur)
   return (
     <AuthShell
       titre="Vérifier votre email"
@@ -93,7 +110,7 @@ function Verification() {
         <div className="space-y-2">
           <p
             className="text-sm font-semibold tracking-wide text-foreground"
-            style={erreur ? { color: "var(--color-destructive)" } : undefined}
+            style={erreur ? { color: 'var(--color-destructive)' } : undefined}
           >
             Enter Code
           </p>
@@ -102,29 +119,52 @@ function Verification() {
               <input
                 key={i}
                 ref={(el) => {
-                  refs.current[i] = el;
+                  refs.current[i] = el
                 }}
                 inputMode="numeric"
+                maxLength={1}
+                aria-invalid={invalid || undefined}
                 value={chiffre}
                 onChange={(e) => {
-                  if (erreur) setErreur(null);
-                  saisir(i, e.target.value);
+                  if (erreur) setErreur(null)
+                  saisir(i, e.target.value)
+                }}
+                onPaste={(e) => {
+                  e.preventDefault()
+                  const code = e.clipboardData
+                    .getData('text')
+                    .replace(/\D/g, '')
+                    .slice(0, chiffres.length)
+                  if (!code) return
+                  code.split('').forEach((chiffre, index) => {
+                    saisir(index, chiffre)
+                  })
+                  refs.current[
+                    Math.min(code.length, chiffres.length - 1)
+                  ]?.focus()
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "Backspace" && !chiffres[i] && i > 0) refs.current[i - 1]?.focus();
+                  if (e.key === 'Backspace' && !chiffres[i] && i > 0)
+                    refs.current[i - 1]?.focus()
                 }}
-                className="h-12 w-12 rounded-sm border border-input text-center text-lg text-foreground outline-none focus:border-primary"
-                style={erreur ? { borderColor: "var(--color-destructive)" } : undefined}
+                className={
+                  'h-12 w-12 rounded-md border bg-transparent text-center text-lg font-semibold text-foreground outline-none focus:ring-2 ' +
+                  (invalid
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/40'
+                    : 'border-[#636F88] focus:border-primary focus:ring-primary/40')
+                }
               />
             ))}
           </div>
-          {erreur ? <p className="mt-1 text-xs text-destructive">{erreur}</p> : null}
+          {erreur ? (
+            <p className="mt-1 text-xs text-destructive">{erreur}</p>
+          ) : null}
         </div>
 
         {info ? <p className="text-xs text-muted-foreground">{info}</p> : null}
 
         <BoutonPrincipal type="submit" disabled={chargement}>
-          {chargement ? "Vérification..." : "Vérifier"}
+          {chargement ? 'Vérification...' : 'Vérifier'}
         </BoutonPrincipal>
 
         <button
@@ -136,5 +176,5 @@ function Verification() {
         </button>
       </form>
     </AuthShell>
-  );
+  )
 }
