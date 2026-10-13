@@ -595,7 +595,39 @@ function Dashboard() {
                     dataKey="value"
                     nameKey="name"
                     outerRadius={90}
-                    label
+                    labelLine={false}
+                    label={({
+                      cx,
+                      cy,
+                      midAngle,
+                      innerRadius,
+                      outerRadius,
+                      percent,
+                    }) => {
+                      const RADIAN = Math.PI / 180
+                      const angle = midAngle ?? 0
+                      const rayon =
+                        (Number(innerRadius ?? 0) + Number(outerRadius ?? 0)) /
+                        2
+
+                      const x =
+                        Number(cx ?? 0) + rayon * Math.cos(-angle * RADIAN)
+                      const y =
+                        Number(cy ?? 0) + rayon * Math.sin(-angle * RADIAN)
+                      return (
+                        <text
+                          x={x}
+                          y={y}
+                          fill="#FFFFFF"
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          fontSize={12}
+                          fontWeight="bold"
+                        >
+                          {`${((percent ?? 0) * 100).toFixed(0)}%`}
+                        </text>
+                      )
+                    }}
                   >
                     {parGenre.map((_, i) => (
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
@@ -616,6 +648,39 @@ function Dashboard() {
                     nameKey="name"
                     innerRadius={55}
                     outerRadius={90}
+                    label={({
+                      cx,
+                      cy,
+                      midAngle,
+                      innerRadius,
+                      outerRadius,
+                      percent,
+                    }) => {
+                      const RADIAN = Math.PI / 180
+                      const angle = midAngle ?? 0
+                      const rayon =
+                        (Number(innerRadius ?? 0) + Number(outerRadius ?? 0)) /
+                        2
+
+                      const x =
+                        Number(cx ?? 0) + rayon * Math.cos(-angle * RADIAN)
+                      const y =
+                        Number(cy ?? 0) + rayon * Math.sin(-angle * RADIAN)
+                      return (
+                        <text
+                          x={x}
+                          y={y}
+                          fill="#FFFFFF"
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          fontSize={12}
+                          fontWeight="bold"
+                        >
+                          {`${((percent ?? 0) * 100).toFixed(0)}%`}
+                        </text>
+                      )
+                    }}
+                    labelLine={false}
                   >
                     {parCategorieSocio.map((_, i) => (
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
