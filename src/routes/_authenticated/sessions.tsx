@@ -277,8 +277,14 @@ function Page() {
   })
 
   useEffect(() => {
-    void actualiserStatutsSessions.mutateAsync()
-  }, [])
+    actualiserStatutsSessions.mutate()
+    const intervalle = window.setInterval(() => {
+      actualiserStatutsSessions.mutate()
+    }, 60_000)
+    return () => {
+      window.clearInterval(intervalle)
+    }
+  }, [actualiserStatutsSessions.mutate])
 
   return (
     <div className="space-y-5">

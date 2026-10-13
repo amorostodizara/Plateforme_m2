@@ -16,17 +16,17 @@ import {
   CartesianGrid,
   Cell,
   Legend,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
+  AreaChart,
+  Area,
 } from 'recharts'
 import { supabase } from '@/integrations/supabase/client'
-import { COULEURS } from '@/lib/images-formation'
+import { PIE_COLORS } from '@/lib/images-formation'
 import {
   SqueletteCartes,
   SqueletteGraphiques,
@@ -36,7 +36,7 @@ import { CarteDash } from '@/components/app/AdminKit'
 export const Route = createFileRoute('/_authenticated/tableau-de-bord')({
   head: () => ({
     meta: [
-      { title: 'Dashboard — Suivi des formations' },
+      { title: 'Dashboard' },
       {
         name: 'description',
         content:
@@ -53,7 +53,7 @@ export const Route = createFileRoute('/_authenticated/tableau-de-bord')({
     ],
   }),
   component: () => (
-    <AccesReserve roles={['ADMINISTRATEUR', 'RESPONSABLE']}>
+    <AccesReserve roles={['ADMINISTRATEUR', 'RESPONSABLE', 'FORMATEUR']}>
       <Dashboard />
     </AccesReserve>
   ),
@@ -84,14 +84,20 @@ type LigneInscription = {
     formation: {
       formation_id: number
       titre: string
-      categorie: { nom: string } | null
     } | null
   } | null
   participant: {
     participant_id: number
     utilisateur: { genre: string | null } | null
-    profil_professionnel: { statut_actuel: string | null }[] | null
+    profil_professionnel: { statut_actuel: string | null } | null
   } | null
+  presence:
+    | {
+        presence_id: number
+        present: boolean
+        statut: string
+      }[]
+    | null
 }
 
 function Bloc({
@@ -124,28 +130,34 @@ function Dashboard() {
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
     queryFn: async () => {
-      const [insc, form, cat, formateurs, attest] = await Promise.all([
+      const [insc, form, formateurs, attest, util] = await Promise.all([
         supabase
           .from('inscription')
           .select(
-            'inscription_id, statut, date_inscription, session:session_formation(session_id, date_debut, formation:formation(formation_id, titre, categorie:categorie_formation(nom))), participant:participant(participant_id, utilisateur:utilisateur(genre), profil_professionnel:profil_professionnel(statut_actuel))',
+            'inscription_id, statut, date_inscription, session:session_formation(session_id, date_debut, formation:formation(formation_id, titre)), participant:participant(participant_id, utilisateur:utilisateur(genre), profil_professionnel:profil_professionnel(statut_actuel)), presence:presence(presence_id, present, statut)',
           ),
         supabase
           .from('formation')
           .select('formation_id, titre, categorie:categorie_formation(nom)'),
-        supabase.from('categorie_formation').select('nom'),
         supabase.from('formateur').select('formateur_id'),
         supabase.from('attestation').select('attestation_id'),
+        supabase.from('utilisateur').select('utilisateur_id, genre'),
       ])
-
+      const erreurs = [insc, form, formateurs, attest, util].filter(
+        (resultat) => resultat.error,
+      )
+      if (erreurs.length > 0) {
+        throw new Error(
+          erreurs.map((resultat) => resultat.error?.message).join('; '),
+        )
+      }
       return {
         inscriptions: (insc.data ?? []) as unknown as LigneInscription[],
         formations: (form.data ?? []) as unknown as {
           formation_id: number
           titre: string
-          categorie: { nom: string } | null
         }[],
-        categories: (cat.data ?? []).map((c) => c.nom),
+        utilisateurs: util.data ?? [],
         nbFormateurs: formateurs.data?.length ?? 0,
         nbAttestations: attest.data?.length ?? 0,
       }
@@ -176,7 +188,8 @@ function Dashboard() {
         return false
       if (
         filtres.categorie !== 'Toutes' &&
-        i.session?.formation?.categorie?.nom !== filtres.categorie
+        (i.participant?.profil_professionnel?.statut_actuel ?? 'Autre') !==
+          filtres.categorie
       )
         return false
       if (
@@ -188,7 +201,18 @@ function Dashboard() {
     })
   }, [inscriptions, filtres])
 
-  const beneficiaires = filtrees.filter((i) => i.statut === 'Acceptée')
+  const statutActuel = useMemo(() => {
+    return [
+      ...new Set(
+        inscriptions
+          .map((i) => i.participant?.profil_professionnel?.statut_actuel)
+          .filter(
+            (statut): statut is string =>
+              statut != null && statut.trim() !== '',
+          ),
+      ),
+    ].sort((a, b) => a.localeCompare(b))
+  }, [inscriptions])
 
   const parMois = useMemo(() => {
     return MOIS.map((m, index) => {
@@ -207,68 +231,118 @@ function Dashboard() {
     })
   }, [filtrees])
 
-  const parFormation = useMemo(() => {
+  const presencesParFormation = useMemo(() => {
+    const map = new Map<string, number>()
+    filtrees.forEach((inscription) => {
+      const titre = inscription.session?.formation?.titre ?? '—'
+      const presences = inscription.presence ?? []
+      const nombrePresences = presences.filter(
+        (presence) =>
+          presence.present === true || presence.statut === 'Présent',
+      ).length
+
+      map.set(titre, (map.get(titre) ?? 0) + nombrePresences)
+    })
+    return Array.from(map.entries()).map(([formation, presences]) => ({
+      formation,
+      presences,
+    }))
+  }, [filtrees])
+
+  const parGenre = useMemo(() => {
+    const participantsUniques = new Map<number, string | null>()
+    filtrees.forEach((i) => {
+      const participantId = i.participant?.participant_id
+      const utilisateur = i.participant?.utilisateur
+      if (participantId != null && utilisateur) {
+        participantsUniques.set(participantId, utilisateur.genre ?? null)
+      }
+    })
+    const compte = { Homme: 0, Femme: 0, 'Non renseigné': 0 }
+    participantsUniques.forEach((genre) => {
+      const sexe = genre?.trim()
+      if (sexe === 'Homme') compte.Homme++
+      else if (sexe === 'Femme') compte.Femme++
+      else compte['Non renseigné']++
+    })
+    return Object.entries(compte).map(([name, value]) => ({ name, value }))
+  }, [filtrees])
+
+  // const parCategorieSocio = useMemo(() => {
+  //   const map = new Map<string, number>()
+  //   filtrees.forEach((i) => {
+  //     const statut =
+  //       i.participant?.profil_professionnel?.statut_actuel?.trim() || 'Autre'
+  //     map.set(statut, (map.get(statut) ?? 0) + 1)
+  //   })
+  //   return Array.from(map.entries()).map(([name, value]) => ({
+  //     name,
+  //     value,
+  //   }))
+  // }, [filtrees])
+
+  const parCategorieSocio = useMemo(() => {
+    const participantsUniques = new Map<number, string | null>()
+    filtrees.forEach((i) => {
+      const participantId = i.participant?.participant_id
+      const statut = i.participant?.profil_professionnel?.statut_actuel
+
+      if (participantId != null) {
+        participantsUniques.set(participantId, statut?.trim() || null)
+      }
+    })
+    const compte: Record<string, number> = {}
+    participantsUniques.forEach((statut) => {
+      const categorie = statut ?? 'Non renseigné'
+      compte[categorie] = (compte[categorie] ?? 0) + 1
+    })
+
+    return Object.entries(compte)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+  }, [filtrees])
+
+  const tauxParticipation = useMemo(() => {
     const map = new Map<
       string,
       {
-        formation: string
-        acceptes: number
-        attente: number
-        refuses: number
-        total: number
+        inscrits: Set<number>
+        presentsComplets: Set<number>
       }
     >()
     filtrees.forEach((i) => {
       const titre = i.session?.formation?.titre ?? '—'
-      const court = titre.length > 18 ? `${titre.slice(0, 18)}…` : titre
-      const ligne = map.get(court) ?? {
-        formation: court,
-        acceptes: 0,
-        attente: 0,
-        refuses: 0,
-        total: 0,
+      const participantId = i.participant?.participant_id
+      if (participantId == null) return
+      if (!map.has(titre)) {
+        map.set(titre, {
+          inscrits: new Set(),
+          presentsComplets: new Set(),
+        })
       }
-      ligne.total += 1
-      if (i.statut === 'Acceptée') ligne.acceptes += 1
-      else if (i.statut === 'Refusée') ligne.refuses += 1
-      else ligne.attente += 1
-      map.set(court, ligne)
-    })
-    return Array.from(map.values())
-  }, [filtrees])
+      const ligne = map.get(titre)!
+      ligne.inscrits.add(participantId)
 
-  const parGenre = useMemo(() => {
-    const compte = { Homme: 0, Femme: 0, 'Non renseigné': 0 }
-    filtrees.forEach((i) => {
-      const g = i.participant?.utilisateur?.genre
-      if (g === 'Homme') compte.Homme += 1
-      else if (g === 'Femme') compte.Femme += 1
-      else compte['Non renseigné'] += 1
-    })
-    return Object.entries(compte)
-      .filter(([, v]) => v > 0)
-      .map(([name, value]) => ({ name, value }))
-  }, [filtrees])
+      const presences = i.presence ?? []
+      const presenceComplete =
+        presences.length > 0 && presences.every((p) => p.statut === 'Présent')
 
-  const parCategorieSocio = useMemo(() => {
-    const map = new Map<string, number>()
-    filtrees.forEach((i) => {
-      const profils = i.participant?.profil_professionnel
-      const statut =
-        (Array.isArray(profils) ? profils[0]?.statut_actuel : null) ?? 'Autre'
-      map.set(statut, (map.get(statut) ?? 0) + 1)
+      if (presenceComplete) {
+        ligne.presentsComplets.add(participantId)
+      }
     })
-    return Array.from(map.entries()).map(([name, value]) => ({ name, value }))
+    return Array.from(map.entries()).map(([formation, valeurs]) => ({
+      formation,
+      taux: valeurs.inscrits.size
+        ? Math.round(
+            (valeurs.presentsComplets.size / valeurs.inscrits.size) * 100,
+          )
+        : 0,
+    }))
   }, [filtrees])
-
-  const tauxParticipation = parFormation.map((f) => ({
-    formation: f.formation,
-    taux: f.total ? Math.round((f.acceptes / f.total) * 100) : 0,
-  }))
 
   const selectClass =
     'h-10 rounded-md border border-input bg-card px-3 text-sm text-foreground focus:border-primary focus:outline-none'
-
   return (
     <div className="space-y-5">
       <div>
@@ -317,9 +391,11 @@ function Dashboard() {
             value={categorie}
             onChange={(e) => setCategorie(e.target.value)}
           >
-            <option>Toutes</option>
-            {(data?.categories ?? []).map((c) => (
-              <option key={c}>{c}</option>
+            <option value="Toutes">Toutes</option>
+            {statutActuel.map((statut) => (
+              <option key={statut} value={statut}>
+                {statut}
+              </option>
             ))}
           </select>
         </label>
@@ -380,8 +456,8 @@ function Dashboard() {
               icone={Users}
             />
             <CarteDash
-              titre="BÉNÉFICIAIRES"
-              valeur={beneficiaires.length}
+              titre="PARTICIPANTS"
+              valeur={filtrees.filter((i) => i.statut === 'Acceptée').length}
               icone={UserCheck}
             />
             <CarteDash
@@ -404,84 +480,111 @@ function Dashboard() {
           <div className="grid gap-4 lg:grid-cols-3">
             <Bloc titre="Participants et formations par mois">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={parMois}>
+                <AreaChart
+                  data={parMois}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#EFF4FA" />
                   <XAxis dataKey="mois" fontSize={12} stroke="#5F6368" />
                   <YAxis fontSize={12} stroke="#5F6368" allowDecimals={false} />
                   <Tooltip />
                   <Legend />
-                  <Line
+
+                  <Area
                     type="monotone"
                     dataKey="participants"
                     name="Participants"
                     stroke="#FF7900"
+                    fill="#FF7900"
+                    fillOpacity={0.25}
                     strokeWidth={2}
                   />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="formations"
                     name="Formations"
-                    stroke="#000000"
+                    stroke="#5F6368"
+                    fill="#000000"
+                    fillOpacity={0.15}
                     strokeWidth={2}
                   />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </Bloc>
 
             <Bloc titre="Inscrits et bénéficiaires par mois">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={parMois}>
+                <AreaChart
+                  data={parMois}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#EFF4FA" />
                   <XAxis dataKey="mois" fontSize={12} stroke="#5F6368" />
                   <YAxis fontSize={12} stroke="#5F6368" allowDecimals={false} />
                   <Tooltip />
                   <Legend />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="inscrits"
                     name="Inscrits"
                     stroke="#FF7900"
+                    fill="#FF7900"
+                    fillOpacity={0.25}
                     strokeWidth={2}
                   />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="beneficiaires"
                     name="Bénéficiaires"
                     stroke="#5F6368"
+                    fill="#000000"
+                    fillOpacity={0.15}
                     strokeWidth={2}
                   />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </Bloc>
 
-            <Bloc titre="Participants par formation">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={parFormation}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#EFF4FA" />
-                  <XAxis dataKey="formation" fontSize={11} stroke="#5F6368" />
-                  <YAxis fontSize={12} stroke="#5F6368" allowDecimals={false} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar
-                    dataKey="acceptes"
-                    name="Acceptés"
-                    stackId="a"
-                    fill="#FF7900"
-                  />
-                  <Bar
-                    dataKey="attente"
-                    name="En attente"
-                    stackId="a"
-                    fill="#F2A65A"
-                  />
-                  <Bar
-                    dataKey="refuses"
-                    name="Refusés"
-                    stackId="a"
-                    fill="#5F6368"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <Bloc titre="Présence par formation">
+              <div
+                style={{
+                  width: '100%',
+                  overflowX: 'auto',
+                  overflowY: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: Math.max(600, presencesParFormation.length * 100),
+                    height: 270,
+                  }}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={presencesParFormation}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#EFF4FA" />
+                      <XAxis
+                        dataKey="formation"
+                        fontSize={11}
+                        stroke="#5F6368"
+                        tickFormatter={(nom) =>
+                          nom.length > 10 ? `${nom.slice(0, 10)}…` : nom
+                        }
+                      />
+                      <YAxis
+                        fontSize={12}
+                        stroke="#5F6368"
+                        allowDecimals={false}
+                      />
+                      <Tooltip formatter={(value) => [value, 'Présences']} />
+                      <Bar
+                        dataKey="presences"
+                        name="Présences"
+                        fill="#FF7900"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             </Bloc>
 
             <Bloc titre="Répartition par sexe">
@@ -495,7 +598,7 @@ function Dashboard() {
                     label
                   >
                     {parGenre.map((_, i) => (
-                      <Cell key={i} fill={COULEURS[i % COULEURS.length]} />
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -515,7 +618,7 @@ function Dashboard() {
                     outerRadius={90}
                   >
                     {parCategorieSocio.map((_, i) => (
-                      <Cell key={i} fill={COULEURS[i % COULEURS.length]} />
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -524,21 +627,51 @@ function Dashboard() {
               </ResponsiveContainer>
             </Bloc>
 
-            <Bloc titre="Taux de participation par formation (%)">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={tauxParticipation}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#EFF4FA" />
-                  <XAxis dataKey="formation" fontSize={11} stroke="#5F6368" />
-                  <YAxis fontSize={12} stroke="#5F6368" domain={[0, 100]} />
-                  <Tooltip />
-                  <Bar
-                    dataKey="taux"
-                    name="Taux (%)"
-                    fill="#FF7900"
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <Bloc titre="Taux de présence par formation">
+              <div style={{ height: 260, overflowY: 'auto' }}>
+                <ResponsiveContainer
+                  width="100%"
+                  height={Math.max(250, tauxParticipation.length * 42)}
+                >
+                  <BarChart
+                    data={[...tauxParticipation].sort(
+                      (a, b) => b.taux - a.taux,
+                    )}
+                    layout="vertical"
+                    margin={{ left: 0, right: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#EFF4FA" />
+
+                    <XAxis
+                      type="number"
+                      domain={[0, 100]}
+                      unit="%"
+                      fontSize={12}
+                      stroke="#5F6368"
+                    />
+
+                    <YAxis
+                      type="category"
+                      dataKey="formation"
+                      fontSize={11}
+                      stroke="#5F6368"
+                      width={150}
+                      tickFormatter={(nom) =>
+                        nom.length > 15 ? `${nom.slice(0, 15)}…` : nom
+                      }
+                    />
+
+                    <Tooltip formatter={(value) => [`${value}%`, 'Taux']} />
+
+                    <Bar
+                      dataKey="taux"
+                      name="Taux (%)"
+                      fill="#FF7900"
+                      // radius={[0, 4, 4, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </Bloc>
           </div>
         </>
