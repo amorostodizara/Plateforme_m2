@@ -6,7 +6,7 @@ import { BoutonPrincipal } from '@/components/auth/Field'
 export const Route = createFileRoute('/auth/mot-de-passe-modifie')({
   head: () => ({
     meta: [
-      { title: 'Mot de passe modifié — Plateforme de formation' },
+      { title: 'Mot de passe modifié ' },
       {
         name: 'description',
         content: 'Votre mot de passe a été modifié avec succès.',

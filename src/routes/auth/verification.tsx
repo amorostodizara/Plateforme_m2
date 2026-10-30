@@ -13,7 +13,7 @@ export const Route = createFileRoute('/auth/verification')({
   }),
   head: () => ({
     meta: [
-      { title: 'Vérifier votre email — Plateforme de formation' },
+      { title: 'Vérifier votre email ' },
       {
         name: 'description',
         content:
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/auth/verification')({
       },
       {
         property: 'og:title',
-        content: 'Vérifier votre email — Plateforme de formation',
+        content: 'Vérifier votre email ',
       },
       {
         property: 'og:description',
