@@ -1,52 +1,58 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { AuthShell } from "@/components/auth/AuthShell";
-import { Field, BoutonPrincipal } from "@/components/auth/Field";
-import { demanderReinitialisation } from "@/backend/functions/email-auth.functions";
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
+import { AuthShell } from '@/components/auth/AuthShell'
+import { Field, BoutonPrincipal } from '@/components/auth/Field'
+import { demanderReinitialisation } from '@/backend/functions/email-auth.functions'
 
-export const Route = createFileRoute("/auth/mot-de-passe-oublie")({
+export const Route = createFileRoute('/auth/mot-de-passe-oublie')({
   head: () => ({
     meta: [
-      { title: "Mot de passe oublié — Plateforme de formation" },
+      { title: 'Mot de passe oublié ' },
       {
-        name: "description",
-        content: "Recevez un lien sécurisé pour réinitialiser le mot de passe de votre compte.",
+        name: 'description',
+        content:
+          'Recevez un lien sécurisé pour réinitialiser le mot de passe de votre compte.',
       },
-      { property: "og:title", content: "Mot de passe oublié — Plateforme de formation" },
-      { property: "og:description", content: "Réinitialisation du mot de passe." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { property: 'og:title', content: 'Mot de passe oublié ' },
+      {
+        property: 'og:description',
+        content: 'Réinitialisation du mot de passe.',
+      },
+      { property: 'og:type', content: 'website' },
+      { name: 'twitter:card', content: 'summary_large_image' },
     ],
   }),
   component: MotDePasseOublie,
-});
+})
 
 function MotDePasseOublie() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [erreur, setErreur] = useState<string | null>(null);
-  const [chargement, setChargement] = useState(false);
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [erreur, setErreur] = useState<string | null>(null)
+  const [chargement, setChargement] = useState(false)
 
   async function envoyer(ev: React.FormEvent) {
-    ev.preventDefault();
-    setErreur(null);
+    ev.preventDefault()
+    setErreur(null)
     if (!email.trim()) {
-      setErreur("L'adresse e-mail est requise");
-      return;
+      setErreur("L'adresse e-mail est requise")
+      return
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setErreur("Adresse e-mail invalide");
-      return;
+      setErreur('Adresse e-mail invalide')
+      return
     }
-    setChargement(true);
-    const r = await demanderReinitialisation({ data: { email: email.trim() } }).catch(() => ({ ok: false }));
-    const error = !r.ok;
-    setChargement(false);
+    setChargement(true)
+    const r = await demanderReinitialisation({
+      data: { email: email.trim() },
+    }).catch(() => ({ ok: false }))
+    const error = !r.ok
+    setChargement(false)
     if (error) {
-      setErreur("L'envoi a échoué. Vérifiez l'adresse e-mail saisie.");
-      return;
+      setErreur("L'envoi a échoué. Vérifiez l'adresse e-mail saisie.")
+      return
     }
-    navigate({ to: "/auth/verifier-email", search: { email: email.trim() } });
+    navigate({ to: '/auth/verifier-email', search: { email: email.trim() } })
   }
 
   return (
@@ -61,12 +67,12 @@ function MotDePasseOublie() {
           value={email}
           erreur={erreur ?? undefined}
           onChange={(e) => {
-            setEmail(e.target.value);
-            setErreur(null);
+            setEmail(e.target.value)
+            setErreur(null)
           }}
         />
         <BoutonPrincipal type="submit" disabled={chargement}>
-          {chargement ? "Envoi..." : "Continuer"}
+          {chargement ? 'Envoi...' : 'Continuer'}
         </BoutonPrincipal>
         <Link
           to="/auth"
@@ -76,5 +82,5 @@ function MotDePasseOublie() {
         </Link>
       </form>
     </AuthShell>
-  );
+  )
 }

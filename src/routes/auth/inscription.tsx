@@ -12,7 +12,7 @@ import { creerCompte } from '@/backend/functions/email-auth.functions'
 export const Route = createFileRoute('/auth/inscription')({
   head: () => ({
     meta: [
-      { title: 'Créer votre compte — Plateforme de formation' },
+      { title: 'Créer votre compte ' },
       {
         name: 'description',
         content:
@@ -20,7 +20,7 @@ export const Route = createFileRoute('/auth/inscription')({
       },
       {
         property: 'og:title',
-        content: 'Créer votre compte — Plateforme de formation',
+        content: 'Créer votre compte ',
       },
       {
         property: 'og:description',

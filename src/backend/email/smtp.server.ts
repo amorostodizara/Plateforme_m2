@@ -56,7 +56,7 @@ export function gabarit(
 <h1 style="font-size:22px;margin:24px 0 12px">${echap(titre)}</h1>
 <div style="font-size:15px;line-height:1.6;color:#5F6368;">${contenu}</div>
 ${bouton ? `<p style="margin:28px 0"><a href="${echap(bouton.url)}" style="background:#FF7900;color:#fff;text-decoration:none;padding:12px 24px;border-radius:2px;font-weight:bold">${echap(bouton.texte)}</a></p>` : ''}
-<p style="font-size:12px;color:#5F6368;margin-top:32px">Orange Digital Center Fianarantsosa — Plateforme de formation - Create by Amoros TODIZARA</p>
+<p style="font-size:12px;color:#5F6368;margin-top:32px">Orange Digital Center Fianarantsosa  - Create by Amoros TODIZARA</p>
 </div></body></html>`
 }
 export { echap }

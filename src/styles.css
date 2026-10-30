@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system — Plateforme de formation
+ * Design system 
  * Couleurs officielles : #FF7900 / #000000 / #EFF4FA / #5F6368 / #FFF8F0
  * Police : Roboto (chargée via <link> dans src/routes/__root.tsx)
  */
