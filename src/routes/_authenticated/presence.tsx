@@ -38,7 +38,7 @@ import { AccesReserve } from '@/components/app/Acces'
 export const Route = createFileRoute('/_authenticated/presence')({
   head: () => ({
     meta: [
-      { title: 'Gestion des présences — Orange Digital Center' },
+      { title: 'Gestion des présences ' },
       {
         name: 'description',
         content:
@@ -46,7 +46,7 @@ export const Route = createFileRoute('/_authenticated/presence')({
       },
       {
         property: 'og:title',
-        content: 'Gestion des présences — Orange Digital Center',
+        content: 'Gestion des présences ',
       },
       {
         property: 'og:description',

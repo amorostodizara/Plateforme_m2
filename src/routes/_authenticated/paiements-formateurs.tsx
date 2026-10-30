@@ -48,7 +48,7 @@ import {
 export const Route = createFileRoute('/_authenticated/paiements-formateurs')({
   head: () => ({
     meta: [
-      { title: 'Paiements formateurs — Orange Digital Center' },
+      { title: 'Paiements formateurs ' },
       {
         name: 'description',
         content:
@@ -56,7 +56,7 @@ export const Route = createFileRoute('/_authenticated/paiements-formateurs')({
       },
       {
         property: 'og:title',
-        content: 'Paiements formateurs — Orange Digital Center',
+        content: 'Paiements formateurs ',
       },
       {
         property: 'og:description',

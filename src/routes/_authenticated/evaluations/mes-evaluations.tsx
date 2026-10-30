@@ -29,14 +29,14 @@ export const Route = createFileRoute(
 )({
   head: () => ({
     meta: [
-      { title: 'Mes évaluations — Orange Digital Center' },
+      { title: 'Mes évaluations ' },
       {
         name: 'description',
         content: 'Consultez, publiez et suivez vos évaluations de formation.',
       },
       {
         property: 'og:title',
-        content: 'Mes évaluations — Orange Digital Center',
+        content: 'Mes évaluations ',
       },
       {
         property: 'og:description',

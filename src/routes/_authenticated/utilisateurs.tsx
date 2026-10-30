@@ -28,13 +28,13 @@ import {
 export const Route = createFileRoute('/_authenticated/utilisateurs')({
   head: () => ({
     meta: [
-      { title: 'Utilisateurs — Orange Digital Center' },
+      { title: 'Utilisateurs ' },
       {
         name: 'description',
         content:
           'Gérez les comptes de la plateforme, leur statut et leurs rôles.',
       },
-      { property: 'og:title', content: 'Utilisateurs — Orange Digital Center' },
+      { property: 'og:title', content: 'Utilisateurs ' },
       {
         property: 'og:description',
         content:

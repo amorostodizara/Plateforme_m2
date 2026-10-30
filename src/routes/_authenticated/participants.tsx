@@ -35,17 +35,18 @@ import {
   calculerAge,
   dateHeureFr,
 } from '@/components/app/AdminKit'
+import { useDroits } from '@/components/app/AppShell'
 
 export const Route = createFileRoute('/_authenticated/participants')({
   head: () => ({
     meta: [
-      { title: 'Participants — Orange Digital Center' },
+      { title: 'Participants ' },
       {
         name: 'description',
         content:
           'Gérez les participants et consultez tout leur parcours de formation.',
       },
-      { property: 'og:title', content: 'Participants — Orange Digital Center' },
+      { property: 'og:title', content: 'Participants ' },
       {
         property: 'og:description',
         content:
@@ -148,6 +149,7 @@ function Page() {
     'synthese' | 'inscriptions' | 'presences' | 'evaluations' | 'attestations'
   >('synthese')
   const [badge, setBadge] = useState<Participant | null>(null)
+  const { estGestionnaire } = useDroits()
 
   const { data: participants = [], isLoading } = useQuery({
     queryKey: ['admin-participants'],
@@ -183,72 +185,6 @@ function Page() {
       return (data ?? []) as unknown as Parcours[]
     },
   })
-
-  // const enregistrerProfil = useMutation({
-  //   mutationFn: async () => {
-  //     if (!form.telephone.trim() || !form.adresse || !form.genre)
-  //       throw new Error('Telephone, adresse et genre ne doit pas être vide.')
-  //     if (
-  //       !form.date_naissance ||
-  //       !form.statut_actuel ||
-  //       !form.institution ||
-  //       !form.niveau_education
-  //     )
-  //       throw new Error(
-  //         "Date de naissance, statut, institution et niveau d'etude  ne doit pas être vide",
-  //       )
-  //     if (!/^03\d{8}$/.test(form.telephone)) {
-  //       toast.error(
-  //         'Le numéro doit contenir 10 chiffres et commencer par 03xxx',
-  //       )
-  //       return
-  //     }
-
-  //     if (calculerAge(form.date_naissance) < 10) {
-  //       toast.error('Participant doit avoir au minimum 10 ans.')
-  //       return
-  //     }
-
-  //     const p = edite!
-  //     const { error: e1 } = await supabase
-  //       .from('utilisateur')
-  //       .update({
-  //         telephone: form.telephone || null,
-  //         adresse: form.adresse || null,
-  //         genre: (form.genre || null) as 'Homme' | 'Femme' | null,
-  //       })
-  //       .eq('utilisateur_id', p.utilisateur_id)
-  //     if (e1) throw e1
-
-  //     const { error: e2 } = await supabase
-  //       .from('participant')
-  //       .update({ date_naissance: form.date_naissance || null })
-  //       .eq('participant_id', p.participant_id)
-  //     if (e2) throw e2
-
-  //     const valeurs = {
-  //       participant_id: p.participant_id,
-  //       statut_actuel: (form.statut_actuel || null) as never,
-  //       institution: form.institution || null,
-  //       specialisation: form.specialisation || null,
-  //       mention: form.mention || null,
-  //       niveau_education: (form.niveau_education || null) as never,
-  //     }
-  //     const { error: e3 } = (p.profil_professionnel ?? []).length
-  //       ? await supabase
-  //           .from('profil_professionnel')
-  //           .update(valeurs)
-  //           .eq('participant_id', p.participant_id)
-  //       : await supabase.from('profil_professionnel').insert(valeurs)
-  //     if (e3) throw e3
-  //   },
-  //   onSuccess: () => {
-  //     toast.success('Profil du participant mis à jour.')
-  //     setEdite(null)
-  //     queryClient.invalidateQueries({ queryKey: ['admin-participants'] })
-  //   },
-  //   onError: (e: Error) => toast.error(e.message),
-  // })
 
   const enregistrerProfil = useMutation({
     mutationFn: async () => {
@@ -388,7 +324,6 @@ function Page() {
     })),
   )
   const pro = detail?.profil_professionnel?.[0]
-
   return (
     <div className="space-y-5">
       <EnteteAdmin
@@ -541,13 +476,14 @@ function Page() {
                             <QrCode /> Voir le badge QR
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-
-                          <DropdownMenuItem
-                            onClick={() => supprimer.mutate(p.participant_id)}
-                            className="background-delete cursor-pointer"
-                          >
-                            <Trash2 /> Supprimer
-                          </DropdownMenuItem>
+                          {estGestionnaire && (
+                            <DropdownMenuItem
+                              onClick={() => supprimer.mutate(p.participant_id)}
+                              className="background-delete cursor-pointer"
+                            >
+                              <Trash2 /> Supprimer
+                            </DropdownMenuItem>
+                          )}
                         </MenuActions>
                       </td>
                     </tr>

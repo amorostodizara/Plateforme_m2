@@ -31,7 +31,7 @@ export function Notifications() {
       .channel('notifications-temps-reel')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'notification' },
+        { event: 'INSERT', schema: 'orange', table: 'notification' },
         (payload) => {
           const n = payload.new as { titre?: string; message?: string }
           queryClient.invalidateQueries({ queryKey: ['notifications'] })
@@ -40,7 +40,7 @@ export function Notifications() {
       )
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'notification' },
+        { event: 'UPDATE', schema: 'orange', table: 'notification' },
         () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
       )
       .subscribe()

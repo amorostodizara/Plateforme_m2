@@ -40,7 +40,7 @@ import {
 export const Route = createFileRoute('/_authenticated/catalogue')({
   head: () => ({
     meta: [
-      { title: 'Catalogue des formations — Orange Digital Center' },
+      { title: 'Catalogue des formations ' },
       {
         name: 'description',
         content:

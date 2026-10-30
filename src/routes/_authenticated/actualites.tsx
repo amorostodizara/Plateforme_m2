@@ -33,7 +33,7 @@ import { quand } from '@/components/app/AdminKit'
 export const Route = createFileRoute('/_authenticated/actualites')({
   head: () => ({
     meta: [
-      { title: 'Fil d’actualité — Orange Digital Center' },
+      { title: 'Fil d’actualité ' },
       {
         name: 'description',
         content:
@@ -41,7 +41,7 @@ export const Route = createFileRoute('/_authenticated/actualites')({
       },
       {
         property: 'og:title',
-        content: 'Fil d’actualité — Orange Digital Center',
+        content: 'Fil d’actualité ',
       },
       {
         property: 'og:description',

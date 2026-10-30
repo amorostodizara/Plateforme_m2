@@ -19,7 +19,7 @@ export const Route = createFileRoute(
 )({
   head: () => ({
     meta: [
-      { title: 'Passer l’évaluation — Orange Digital Center' },
+      { title: 'Passer l’évaluation ' },
       {
         name: 'description',
         content:
@@ -27,7 +27,7 @@ export const Route = createFileRoute(
       },
       {
         property: 'og:title',
-        content: 'Passer l’évaluation — Orange Digital Center',
+        content: 'Passer l’évaluation ',
       },
       {
         property: 'og:description',

@@ -54,19 +54,19 @@ async function televerserCv(fichier: File) {
     fichier.type === 'application/pdf' ||
     fichier.name.toLowerCase().endsWith('.pdf')
   if (!ok) throw new Error('Le CV doit être un fichier PDF.')
-  return televerserFichier('cv-formateurs', fichier, 1)
+  return televerserFichier('cv-formateurs', fichier, 5)
 }
 
 export const Route = createFileRoute('/_authenticated/formateurs')({
   head: () => ({
     meta: [
-      { title: 'Formateurs — Orange Digital Center' },
+      { title: 'Formateurs ' },
       {
         name: 'description',
         content:
           'Gérez les profils des formateurs, leur historique et leurs paiements.',
       },
-      { property: 'og:title', content: 'Formateurs — Orange Digital Center' },
+      { property: 'og:title', content: 'Formateurs ' },
       {
         property: 'og:description',
         content:
@@ -890,7 +890,7 @@ function Page() {
             </div>
             <div className="sm:col-span-2">
               <label className={labelClass}>
-                Curriculum vitae (fichier PDF, 1 Mo maximum)
+                Curriculum vitae (fichier PDF, 5 Mo maximum)
               </label>
               <input
                 type="file"

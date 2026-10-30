@@ -26,7 +26,7 @@ import type { DonneesAttestation } from '@/lib/attestation-pdf'
 export const Route = createFileRoute('/_authenticated/attestations')({
   head: () => ({
     meta: [
-      { title: 'Mes attestations — Orange Digital Center' },
+      { title: 'Mes attestations ' },
       {
         name: 'description',
         content:
@@ -34,7 +34,7 @@ export const Route = createFileRoute('/_authenticated/attestations')({
       },
       {
         property: 'og:title',
-        content: 'Mes attestations — Orange Digital Center',
+        content: 'Mes attestations ',
       },
       {
         property: 'og:description',

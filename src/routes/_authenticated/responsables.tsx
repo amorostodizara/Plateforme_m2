@@ -31,13 +31,13 @@ import { AccesReserve } from '@/components/app/Acces'
 export const Route = createFileRoute('/_authenticated/responsables')({
   head: () => ({
     meta: [
-      { title: 'Responsables — Orange Digital Center' },
+      { title: 'Responsables ' },
       {
         name: 'description',
         content:
           'Gérez les responsables, leur service et leur statut de service.',
       },
-      { property: 'og:title', content: 'Responsables — Orange Digital Center' },
+      { property: 'og:title', content: 'Responsables ' },
       {
         property: 'og:description',
         content:

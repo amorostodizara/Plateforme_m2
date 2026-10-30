@@ -52,14 +52,14 @@ const champFichierClass =
 export const Route = createFileRoute('/_authenticated/formations')({
   head: () => ({
     meta: [
-      { title: 'Gestion des formations — Orange Digital Center' },
+      { title: 'Gestion des formations ' },
       {
         name: 'description',
         content: 'Créez, publiez et archivez les formations de la plateforme.',
       },
       {
         property: 'og:title',
-        content: 'Gestion des formations — Orange Digital Center',
+        content: 'Gestion des formations ',
       },
       {
         property: 'og:description',
@@ -145,7 +145,7 @@ function Page() {
       if (image) {
         if (!image.type.startsWith('image/'))
           throw new Error('Choisissez une image (JPG, PNG, WEBP).')
-        chemin = await televerserFichier('formations', image, 1)
+        chemin = await televerserFichier('formations', image, 5)
       }
       const valeurs = {
         titre: form.titre.trim(),
@@ -522,7 +522,7 @@ function Page() {
             </div>
             <div>
               <label className={labelClass}>
-                Image de présentation (fichier, 1 Mo maximum)
+                Image de présentation (fichier, 5 Mo maximum)
               </label>
               <input
                 type="file"

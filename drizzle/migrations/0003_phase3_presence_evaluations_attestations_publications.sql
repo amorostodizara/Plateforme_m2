@@ -18,9 +18,6 @@ ALTER TABLE public.presence ADD COLUMN enregistre_le timestamptz NOT NULL DEFAUL
 UPDATE public.presence SET statut = CASE WHEN present THEN 'Présent'::public.statut_presence_enum ELSE 'Absent'::public.statut_presence_enum END;
 
 -- ATTESTATION
-ALTER TABLE public.attestation ADD COLUMN numero_attestation varchar;
-ALTER TABLE public.attestation ADD COLUMN jeton_verification varchar;
-ALTER TABLE public.attestation ADD COLUMN statut public.statut_attestation_enum NOT NULL DEFAULT 'Valide';
 UPDATE public.attestation SET numero_attestation = 'ATT-' || lpad(attestation_id::text, 6, '0'),
   jeton_verification = replace(gen_random_uuid()::text, '-', '') WHERE numero_attestation IS NULL;
 

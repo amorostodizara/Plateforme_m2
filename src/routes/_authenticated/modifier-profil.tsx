@@ -25,7 +25,7 @@ import {
 export const Route = createFileRoute('/_authenticated/modifier-profil')({
   head: () => ({
     meta: [
-      { title: 'Modifier profil — Orange Digital Center' },
+      { title: 'Modifier profil ' },
       {
         name: 'description',
         content:
@@ -33,7 +33,7 @@ export const Route = createFileRoute('/_authenticated/modifier-profil')({
       },
       {
         property: 'og:title',
-        content: 'Modifier profil — Orange Digital Center',
+        content: 'Modifier profil ',
       },
       {
         property: 'og:description',
@@ -210,8 +210,8 @@ function Page() {
       toast.error('Choisissez une image.')
       return
     }
-    if (fichierTropLourd(fichier, 1)) {
-      toast.error('Image trop lourde (1 Mo maximum).')
+    if (fichierTropLourd(fichier, 5)) {
+      toast.error('Image trop lourde (5 Mo maximum).')
       return
     }
     setEnvoiPhoto(true)
@@ -664,7 +664,7 @@ function Page() {
             </div>
             <div className="sm:col-span-2">
               <label className={labelClass}>
-                Curriculum vitae (fichier PDF, 1 Mo maximum)
+                Curriculum vitae (fichier PDF, 5 Mo maximum)
               </label>
               <input
                 type="file"

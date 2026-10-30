@@ -12,8 +12,8 @@ CREATE TABLE public.utilisateur (
   nom VARCHAR(100) NOT NULL DEFAULT '',
   prenoms VARCHAR(150) NOT NULL DEFAULT '',
   telephone VARCHAR(30),
-  email VARCHAR(255) NOT NULL UNIQUE,
-  adresse VARCHAR(255),
+  email VARCHAR(100) NOT NULL UNIQUE,
+  adresse VARCHAR(100),
   genre public.genre_enum,
   url_profil VARCHAR(500),
   statut public.statut_actif_enum NOT NULL DEFAULT 'Actif',
@@ -40,7 +40,7 @@ ALTER TABLE public.role ENABLE ROW LEVEL SECURITY;
 -- PERMISSION
 CREATE TABLE public.permission (
   permission_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  nom VARCHAR(150) NOT NULL,
+  nom VARCHAR(100) NOT NULL,
   code VARCHAR(100) NOT NULL UNIQUE,
   module VARCHAR(100) NOT NULL
 );
@@ -74,8 +74,8 @@ ALTER TABLE public.role_utilisateur ENABLE ROW LEVEL SECURITY;
 CREATE TABLE public.administrateur (
   admin_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   utilisateur_id BIGINT NOT NULL UNIQUE REFERENCES public.utilisateur(utilisateur_id) ON DELETE CASCADE,
-  service VARCHAR(150),
-  intitule_poste VARCHAR(150),
+  service VARCHAR(100),
+  intitule_poste VARCHAR(100),
   statut_service public.statut_actif_enum NOT NULL DEFAULT 'Actif'
 );
 GRANT SELECT, INSERT, UPDATE ON public.administrateur TO authenticated;
@@ -85,24 +85,24 @@ ALTER TABLE public.administrateur ENABLE ROW LEVEL SECURITY;
 CREATE TABLE public.responsable (
   responsable_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   utilisateur_id BIGINT NOT NULL UNIQUE REFERENCES public.utilisateur(utilisateur_id) ON DELETE CASCADE,
-  service VARCHAR(150),
-  intitule_poste VARCHAR(150),
+  service VARCHAR(100),
+  intitule_poste VARCHAR(100),
   statut_service public.statut_actif_enum NOT NULL DEFAULT 'Actif'
 );
-GRANT SELECT, INSERT, UPDATE ON public.responsable TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.responsable TO authenticated;
 GRANT ALL ON public.responsable TO service_role;
 ALTER TABLE public.responsable ENABLE ROW LEVEL SECURITY;
 
 CREATE TABLE public.formateur (
   formateur_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   utilisateur_id BIGINT NOT NULL UNIQUE REFERENCES public.utilisateur(utilisateur_id) ON DELETE CASCADE,
-  institution VARCHAR(200),
-  intitule_poste VARCHAR(150),
-  specialisation VARCHAR(200),
+  institution VARCHAR(100),
+  intitule_poste VARCHAR(100),
+  specialisation VARCHAR(100),
   annees_experience INT,
   curriculum_vitae VARCHAR(500)
 );
-GRANT SELECT, INSERT, UPDATE ON public.formateur TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.formateur TO authenticated;
 GRANT ALL ON public.formateur TO service_role;
 ALTER TABLE public.formateur ENABLE ROW LEVEL SECURITY;
 
@@ -186,6 +186,15 @@ CREATE POLICY "utilisateur lit son profil" ON public.utilisateur FOR SELECT TO a
   USING (auth_user_id = auth.uid() OR public.a_role(auth.uid(),'ADMINISTRATEUR') OR public.a_role(auth.uid(),'RESPONSABLE'));
 CREATE POLICY "utilisateur modifie son profil" ON public.utilisateur FOR UPDATE TO authenticated
   USING (auth_user_id = auth.uid()) WITH CHECK (auth_user_id = auth.uid());
+
+CREATE POLICY "Administrateur supprime un formateur"
+ON public.formateur FOR DELETE TO authenticated USING ( public.a_role(auth.uid(), 'ADMINISTRATEUR'));
+
+CREATE POLICY "Administrateur supprime un responsable"
+ON public.responsable FOR DELETE TO authenticated USING (public.a_role(auth.uid(), 'ADMINISTRATEUR'));
+
+CREATE POLICY "Administrateur supprime un participant"
+ON public.participant FOR DELETE TO authenticated USING (public.a_role(auth.uid(), 'ADMINISTRATEUR'));
 
 CREATE POLICY "roles visibles" ON public.role FOR SELECT TO authenticated USING (true);
 CREATE POLICY "permissions visibles" ON public.permission FOR SELECT TO authenticated USING (true);
@@ -286,20 +295,106 @@ INSERT INTO public.role (nom_role, code_role, description) VALUES
   ('Responsable','RESPONSABLE','Pilote les formations et les inscriptions'),
   ('Administrateur','ADMINISTRATEUR','Administre la plateforme');
 
-INSERT INTO public.permission (nom, code, module) VALUES
-  ('Consulter les formations','formation.lire','FORMATION'),
-  ('Gérer les formations','formation.gerer','FORMATION'),
-  ('Consulter les sessions','session.lire','SESSION'),
-  ('Gérer les sessions','session.gerer','SESSION'),
-  ('S''inscrire à une session','inscription.creer','INSCRIPTION'),
-  ('Gérer les inscriptions','inscription.gerer','INSCRIPTION'),
-  ('Marquer les présences','presence.gerer','PRESENCE'),
-  ('Gérer les utilisateurs','utilisateur.gerer','UTILISATEUR'),
-  ('Gérer les rôles','role.gerer','ROLE');
 
+
+   -- Matrice complète des droits : 38 permissions et 106 autorisations par acteur.
+-- Identique à la base hébergée. Idempotent : peut être rejoué sans doublon.
+
+INSERT INTO public.permission (nom, code, module) VALUES
+  ('Consulter le tableau de bord', 'dashboard.lire', 'Tableau de bord'),
+  ('Consulter l''agenda', 'agenda.lire', 'Agenda'),
+  ('Gérer les événements de l''agenda', 'agenda.gerer', 'Agenda'),
+  ('Consulter le catalogue', 'catalogue.lire', 'Catalogue'),
+  ('Gérer le catalogue', 'catalogue.gerer', 'Catalogue'),
+  ('S''inscrire à une session', 'inscription.creer', 'Inscriptions'),
+  ('Consulter ses inscriptions', 'inscription.lire', 'Inscriptions'),
+  ('Gérer les inscriptions', 'inscription.gerer', 'Inscriptions'),
+  ('Consulter ses présences', 'presence.lire', 'Présence'),
+  ('Gérer les présences', 'presence.gerer', 'Présence'),
+  ('Consulter les évaluations', 'evaluation.lire', 'Évaluations'),
+  ('Créer et gérer les évaluations', 'evaluation.gerer', 'Évaluations'),
+  ('Passer une évaluation', 'evaluation.passer', 'Évaluations'),
+  ('Consulter ses attestations', 'attestation.lire', 'Mes attestations'),
+  ('Consulter les supports', 'support.lire', 'Supports'),
+  ('Créer et gérer les supports', 'support.gerer', 'Supports'),
+  ('Consulter les publications', 'publication.lire', 'Fil d''actualité'),
+  ('Gérer les publications', 'publication.gerer', 'Fil d''actualité'),
+  ('Gérer les commentaires', 'commentaire.gerer', 'Fil d''actualité'),
+  ('Gérer ses réactions', 'reaction.gerer', 'Fil d''actualité'),
+  ('Utiliser l''assistant IA', 'ia.lire', 'Assistant IA'),
+  ('Donner un retour sur l''assistant IA', 'ia.retour', 'Assistant IA'),
+  ('Consulter les formations', 'formation.lire', 'Administration'),
+  ('Gérer les formations', 'formation.gerer', 'Administration'),
+  ('Consulter les sessions', 'session.lire', 'Administration'),
+  ('Gérer les sessions', 'session.gerer', 'Administration'),
+  ('Consulter les formateurs', 'formateur.lire', 'Administration'),
+  ('Gérer les formateurs', 'formateur.gerer', 'Administration'),
+  ('Consulter les paiements formateurs', 'paiement_formateur.lire', 'Administration'),
+  ('Gérer les paiements formateurs', 'paiement_formateur.gerer', 'Administration'),
+  ('Consulter les participants', 'participant.lire', 'Administration'),
+  ('Gérer les participants', 'participant.gerer', 'Administration'),
+  ('Consulter les responsables', 'responsable.lire', 'Administration'),
+  ('Gérer les responsables', 'responsable.gerer', 'Administration'),
+  ('Consulter les utilisateurs', 'utilisateur.lire', 'Administration'),
+  ('Gérer les utilisateurs', 'utilisateur.gerer', 'Administration'),
+  ('Gérer les rôles et permissions', 'role.gerer', 'Administration'),
+  ('Consulter les logs d''activités', 'journal.lire', 'Administration')
+ON CONFLICT (code) DO UPDATE SET nom = EXCLUDED.nom, module = EXCLUDED.module;
+
+WITH matrice(code_role, code) AS (
+  VALUES
+    -- PARTICIPANT (17)
+    ('PARTICIPANT','dashboard.lire'),('PARTICIPANT','agenda.lire'),('PARTICIPANT','catalogue.lire'),
+    ('PARTICIPANT','inscription.creer'),('PARTICIPANT','inscription.lire'),('PARTICIPANT','presence.lire'),
+    ('PARTICIPANT','evaluation.lire'),('PARTICIPANT','evaluation.passer'),('PARTICIPANT','attestation.lire'),
+    ('PARTICIPANT','support.lire'),('PARTICIPANT','support.gerer'),('PARTICIPANT','publication.lire'),
+    ('PARTICIPANT','reaction.gerer'),('PARTICIPANT','ia.lire'),('PARTICIPANT','ia.retour'),
+    ('PARTICIPANT','formation.lire'),('PARTICIPANT','session.lire'),
+    -- FORMATEUR (18)
+    ('FORMATEUR','dashboard.lire'),('FORMATEUR','agenda.lire'),('FORMATEUR','catalogue.lire'),
+    ('FORMATEUR','presence.lire'),('FORMATEUR','presence.gerer'),('FORMATEUR','evaluation.lire'),
+    ('FORMATEUR','evaluation.gerer'),('FORMATEUR','attestation.lire'),('FORMATEUR','support.lire'),
+    ('FORMATEUR','support.gerer'),('FORMATEUR','publication.lire'),('FORMATEUR','reaction.gerer'),
+    ('FORMATEUR','ia.lire'),('FORMATEUR','ia.retour'),('FORMATEUR','formation.lire'),
+    ('FORMATEUR','session.lire'),('FORMATEUR','participant.lire'),('FORMATEUR','paiement_formateur.lire'),
+    -- RESPONSABLE (33)
+    ('RESPONSABLE','dashboard.lire'),('RESPONSABLE','agenda.lire'),('RESPONSABLE','agenda.gerer'),
+    ('RESPONSABLE','catalogue.lire'),('RESPONSABLE','catalogue.gerer'),('RESPONSABLE','inscription.creer'),
+    ('RESPONSABLE','inscription.lire'),('RESPONSABLE','inscription.gerer'),('RESPONSABLE','presence.lire'),
+    ('RESPONSABLE','presence.gerer'),('RESPONSABLE','evaluation.lire'),('RESPONSABLE','evaluation.gerer'),
+    ('RESPONSABLE','attestation.lire'),('RESPONSABLE','support.lire'),('RESPONSABLE','support.gerer'),
+    ('RESPONSABLE','publication.lire'),('RESPONSABLE','publication.gerer'),('RESPONSABLE','commentaire.gerer'),
+    ('RESPONSABLE','reaction.gerer'),('RESPONSABLE','ia.lire'),('RESPONSABLE','ia.retour'),
+    ('RESPONSABLE','formation.lire'),('RESPONSABLE','formation.gerer'),('RESPONSABLE','session.lire'),
+    ('RESPONSABLE','session.gerer'),('RESPONSABLE','formateur.lire'),('RESPONSABLE','formateur.gerer'),
+    ('RESPONSABLE','paiement_formateur.lire'),('RESPONSABLE','paiement_formateur.gerer'),
+    ('RESPONSABLE','participant.lire'),('RESPONSABLE','participant.gerer'),
+    ('RESPONSABLE','responsable.lire'),('RESPONSABLE','responsable.gerer')
+)
 INSERT INTO public.role_permission (role_id, permission_id)
-SELECT r.role_id, p.permission_id FROM public.role r, public.permission p
-WHERE (r.code_role = 'ADMINISTRATEUR')
-   OR (r.code_role = 'RESPONSABLE' AND p.code IN ('formation.lire','formation.gerer','session.lire','session.gerer','inscription.gerer','presence.gerer'))
-   OR (r.code_role = 'FORMATEUR' AND p.code IN ('formation.lire','session.lire','presence.gerer'))
-   OR (r.code_role = 'PARTICIPANT' AND p.code IN ('formation.lire','session.lire','inscription.creer'));
+SELECT r.role_id, p.permission_id
+FROM matrice m
+JOIN public.role r ON r.code_role::text = m.code_role
+JOIN public.permission p ON p.code = m.code
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.role_permission rp
+  WHERE rp.role_id = r.role_id AND rp.permission_id = p.permission_id
+);
+
+-- -- ADMINISTRATEUR : toutes les permissions (38)
+-- INSERT INTO public.role_permission (role_id, permission_id)
+-- SELECT r.role_id, p.permission_id
+-- FROM public.role r CROSS JOIN public.permission p
+-- WHERE r.code_role = 'ADMINISTRATEUR'
+--   AND NOT EXISTS (
+--     SELECT 1 FROM public.role_permission rp
+--     WHERE rp.role_id = r.role_id AND rp.permission_id = p.permission_id
+--   );
+
+  
+-- INSERT INTO public.role_permission (role_id, permission_id)
+-- SELECT r.role_id, p.permission_id FROM public.role r, public.permission p
+-- WHERE (r.code_role = 'ADMINISTRATEUR')
+--    OR (r.code_role = 'RESPONSABLE' AND p.code IN ('formation.lire','formation.gerer','session.lire','session.gerer','inscription.gerer','presence.gerer'))
+--    OR (r.code_role = 'FORMATEUR' AND p.code IN ('formation.lire','session.lire','presence.gerer'))
+--    OR (r.code_role = 'PARTICIPANT' AND p.code IN ('formation.lire','session.lire','inscription.creer'));

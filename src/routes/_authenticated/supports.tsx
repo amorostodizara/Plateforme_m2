@@ -41,7 +41,7 @@ import {
 export const Route = createFileRoute('/_authenticated/supports')({
   head: () => ({
     meta: [
-      { title: 'Supports de formation — Orange Digital Center' },
+      { title: 'Supports de formation ' },
       {
         name: 'description',
         content:
@@ -49,7 +49,7 @@ export const Route = createFileRoute('/_authenticated/supports')({
       },
       {
         property: 'og:title',
-        content: 'Supports de formation — Orange Digital Center',
+        content: 'Supports de formation ',
       },
       {
         property: 'og:description',
@@ -299,18 +299,20 @@ function Page() {
             className={`${champClass} pl-9`}
           />
         </div>
-        <select
-          className={`${selectClass} w-full sm:w-64`}
-          value={sessionFiltre}
-          onChange={(e) => setSessionFiltre(e.target.value)}
-        >
-          <option value="Toutes">Toutes les sessions</option>
-          {sessions.map((s) => (
-            <option key={s.session_id} value={String(s.session_id)}>
-              {s.nom_session}
-            </option>
-          ))}
-        </select>
+        {peutGerer ? (
+          <select
+            className={`${selectClass} w-full sm:w-64`}
+            value={sessionFiltre}
+            onChange={(e) => setSessionFiltre(e.target.value)}
+          >
+            <option value="Toutes">Toutes les sessions</option>
+            {sessions.map((s) => (
+              <option key={s.session_id} value={String(s.session_id)}>
+                {s.nom_session}
+              </option>
+            ))}
+          </select>
+        ) : null}
       </div>
 
       {isLoading ? (

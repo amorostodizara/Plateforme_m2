@@ -18,7 +18,7 @@ export const Route = createFileRoute('/_authenticated/evaluations/creation')({
   }),
   head: () => ({
     meta: [
-      { title: 'Création d’évaluation — Orange Digital Center' },
+      { title: 'Création d’évaluation ' },
       {
         name: 'description',
         content:
@@ -26,7 +26,7 @@ export const Route = createFileRoute('/_authenticated/evaluations/creation')({
       },
       {
         property: 'og:title',
-        content: 'Création d’évaluation — Orange Digital Center',
+        content: 'Création d’évaluation ',
       },
       {
         property: 'og:description',

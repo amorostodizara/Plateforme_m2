@@ -7,33 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: '14.5'
   }
-  public: {
+  orange: {
     Tables: {
       administrateur: {
         Row: {
           admin_id: number
           intitule_poste: string | null
           service: string | null
-          statut_service: Database['public']['Enums']['statut_actif_enum']
+          statut_service: Database['orange']['Enums']['statut_actif_enum']
           utilisateur_id: number
         }
         Insert: {
           admin_id?: never
           intitule_poste?: string | null
           service?: string | null
-          statut_service?: Database['public']['Enums']['statut_actif_enum']
+          statut_service?: Database['orange']['Enums']['statut_actif_enum']
           utilisateur_id: number
         }
         Update: {
           admin_id?: never
           intitule_poste?: string | null
           service?: string | null
-          statut_service?: Database['public']['Enums']['statut_actif_enum']
+          statut_service?: Database['orange']['Enums']['statut_actif_enum']
           utilisateur_id?: number
         }
         Relationships: [
@@ -53,7 +51,7 @@ export type Database = {
           inscription_id: number
           jeton_verification: string | null
           numero_attestation: string | null
-          statut: Database['public']['Enums']['statut_attestation_enum']
+          statut: Database['orange']['Enums']['statut_attestation_enum']
           url_fichier: string | null
         }
         Insert: {
@@ -62,7 +60,7 @@ export type Database = {
           inscription_id: number
           jeton_verification?: string | null
           numero_attestation?: string | null
-          statut?: Database['public']['Enums']['statut_attestation_enum']
+          statut?: Database['orange']['Enums']['statut_attestation_enum']
           url_fichier?: string | null
         }
         Update: {
@@ -71,7 +69,7 @@ export type Database = {
           inscription_id?: number
           jeton_verification?: string | null
           numero_attestation?: string | null
-          statut?: Database['public']['Enums']['statut_attestation_enum']
+          statut?: Database['orange']['Enums']['statut_attestation_enum']
           url_fichier?: string | null
         }
         Relationships: [
@@ -111,7 +109,7 @@ export type Database = {
           contenu: string
           cree_le: string
           publication_id: number
-          statut: Database['public']['Enums']['statut_commentaire_enum']
+          statut: Database['orange']['Enums']['statut_commentaire_enum']
           utilisateur_id: number
         }
         Insert: {
@@ -119,7 +117,7 @@ export type Database = {
           contenu: string
           cree_le?: string
           publication_id: number
-          statut?: Database['public']['Enums']['statut_commentaire_enum']
+          statut?: Database['orange']['Enums']['statut_commentaire_enum']
           utilisateur_id: number
         }
         Update: {
@@ -127,7 +125,7 @@ export type Database = {
           contenu?: string
           cree_le?: string
           publication_id?: number
-          statut?: Database['public']['Enums']['statut_commentaire_enum']
+          statut?: Database['orange']['Enums']['statut_commentaire_enum']
           utilisateur_id?: number
         }
         Relationships: [
@@ -190,7 +188,7 @@ export type Database = {
           max_tentatives: number
           score_reussite: number
           session_id: number
-          statut: Database['public']['Enums']['statut_evaluation_enum']
+          statut: Database['orange']['Enums']['statut_evaluation_enum']
           titre_evaluation: string
         }
         Insert: {
@@ -203,7 +201,7 @@ export type Database = {
           max_tentatives?: number
           score_reussite?: number
           session_id: number
-          statut?: Database['public']['Enums']['statut_evaluation_enum']
+          statut?: Database['orange']['Enums']['statut_evaluation_enum']
           titre_evaluation: string
         }
         Update: {
@@ -216,7 +214,7 @@ export type Database = {
           max_tentatives?: number
           score_reussite?: number
           session_id?: number
-          statut?: Database['public']['Enums']['statut_evaluation_enum']
+          statut?: Database['orange']['Enums']['statut_evaluation_enum']
           titre_evaluation?: string
         }
         Relationships: [
@@ -245,9 +243,9 @@ export type Database = {
           description: string | null
           evenement_id: number
           lieu: string | null
-          statut: Database['public']['Enums']['statut_evenement_enum']
+          statut: Database['orange']['Enums']['statut_evenement_enum']
           titre: string
-          type_evenement: Database['public']['Enums']['type_evenement_enum']
+          type_evenement: Database['orange']['Enums']['type_evenement_enum']
         }
         Insert: {
           cree_le?: string
@@ -257,9 +255,9 @@ export type Database = {
           description?: string | null
           evenement_id?: never
           lieu?: string | null
-          statut?: Database['public']['Enums']['statut_evenement_enum']
+          statut?: Database['orange']['Enums']['statut_evenement_enum']
           titre: string
-          type_evenement?: Database['public']['Enums']['type_evenement_enum']
+          type_evenement?: Database['orange']['Enums']['type_evenement_enum']
         }
         Update: {
           cree_le?: string
@@ -269,9 +267,9 @@ export type Database = {
           description?: string | null
           evenement_id?: never
           lieu?: string | null
-          statut?: Database['public']['Enums']['statut_evenement_enum']
+          statut?: Database['orange']['Enums']['statut_evenement_enum']
           titre?: string
-          type_evenement?: Database['public']['Enums']['type_evenement_enum']
+          type_evenement?: Database['orange']['Enums']['type_evenement_enum']
         }
         Relationships: [
           {
@@ -327,8 +325,8 @@ export type Database = {
           cree_le: string
           description: string | null
           formation_id: number
-          niveau: Database['public']['Enums']['niveau_formation_enum']
-          statut: Database['public']['Enums']['statut_formation_enum']
+          niveau: Database['orange']['Enums']['niveau_formation_enum']
+          statut: Database['orange']['Enums']['statut_formation_enum']
           titre: string
           url_image: string | null
         }
@@ -337,8 +335,8 @@ export type Database = {
           cree_le?: string
           description?: string | null
           formation_id?: never
-          niveau?: Database['public']['Enums']['niveau_formation_enum']
-          statut?: Database['public']['Enums']['statut_formation_enum']
+          niveau?: Database['orange']['Enums']['niveau_formation_enum']
+          statut?: Database['orange']['Enums']['statut_formation_enum']
           titre: string
           url_image?: string | null
         }
@@ -347,8 +345,8 @@ export type Database = {
           cree_le?: string
           description?: string | null
           formation_id?: never
-          niveau?: Database['public']['Enums']['niveau_formation_enum']
-          statut?: Database['public']['Enums']['statut_formation_enum']
+          niveau?: Database['orange']['Enums']['niveau_formation_enum']
+          statut?: Database['orange']['Enums']['statut_formation_enum']
           titre?: string
           url_image?: string | null
         }
@@ -371,7 +369,7 @@ export type Database = {
           motivation: string | null
           participant_id: number
           session_id: number
-          statut: Database['public']['Enums']['statut_inscription_enum']
+          statut: Database['orange']['Enums']['statut_inscription_enum']
         }
         Insert: {
           date_inscription?: string
@@ -381,7 +379,7 @@ export type Database = {
           motivation?: string | null
           participant_id: number
           session_id: number
-          statut?: Database['public']['Enums']['statut_inscription_enum']
+          statut?: Database['orange']['Enums']['statut_inscription_enum']
         }
         Update: {
           date_inscription?: string
@@ -391,7 +389,7 @@ export type Database = {
           motivation?: string | null
           participant_id?: number
           session_id?: number
-          statut?: Database['public']['Enums']['statut_inscription_enum']
+          statut?: Database['orange']['Enums']['statut_inscription_enum']
         }
         Relationships: [
           {
@@ -492,7 +490,7 @@ export type Database = {
           nom_fichier: string | null
           publication_id: number
           taille_fichier: number | null
-          type_media: Database['public']['Enums']['type_media_enum']
+          type_media: Database['orange']['Enums']['type_media_enum']
           url_media: string
         }
         Insert: {
@@ -500,7 +498,7 @@ export type Database = {
           nom_fichier?: string | null
           publication_id: number
           taille_fichier?: number | null
-          type_media?: Database['public']['Enums']['type_media_enum']
+          type_media?: Database['orange']['Enums']['type_media_enum']
           url_media: string
         }
         Update: {
@@ -508,7 +506,7 @@ export type Database = {
           nom_fichier?: string | null
           publication_id?: number
           taille_fichier?: number | null
-          type_media?: Database['public']['Enums']['type_media_enum']
+          type_media?: Database['orange']['Enums']['type_media_enum']
           url_media?: string
         }
         Relationships: [
@@ -607,7 +605,7 @@ export type Database = {
           message: string
           notification_id: number
           titre: string
-          type_notification: Database['public']['Enums']['type_notification_enum']
+          type_notification: Database['orange']['Enums']['type_notification_enum']
           utilisateur_id: number
         }
         Insert: {
@@ -618,7 +616,7 @@ export type Database = {
           message: string
           notification_id?: never
           titre: string
-          type_notification?: Database['public']['Enums']['type_notification_enum']
+          type_notification?: Database['orange']['Enums']['type_notification_enum']
           utilisateur_id: number
         }
         Update: {
@@ -629,7 +627,7 @@ export type Database = {
           message?: string
           notification_id?: never
           titre?: string
-          type_notification?: Database['public']['Enums']['type_notification_enum']
+          type_notification?: Database['orange']['Enums']['type_notification_enum']
           utilisateur_id?: number
         }
         Relationships: [
@@ -679,39 +677,39 @@ export type Database = {
           cree_le: string
           date_paiement: string
           formateur_id: number
-          methode: Database['public']['Enums']['methode_paiement_enum']
+          methode: Database['orange']['Enums']['methode_paiement_enum']
           montant: number
           ref: string | null
           paiement_id: number
           remarque: string | null
           session_id: number | null
-          statut: Database['public']['Enums']['statut_paiement_enum']
+          statut: Database['orange']['Enums']['statut_paiement_enum']
           valide_par: number | null
         }
         Insert: {
           cree_le?: string
           date_paiement?: string
           formateur_id: number
-          methode?: Database['public']['Enums']['methode_paiement_enum']
+          methode?: Database['orange']['Enums']['methode_paiement_enum']
           ref?: string | null
           montant?: number
           paiement_id?: never
           remarque?: string | null
           session_id?: number | null
-          statut?: Database['public']['Enums']['statut_paiement_enum']
+          statut?: Database['orange']['Enums']['statut_paiement_enum']
           valide_par?: number | null
         }
         Update: {
           cree_le?: string
           date_paiement?: string
           formateur_id?: number
-          methode?: Database['public']['Enums']['methode_paiement_enum']
+          methode?: Database['orange']['Enums']['methode_paiement_enum']
           ref?: string | null
           montant?: number
           paiement_id?: never
           remarque?: string | null
           session_id?: number | null
-          statut?: Database['public']['Enums']['statut_paiement_enum']
+          statut?: Database['orange']['Enums']['statut_paiement_enum']
           valide_par?: number | null
         }
         Relationships: [
@@ -793,31 +791,31 @@ export type Database = {
           date_presence: string
           enregistre_le: string
           inscription_id: number
-          methode: Database['public']['Enums']['methode_presence_enum']
+          methode: Database['orange']['Enums']['methode_presence_enum']
           presence_id: number
           present: boolean
           remarque: string | null
-          statut: Database['public']['Enums']['statut_presence_enum']
+          statut: Database['orange']['Enums']['statut_presence_enum']
         }
         Insert: {
           date_presence?: string
           enregistre_le?: string
           inscription_id: number
-          methode?: Database['public']['Enums']['methode_presence_enum']
+          methode?: Database['orange']['Enums']['methode_presence_enum']
           presence_id?: never
           present?: boolean
           remarque?: string | null
-          statut?: Database['public']['Enums']['statut_presence_enum']
+          statut?: Database['orange']['Enums']['statut_presence_enum']
         }
         Update: {
           date_presence?: string
           enregistre_le?: string
           inscription_id?: number
-          methode?: Database['public']['Enums']['methode_presence_enum']
+          methode?: Database['orange']['Enums']['methode_presence_enum']
           presence_id?: never
           present?: boolean
           remarque?: string | null
-          statut?: Database['public']['Enums']['statut_presence_enum']
+          statut?: Database['orange']['Enums']['statut_presence_enum']
         }
         Relationships: [
           {
@@ -834,34 +832,34 @@ export type Database = {
           institution: string | null
           mention: string | null
           niveau_education:
-            Database['public']['Enums']['niveau_education_enum'] | null
+            Database['orange']['Enums']['niveau_education_enum'] | null
           participant_id: number
           profil_id: number
           specialisation: string | null
           statut_actuel:
-            Database['public']['Enums']['statut_actuel_enum'] | null
+            Database['orange']['Enums']['statut_actuel_enum'] | null
         }
         Insert: {
           institution?: string | null
           mention?: string | null
           niveau_education?:
-            Database['public']['Enums']['niveau_education_enum'] | null
+            Database['orange']['Enums']['niveau_education_enum'] | null
           participant_id: number
           profil_id?: never
           specialisation?: string | null
           statut_actuel?:
-            Database['public']['Enums']['statut_actuel_enum'] | null
+            Database['orange']['Enums']['statut_actuel_enum'] | null
         }
         Update: {
           institution?: string | null
           mention?: string | null
           niveau_education?:
-            Database['public']['Enums']['niveau_education_enum'] | null
+            Database['orange']['Enums']['niveau_education_enum'] | null
           participant_id?: number
           profil_id?: never
           specialisation?: string | null
           statut_actuel?:
-            Database['public']['Enums']['statut_actuel_enum'] | null
+            Database['orange']['Enums']['statut_actuel_enum'] | null
         }
         Relationships: [
           {
@@ -879,27 +877,27 @@ export type Database = {
           contenu: string | null
           publication_id: number
           publie_le: string
-          statut: Database['public']['Enums']['statut_publication_enum']
+          statut: Database['orange']['Enums']['statut_publication_enum']
           titre: string
-          visibilite: Database['public']['Enums']['visibilite_publication_enum']
+          visibilite: Database['orange']['Enums']['visibilite_publication_enum']
         }
         Insert: {
           auteur_id?: number | null
           contenu?: string | null
           publication_id?: never
           publie_le?: string
-          statut?: Database['public']['Enums']['statut_publication_enum']
+          statut?: Database['orange']['Enums']['statut_publication_enum']
           titre: string
-          visibilite?: Database['public']['Enums']['visibilite_publication_enum']
+          visibilite?: Database['orange']['Enums']['visibilite_publication_enum']
         }
         Update: {
           auteur_id?: number | null
           contenu?: string | null
           publication_id?: never
           publie_le?: string
-          statut?: Database['public']['Enums']['statut_publication_enum']
+          statut?: Database['orange']['Enums']['statut_publication_enum']
           titre?: string
-          visibilite?: Database['public']['Enums']['visibilite_publication_enum']
+          visibilite?: Database['orange']['Enums']['visibilite_publication_enum']
         }
         Relationships: [
           {
@@ -919,7 +917,7 @@ export type Database = {
           points: number
           question_evaluation_id: number
           texte_question: string
-          type_question: Database['public']['Enums']['type_question_enum']
+          type_question: Database['orange']['Enums']['type_question_enum']
         }
         Insert: {
           est_requis?: boolean
@@ -928,7 +926,7 @@ export type Database = {
           points?: number
           question_evaluation_id?: never
           texte_question: string
-          type_question?: Database['public']['Enums']['type_question_enum']
+          type_question?: Database['orange']['Enums']['type_question_enum']
         }
         Update: {
           est_requis?: boolean
@@ -937,7 +935,7 @@ export type Database = {
           points?: number
           question_evaluation_id?: never
           texte_question?: string
-          type_question?: Database['public']['Enums']['type_question_enum']
+          type_question?: Database['orange']['Enums']['type_question_enum']
         }
         Relationships: [
           {
@@ -954,21 +952,21 @@ export type Database = {
           cree_le: string
           publication_id: number
           reaction_id: number
-          type_reaction: Database['public']['Enums']['type_reaction_enum']
+          type_reaction: Database['orange']['Enums']['type_reaction_enum']
           utilisateur_id: number
         }
         Insert: {
           cree_le?: string
           publication_id: number
           reaction_id?: never
-          type_reaction?: Database['public']['Enums']['type_reaction_enum']
+          type_reaction?: Database['orange']['Enums']['type_reaction_enum']
           utilisateur_id: number
         }
         Update: {
           cree_le?: string
           publication_id?: number
           reaction_id?: never
-          type_reaction?: Database['public']['Enums']['type_reaction_enum']
+          type_reaction?: Database['orange']['Enums']['type_reaction_enum']
           utilisateur_id?: number
         }
         Relationships: [
@@ -1045,21 +1043,21 @@ export type Database = {
           intitule_poste: string | null
           responsable_id: number
           service: string | null
-          statut_service: Database['public']['Enums']['statut_actif_enum']
+          statut_service: Database['orange']['Enums']['statut_actif_enum']
           utilisateur_id: number
         }
         Insert: {
           intitule_poste?: string | null
           responsable_id?: never
           service?: string | null
-          statut_service?: Database['public']['Enums']['statut_actif_enum']
+          statut_service?: Database['orange']['Enums']['statut_actif_enum']
           utilisateur_id: number
         }
         Update: {
           intitule_poste?: string | null
           responsable_id?: never
           service?: string | null
-          statut_service?: Database['public']['Enums']['statut_actif_enum']
+          statut_service?: Database['orange']['Enums']['statut_actif_enum']
           utilisateur_id?: number
         }
         Relationships: [
@@ -1077,21 +1075,21 @@ export type Database = {
           cree_le: string
           message_id: number
           retour_id: number
-          type_retour: Database['public']['Enums']['type_retour_ia_enum']
+          type_retour: Database['orange']['Enums']['type_retour_ia_enum']
           utilisateur_id: number
         }
         Insert: {
           cree_le?: string
           message_id: number
           retour_id?: never
-          type_retour: Database['public']['Enums']['type_retour_ia_enum']
+          type_retour: Database['orange']['Enums']['type_retour_ia_enum']
           utilisateur_id: number
         }
         Update: {
           cree_le?: string
           message_id?: number
           retour_id?: never
-          type_retour?: Database['public']['Enums']['type_retour_ia_enum']
+          type_retour?: Database['orange']['Enums']['type_retour_ia_enum']
           utilisateur_id?: number
         }
         Relationships: [
@@ -1113,25 +1111,25 @@ export type Database = {
       }
       role: {
         Row: {
-          code_role: Database['public']['Enums']['code_role_enum']
+          code_role: Database['orange']['Enums']['code_role_enum']
           description: string | null
           nom_role: string
           role_id: number
-          statut: Database['public']['Enums']['statut_actif_enum']
+          statut: Database['orange']['Enums']['statut_actif_enum']
         }
         Insert: {
-          code_role: Database['public']['Enums']['code_role_enum']
+          code_role: Database['orange']['Enums']['code_role_enum']
           description?: string | null
           nom_role: string
           role_id?: never
-          statut?: Database['public']['Enums']['statut_actif_enum']
+          statut?: Database['orange']['Enums']['statut_actif_enum']
         }
         Update: {
-          code_role?: Database['public']['Enums']['code_role_enum']
+          code_role?: Database['orange']['Enums']['code_role_enum']
           description?: string | null
           nom_role?: string
           role_id?: never
-          statut?: Database['public']['Enums']['statut_actif_enum']
+          statut?: Database['orange']['Enums']['statut_actif_enum']
         }
         Relationships: []
       }
@@ -1212,7 +1210,7 @@ export type Database = {
           lieu: string | null
           nom_session: string
           session_id: number
-          statut: Database['public']['Enums']['statut_session_enum']
+          statut: Database['orange']['Enums']['statut_session_enum']
         }
         Insert: {
           capacite?: number | null
@@ -1224,7 +1222,7 @@ export type Database = {
           lieu?: string | null
           nom_session: string
           session_id?: never
-          statut?: Database['public']['Enums']['statut_session_enum']
+          statut?: Database['orange']['Enums']['statut_session_enum']
         }
         Update: {
           capacite?: number | null
@@ -1236,7 +1234,7 @@ export type Database = {
           lieu?: string | null
           nom_session?: string
           session_id?: never
-          statut?: Database['public']['Enums']['statut_session_enum']
+          statut?: Database['orange']['Enums']['statut_session_enum']
         }
         Relationships: [
           {
@@ -1325,7 +1323,7 @@ export type Database = {
           reussi: boolean
           score: number | null
           soumis_le: string | null
-          statut: Database['public']['Enums']['statut_tentative_enum']
+          statut: Database['orange']['Enums']['statut_tentative_enum']
           tentative_evaluation_id: number
         }
         Insert: {
@@ -1336,7 +1334,7 @@ export type Database = {
           reussi?: boolean
           score?: number | null
           soumis_le?: string | null
-          statut?: Database['public']['Enums']['statut_tentative_enum']
+          statut?: Database['orange']['Enums']['statut_tentative_enum']
           tentative_evaluation_id?: never
         }
         Update: {
@@ -1347,7 +1345,7 @@ export type Database = {
           reussi?: boolean
           score?: number | null
           soumis_le?: string | null
-          statut?: Database['public']['Enums']['statut_tentative_enum']
+          statut?: Database['orange']['Enums']['statut_tentative_enum']
           tentative_evaluation_id?: never
         }
         Relationships: [
@@ -1374,11 +1372,11 @@ export type Database = {
           cree_le: string
           email: string
           email_verifie: boolean
-          genre: Database['public']['Enums']['genre_enum'] | null
+          genre: Database['orange']['Enums']['genre_enum'] | null
           maj_le: string
           nom: string
           prenoms: string
-          statut: Database['public']['Enums']['statut_actif_enum']
+          statut: Database['orange']['Enums']['statut_actif_enum']
           telephone: string | null
           url_profil: string | null
           utilisateur_id: number
@@ -1389,11 +1387,11 @@ export type Database = {
           cree_le?: string
           email: string
           email_verifie?: boolean
-          genre?: Database['public']['Enums']['genre_enum'] | null
+          genre?: Database['orange']['Enums']['genre_enum'] | null
           maj_le?: string
           nom?: string
           prenoms?: string
-          statut?: Database['public']['Enums']['statut_actif_enum']
+          statut?: Database['orange']['Enums']['statut_actif_enum']
           telephone?: string | null
           url_profil?: string | null
           utilisateur_id?: never
@@ -1404,11 +1402,11 @@ export type Database = {
           cree_le?: string
           email?: string
           email_verifie?: boolean
-          genre?: Database['public']['Enums']['genre_enum'] | null
+          genre?: Database['orange']['Enums']['genre_enum'] | null
           maj_le?: string
           nom?: string
           prenoms?: string
-          statut?: Database['public']['Enums']['statut_actif_enum']
+          statut?: Database['orange']['Enums']['statut_actif_enum']
           telephone?: string | null
           url_profil?: string | null
           utilisateur_id?: never
@@ -1427,7 +1425,7 @@ export type Database = {
       a_role: {
         Args: {
           _auth_user_id: string
-          _code: Database['public']['Enums']['code_role_enum']
+          _code: Database['orange']['Enums']['code_role_enum']
         }
         Returns: boolean
       }
@@ -1436,7 +1434,7 @@ export type Database = {
           _lien?: string
           _message: string
           _titre: string
-          _type: Database['public']['Enums']['type_notification_enum']
+          _type: Database['orange']['Enums']['type_notification_enum']
           _utilisateur_id: number
         }
         Returns: undefined
@@ -1446,7 +1444,7 @@ export type Database = {
           _lien?: string
           _message: string
           _titre: string
-          _type: Database['public']['Enums']['type_notification_enum']
+          _type: Database['orange']['Enums']['type_notification_enum']
         }
         Returns: undefined
       }
@@ -1506,7 +1504,7 @@ export type Database = {
       type_reaction_enum: "J'aime" | "J'adore" | 'Bravo' | 'Intéressant'
       type_retour_ia_enum: 'Positive' | 'Négative'
       visibilite_publication_enum:
-        | 'Public'
+        | 'orange'
         | 'Participant'
         | 'Responsable'
         | 'Administrateur'
@@ -1520,7 +1518,7 @@ export type Database = {
 
 type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'orange'>]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
@@ -1633,7 +1631,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  public: {
+  orange: {
     Enums: {
       code_role_enum: [
         'PARTICIPANT',
