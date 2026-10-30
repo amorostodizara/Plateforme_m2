@@ -19,7 +19,6 @@ import { Route as AuthenticatedAttestationsRouteImport } from './routes/_authent
 import { Route as AuthenticatedCatalogueRouteImport } from './routes/_authenticated/catalogue'
 import { Route as AuthenticatedFormateursRouteImport } from './routes/_authenticated/formateurs'
 import { Route as AuthenticatedFormationsRouteImport } from './routes/_authenticated/formations'
-import { Route as AuthenticatedGestionInscriptionsRouteImport } from './routes/_authenticated/gestion-inscriptions'
 import { Route as AuthenticatedInscriptionsRouteImport } from './routes/_authenticated/inscriptions'
 import { Route as AuthenticatedModifierProfilRouteImport } from './routes/_authenticated/modifier-profil'
 import { Route as AuthenticatedPaiementsFormateursRouteImport } from './routes/_authenticated/paiements-formateurs'
@@ -96,12 +95,6 @@ const AuthenticatedFormationsRoute = AuthenticatedFormationsRouteImport.update({
   path: '/formations',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedGestionInscriptionsRoute =
-  AuthenticatedGestionInscriptionsRouteImport.update({
-    id: '/gestion-inscriptions',
-    path: '/gestion-inscriptions',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedInscriptionsRoute =
   AuthenticatedInscriptionsRouteImport.update({
     id: '/inscriptions',
@@ -245,7 +238,6 @@ export interface FileRoutesByFullPath {
   '/catalogue': typeof AuthenticatedCatalogueRoute
   '/formateurs': typeof AuthenticatedFormateursRoute
   '/formations': typeof AuthenticatedFormationsRoute
-  '/gestion-inscriptions': typeof AuthenticatedGestionInscriptionsRoute
   '/inscriptions': typeof AuthenticatedInscriptionsRoute
   '/modifier-profil': typeof AuthenticatedModifierProfilRoute
   '/paiements-formateurs': typeof AuthenticatedPaiementsFormateursRoute
@@ -281,7 +273,6 @@ export interface FileRoutesByTo {
   '/catalogue': typeof AuthenticatedCatalogueRoute
   '/formateurs': typeof AuthenticatedFormateursRoute
   '/formations': typeof AuthenticatedFormationsRoute
-  '/gestion-inscriptions': typeof AuthenticatedGestionInscriptionsRoute
   '/inscriptions': typeof AuthenticatedInscriptionsRoute
   '/modifier-profil': typeof AuthenticatedModifierProfilRoute
   '/paiements-formateurs': typeof AuthenticatedPaiementsFormateursRoute
@@ -319,7 +310,6 @@ export interface FileRoutesById {
   '/_authenticated/catalogue': typeof AuthenticatedCatalogueRoute
   '/_authenticated/formateurs': typeof AuthenticatedFormateursRoute
   '/_authenticated/formations': typeof AuthenticatedFormationsRoute
-  '/_authenticated/gestion-inscriptions': typeof AuthenticatedGestionInscriptionsRoute
   '/_authenticated/inscriptions': typeof AuthenticatedInscriptionsRoute
   '/_authenticated/modifier-profil': typeof AuthenticatedModifierProfilRoute
   '/_authenticated/paiements-formateurs': typeof AuthenticatedPaiementsFormateursRoute
@@ -357,7 +347,6 @@ export interface FileRouteTypes {
     | '/catalogue'
     | '/formateurs'
     | '/formations'
-    | '/gestion-inscriptions'
     | '/inscriptions'
     | '/modifier-profil'
     | '/paiements-formateurs'
@@ -393,7 +382,6 @@ export interface FileRouteTypes {
     | '/catalogue'
     | '/formateurs'
     | '/formations'
-    | '/gestion-inscriptions'
     | '/inscriptions'
     | '/modifier-profil'
     | '/paiements-formateurs'
@@ -430,7 +418,6 @@ export interface FileRouteTypes {
     | '/_authenticated/catalogue'
     | '/_authenticated/formateurs'
     | '/_authenticated/formations'
-    | '/_authenticated/gestion-inscriptions'
     | '/_authenticated/inscriptions'
     | '/_authenticated/modifier-profil'
     | '/_authenticated/paiements-formateurs'
@@ -541,13 +528,6 @@ declare module '@tanstack/react-router' {
       path: '/formations'
       fullPath: '/formations'
       preLoaderRoute: typeof AuthenticatedFormationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/gestion-inscriptions': {
-      id: '/_authenticated/gestion-inscriptions'
-      path: '/gestion-inscriptions'
-      fullPath: '/gestion-inscriptions'
-      preLoaderRoute: typeof AuthenticatedGestionInscriptionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/inscriptions': {
@@ -729,7 +709,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCatalogueRoute: typeof AuthenticatedCatalogueRoute
   AuthenticatedFormateursRoute: typeof AuthenticatedFormateursRoute
   AuthenticatedFormationsRoute: typeof AuthenticatedFormationsRoute
-  AuthenticatedGestionInscriptionsRoute: typeof AuthenticatedGestionInscriptionsRoute
   AuthenticatedInscriptionsRoute: typeof AuthenticatedInscriptionsRoute
   AuthenticatedModifierProfilRoute: typeof AuthenticatedModifierProfilRoute
   AuthenticatedPaiementsFormateursRoute: typeof AuthenticatedPaiementsFormateursRoute
@@ -756,7 +735,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCatalogueRoute: AuthenticatedCatalogueRoute,
   AuthenticatedFormateursRoute: AuthenticatedFormateursRoute,
   AuthenticatedFormationsRoute: AuthenticatedFormationsRoute,
-  AuthenticatedGestionInscriptionsRoute: AuthenticatedGestionInscriptionsRoute,
   AuthenticatedInscriptionsRoute: AuthenticatedInscriptionsRoute,
   AuthenticatedModifierProfilRoute: AuthenticatedModifierProfilRoute,
   AuthenticatedPaiementsFormateursRoute: AuthenticatedPaiementsFormateursRoute,

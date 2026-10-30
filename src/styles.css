@@ -1,6 +1,6 @@
-@import "tailwindcss" source(none);
+@import 'tailwindcss' source(none);
 @source "../src";
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -11,7 +11,7 @@
  */
 
 @theme inline {
-  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -110,11 +110,21 @@
   }
 
   button,
-  [role="button"] {
+  [role='button'] {
     cursor: pointer;
   }
 }
+@layer components {
+  .background-delete {
+    color: var(--color-destructive) !important;
+  }
 
+  .background-delete:hover,
+  .background-delete:focus {
+    background-color: var(--color-destructive) !important;
+    color: var(--color-destructive-foreground) !important;
+  }
+}
 @utility app-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: var(--color-input) transparent;

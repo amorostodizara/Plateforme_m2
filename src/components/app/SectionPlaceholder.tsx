@@ -21,7 +21,7 @@ export function SectionPlaceholder({
         </span>
         <h2 className="mt-4 text-base font-bold text-foreground">{title}</h2>
         <p className="mt-1 max-w-md text-sm text-muted-foreground">
-          La structure de cet espace est prête. Son contenu sera ajouté à la prochaine étape.
+          C'est ici que tout les logs et les journal des activités de cette app se trouve. Mbolatsara ! 
         </p>
       </div>
     </div>

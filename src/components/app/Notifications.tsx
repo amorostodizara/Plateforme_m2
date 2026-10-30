@@ -1,104 +1,109 @@
-import { useEffect } from "react";
-import { Link } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, CheckCheck } from "lucide-react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useEffect } from 'react'
+import { Link } from '@tanstack/react-router'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Bell, CheckCheck } from 'lucide-react'
+import { toast } from 'sonner'
+import { supabase } from '@/integrations/supabase/client'
+import { Button } from '@/components/ui/button'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { quand } from '@/components/app/AdminKit'
 
 type Notif = {
-  notification_id: number;
-  type_notification: string;
-  titre: string;
-  message: string;
-  lien: string | null;
-  lu: boolean;
-  cree_le: string;
-};
-
-const quand = (v: string) => {
-  const d = new Date(v);
-  const min = Math.round((Date.now() - d.getTime()) / 60000);
-  if (min < 1) return "à l’instant";
-  if (min < 60) return `il y a ${min} min`;
-  if (min < 1440) return `il y a ${Math.round(min / 60)} h`;
-  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
-};
+  notification_id: number
+  type_notification: string
+  titre: string
+  message: string
+  lien: string | null
+  lu: boolean
+  cree_le: string
+}
 
 export function Notifications() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   // Flux temps réel : toute nouvelle notification arrive immédiatement.
   useEffect(() => {
     const canal = supabase
-      .channel("notifications-temps-reel")
+      .channel('notifications-temps-reel')
       .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "notification" },
+        'postgres_changes',
+        { event: 'INSERT', schema: 'orange', table: 'notification' },
         (payload) => {
-          const n = payload.new as { titre?: string; message?: string };
-          queryClient.invalidateQueries({ queryKey: ["notifications"] });
-          if (n?.titre) toast(n.titre, { description: n.message ?? undefined });
+          const n = payload.new as { titre?: string; message?: string }
+          queryClient.invalidateQueries({ queryKey: ['notifications'] })
+          if (n?.titre) toast(n.titre, { description: n.message ?? undefined })
         },
       )
       .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "notification" },
-        () => queryClient.invalidateQueries({ queryKey: ["notifications"] }),
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'orange', table: 'notification' },
+        () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
       )
-      .subscribe();
+      .subscribe()
     return () => {
-      void supabase.removeChannel(canal);
-    };
-  }, [queryClient]);
+      void supabase.removeChannel(canal)
+    }
+  }, [queryClient])
 
   const { data: notifications = [] } = useQuery({
-    queryKey: ["notifications"],
+    queryKey: ['notifications'],
     refetchInterval: 60000,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("notification")
-        .select("notification_id, type_notification, titre, message, lien, lu, cree_le")
-        .order("cree_le", { ascending: false })
-        .limit(30);
-      if (error) throw error;
-      return (data ?? []) as Notif[];
+        .from('notification')
+        .select(
+          'notification_id, type_notification, titre, message, lien, lu, cree_le',
+        )
+        .order('cree_le', { ascending: false })
+        .limit(30)
+      if (error) throw error
+      return (data ?? []) as Notif[]
     },
-  });
+  })
 
-  const nonLues = notifications.filter((n) => !n.lu).length;
+  const nonLues = notifications.filter((n) => !n.lu).length
 
   const basculer = useMutation({
     mutationFn: async ({ id, lu }: { id: number; lu: boolean }) => {
       const { error } = await supabase
-        .from("notification")
+        .from('notification')
         .update({ lu, lu_le: lu ? new Date().toISOString() : null })
-        .eq("notification_id", id);
-      if (error) throw error;
+        .eq('notification_id', id)
+      if (error) throw error
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications"] }),
-  });
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+  })
 
   const toutLire = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
-        .from("notification")
+        .from('notification')
         .update({ lu: true, lu_le: new Date().toISOString() })
-        .eq("lu", false);
-      if (error) throw error;
+        .eq('lu', false)
+      if (error) throw error
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications"] }),
-  });
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+  })
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
-          <Bell />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative text-muted-foreground"
+          aria-label="Notifications"
+        >
+          <Bell className="!h-6 !w-6 " />
           {nonLues > 0 ? (
             <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">
-              {nonLues > 99 ? "99+" : nonLues}
+              {nonLues > 99 ? '99+' : nonLues}
             </span>
           ) : null}
         </Button>
@@ -115,40 +120,60 @@ export function Notifications() {
         </div>
         <div className="app-scrollbar max-h-96 overflow-y-auto">
           {notifications.length === 0 ? (
-            <p className="px-3 py-8 text-center text-sm text-muted-foreground">Aucune notification pour le moment.</p>
+            <p className="px-3 py-8 text-center text-sm text-muted-foreground">
+              Aucune notification pour le moment.
+            </p>
           ) : (
             notifications.map((n) => {
               const contenu = (
                 <>
                   <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-cream px-2 py-0.5 text-[10px] font-bold text-primary">{n.type_notification}</span>
-                    <span className="ml-auto text-[10px] text-muted-foreground">{quand(n.cree_le)}</span>
+                    <span className="rounded-full bg-cream px-2 py-0.5 text-[10px] font-bold text-primary">
+                      {n.type_notification}
+                    </span>
+                    <span className="ml-auto text-[10px] text-muted-foreground">
+                      {quand(n.cree_le)}
+                    </span>
                   </div>
-                  <p className="mt-1 text-xs font-semibold text-foreground">{n.titre}</p>
+                  <p className="mt-1 text-xs font-semibold text-foreground">
+                    {n.titre}
+                  </p>
                   <p className="text-xs text-muted-foreground">{n.message}</p>
                 </>
-              );
+              )
               return (
-                <div key={n.notification_id} className={`border-b border-border/60 px-3 py-2 ${n.lu ? "" : "bg-cream/60"}`}>
+                <div
+                  key={n.notification_id}
+                  className={`border-b border-border/60 px-3 py-2 ${n.lu ? '' : 'bg-cream/60'}`}
+                >
                   {n.lien ? (
-                    <Link to={n.lien as never} onClick={() => !n.lu && basculer.mutate({ id: n.notification_id, lu: true })} className="block">
+                    <Link
+                      to={n.lien as never}
+                      onClick={() =>
+                        !n.lu &&
+                        basculer.mutate({ id: n.notification_id, lu: true })
+                      }
+                      className="block"
+                    >
                       {contenu}
                     </Link>
                   ) : (
                     contenu
                   )}
                   <button
-                    onClick={() => basculer.mutate({ id: n.notification_id, lu: !n.lu })}
+                    onClick={() =>
+                      basculer.mutate({ id: n.notification_id, lu: !n.lu })
+                    }
                     className="mt-1 text-[10px] font-semibold text-primary hover:underline"
                   >
-                    Marquer comme {n.lu ? "non lue" : "lue"}
+                    Marquer comme {n.lu ? 'non lue' : 'lue'}
                   </button>
                 </div>
-              );
+              )
             })
           )}
         </div>
       </PopoverContent>
     </Popover>
-  );
+  )
 }

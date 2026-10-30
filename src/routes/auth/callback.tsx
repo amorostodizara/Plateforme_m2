@@ -1,51 +1,50 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from 'react'
+import { supabase } from '@/integrations/supabase/client'
 
-
-export const Route = createFileRoute("/auth/callback")({
+export const Route = createFileRoute('/auth/callback')({
   component: AuthCallback,
-});
+})
 
 function AuthCallback() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const code = new URLSearchParams(window.location.search).get("code");
+        const code = new URLSearchParams(window.location.search).get('code')
 
         if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          const { error } = await supabase.auth.exchangeCodeForSession(code)
 
           if (error) {
-            console.error("Erreur échange du code :", error);
-            navigate({ to: "/" });
-            return;
+            console.error('Erreur échange du code :', error)
+            navigate({ to: '/' })
+            return
           }
         }
 
         const {
           data: { session },
-        } = await supabase.auth.getSession();
+        } = await supabase.auth.getSession()
 
         if (session) {
-          navigate({ to: "/tableau-de-bord" });
+          navigate({ to: '/catalogue' })
         } else {
-          navigate({ to: "/" });
+          navigate({ to: '/' })
         }
       } catch (error) {
-        console.error("Erreur authentification :", error);
-        navigate({ to: "/" });
+        console.error('Erreur authentification :', error)
+        navigate({ to: '/' })
       }
-    };
+    }
 
-    handleCallback();
-  }, [navigate]);
+    handleCallback()
+  }, [navigate])
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center text-xl text-primary">
       Connexion en cours...
     </div>
-  );
+  )
 }

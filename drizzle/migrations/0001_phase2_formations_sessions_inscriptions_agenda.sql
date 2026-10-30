@@ -28,7 +28,6 @@ CREATE TABLE public.formation (
   description TEXT,
   niveau niveau_formation_enum NOT NULL DEFAULT 'Débutant',
   url_image VARCHAR,
-  duree_jours INTEGER NOT NULL DEFAULT 1,
   statut statut_formation_enum NOT NULL DEFAULT 'Brouillon',
   cree_le TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -108,26 +107,39 @@ CREATE POLICY "presence gestion" ON public.presence FOR ALL TO authenticated
   USING (public.a_role(auth.uid(), 'ADMINISTRATEUR') OR public.a_role(auth.uid(), 'RESPONSABLE') OR public.a_role(auth.uid(), 'FORMATEUR'))
   WITH CHECK (public.a_role(auth.uid(), 'ADMINISTRATEUR') OR public.a_role(auth.uid(), 'RESPONSABLE') OR public.a_role(auth.uid(), 'FORMATEUR'));
 
+
+
 CREATE TABLE public.attestation (
   attestation_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  inscription_id BIGINT NOT NULL REFERENCES public.inscription(inscription_id) ON DELETE CASCADE,
-  url_fichier VARCHAR,
+  inscription_id BIGINT NOT NULL UNIQUE REFERENCES public.inscription(inscription_id) ON DELETE CASCADE,
+  numero_attestation VARCHAR(30) NOT NULL UNIQUE,
+  jeton_verification VARCHAR(255) NOT NULL UNIQUE,
+  statut public.statut_attestation_enum NOT NULL DEFAULT 'Valide',
   delivree_le TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.attestation TO authenticated;
 GRANT ALL ON public.attestation TO service_role;
 ALTER TABLE public.attestation ENABLE ROW LEVEL SECURITY;
+
 CREATE POLICY "attestation lecture" ON public.attestation FOR SELECT TO authenticated USING (
   inscription_id IN (
     SELECT i.inscription_id FROM public.inscription i
     JOIN public.participant p ON p.participant_id = i.participant_id
     WHERE p.utilisateur_id = public.utilisateur_courant_id()
   )
-  OR public.a_role(auth.uid(), 'ADMINISTRATEUR') OR public.a_role(auth.uid(), 'RESPONSABLE')
+  OR public.a_role(auth.uid(), 'ADMINISTRATEUR')
 );
 CREATE POLICY "attestation gestion" ON public.attestation FOR ALL TO authenticated
   USING (public.a_role(auth.uid(), 'ADMINISTRATEUR') OR public.a_role(auth.uid(), 'RESPONSABLE'))
   WITH CHECK (public.a_role(auth.uid(), 'ADMINISTRATEUR') OR public.a_role(auth.uid(), 'RESPONSABLE'));
+
+CREATE POLICY "attestation insertion"
+ON public.attestation FOR INSERT TO authenticated
+WITH CHECK (
+  inscription_id IN ( SELECT i.inscription_id FROM public.inscription i JOIN public.participant p ON p.participant_id = i.participant_id
+   WHERE p.utilisateur_id = public.utilisateur_courant_id())
+  OR public.a_role(auth.uid(), 'ADMINISTRATEUR'));
 
 CREATE TABLE public.evenement (
   evenement_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

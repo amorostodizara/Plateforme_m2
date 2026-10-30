@@ -89,13 +89,14 @@ function Connexion() {
       .maybeSingle();
 
     if (profil?.statut === "Inactif") {
+      navigate({ to: "/auth" });
       await supabase.auth.signOut();
       setChargement(false);
       setErreurs({ global: "Votre compte est inactif. Contactez un administrateur." });
       return;
     }
 
-    navigate({ to: "/tableau-de-bord" });
+    navigate({ to: "/catalogue" });
   }
 
   async function connexionGoogle() {
