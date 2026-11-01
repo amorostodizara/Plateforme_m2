@@ -139,8 +139,6 @@ function Actualites() {
   )
   const [titre, setTitre] = useState('')
   const [contenu, setContenu] = useState('')
-  // const [visibilite, setVisibilite] =
-  //   useState<Publication['visibilite']>('Public')
   const [visibilite, setVisibilite] = useState<Visibilite>('Public')
 
   const [fichiers, setFichiers] = useState<File[]>([])
