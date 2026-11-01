@@ -1180,7 +1180,7 @@ LANGUAGE plpgsql SECURITY DEFINER SET search_path = orange AS $$
 BEGIN
   IF NEW.statut IN ('Planifié', 'En cours', 'Annulé') THEN
     PERFORM orange.notifier_gestionnaires('AGENDA', 'Agenda : ' || NEW.titre,
-      'Événement ' || NEW.type_evenement::text || ' — statut ' || NEW.statut::text || ' le ' || to_char(NEW.date_debut, 'DD/MM/YYYY HH24:MI') || '.', '/agenda');
+      'Événement ' || NEW.type_evenement::text || ' — statut ' || NEW.statut::text || ' le ' || to_char( NEW.date_debut AT TIME ZONE 'Indian/Antananarivo','DD/MM/YYYY HH24:MI') || '.', '/agenda');
   END IF;
   RETURN NEW;
 END $$;

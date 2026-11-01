@@ -10,7 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { quand } from '@/components/app/AdminKit'
+import { dateFr } from '@/components/app/AdminKit'
 
 type Notif = {
   notification_id: number
@@ -132,7 +132,7 @@ export function Notifications() {
                       {n.type_notification}
                     </span>
                     <span className="ml-auto text-[10px] text-muted-foreground">
-                      {quand(n.cree_le)}
+                      {dateFr(n.cree_le)}
                     </span>
                   </div>
                   <p className="mt-1 text-xs font-semibold text-foreground">
