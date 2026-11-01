@@ -26,7 +26,7 @@ const couleurs: Record<string, string> = {
   Refusée: 'bg-[#FCE8E6] text-[#C5221F]',
   Absent: 'bg-[#FCE8E6] text-[#C5221F]',
 }
-
+const TIME_ZONE = 'Indian/Antananarivo'
 export function MenuActions({ children }: { children: ReactNode }) {
   return (
     <DropdownMenu>
@@ -217,6 +217,7 @@ export const dateFr = (v?: string | null) =>
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
+        timeZone: TIME_ZONE,
       })
     : '—'
 
@@ -230,7 +231,7 @@ export const dateHeureFr = (v?: string | null) => {
     minute: '2-digit',
     second: '2-digit',
     hour12: false,
-    timeZone: 'Indian/Antananarivo',
+    timeZone: TIME_ZONE,
   })
 }
 
@@ -244,6 +245,7 @@ export const quand = (v: string) => {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+    timeZone: TIME_ZONE,
   })
 }
 
@@ -264,10 +266,12 @@ export function formaterPeriodeCatalogue(
   const heureDebut = debut.toLocaleTimeString('fr-FR', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: TIME_ZONE,
   })
   const heureFin = fin.toLocaleTimeString('fr-FR', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: TIME_ZONE,
   })
 
   return `${heureDebut} - ${heureFin} • ${nombreJours} jours`

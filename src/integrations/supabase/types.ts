@@ -1504,7 +1504,7 @@ export type Database = {
       type_reaction_enum: "J'aime" | "J'adore" | 'Bravo' | 'Intéressant'
       type_retour_ia_enum: 'Positive' | 'Négative'
       visibilite_publication_enum:
-        | 'orange'
+        | 'Public'
         | 'Participant'
         | 'Responsable'
         | 'Administrateur'
