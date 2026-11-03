@@ -52,7 +52,6 @@ export type Database = {
           jeton_verification: string | null
           numero_attestation: string | null
           statut: Database['orange']['Enums']['statut_attestation_enum']
-          url_fichier: string | null
         }
         Insert: {
           attestation_id?: never
@@ -61,7 +60,6 @@ export type Database = {
           jeton_verification?: string | null
           numero_attestation?: string | null
           statut?: Database['orange']['Enums']['statut_attestation_enum']
-          url_fichier?: string | null
         }
         Update: {
           attestation_id?: never
@@ -70,7 +68,6 @@ export type Database = {
           jeton_verification?: string | null
           numero_attestation?: string | null
           statut?: Database['orange']['Enums']['statut_attestation_enum']
-          url_fichier?: string | null
         }
         Relationships: [
           {

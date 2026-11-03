@@ -122,7 +122,6 @@ type Parcours = {
         numero_attestation: string | null
         delivree_le: string
         statut: string
-        url_fichier: string | null
       }[]
     | null
 }
@@ -177,7 +176,7 @@ function Page() {
       const { data, error } = await supabase
         .from('inscription')
         .select(
-          'inscription_id, date_inscription, motivation, engagement, statut, session:session_formation(nom_session, date_debut, date_fin, lieu, formation:formation(titre)), presences:presence(presence_id, enregistre_le, statut, methode), tentatives:tentative_evaluation(tentative_evaluation_id, numero_tentative, score, statut, reussi, evaluation:evaluation(titre_evaluation)), attestations:attestation(attestation_id, numero_attestation, delivree_le, statut, url_fichier)',
+          'inscription_id, date_inscription, motivation, engagement, statut, session:session_formation(nom_session, date_debut, date_fin, lieu, formation:formation(titre)), presences:presence(presence_id, enregistre_le, statut, methode), tentatives:tentative_evaluation(tentative_evaluation_id, numero_tentative, score, statut, reussi, evaluation:evaluation(titre_evaluation)), attestations:attestation(attestation_id, numero_attestation, delivree_le, statut)',
         )
         .eq('participant_id', detail!.participant_id)
         .order('date_inscription', { ascending: false })
@@ -691,7 +690,7 @@ function Page() {
                       N° {a.numero_attestation ?? '—'} · délivrée le{' '}
                       {dateFr(a.delivree_le)}
                     </p>
-                    {a.url_fichier ? (
+                    {/* {a.url_fichier ? (
                       <a
                         href={a.url_fichier}
                         target="_blank"
@@ -700,7 +699,7 @@ function Page() {
                       >
                         Ouvrir le PDF
                       </a>
-                    ) : null}
+                    ) : null} */}
                   </div>
                 ))
               )}

@@ -427,7 +427,7 @@ function Catalogue() {
                           {s.capacite
                             ? `${s.capacite} places`
                             : 'Places non limitées'}{' '}
-                          · {s.statut}
+                          <span className="text-primary">• {s.statut}</span>
                         </p>
                       </div>
                       <Button
@@ -477,8 +477,13 @@ function Catalogue() {
                       const Icone = iconesCategorie[nom] ?? BriefcaseBusiness
                       return <Icone className="h-5 w-5" />
                     })()}
-                    <span>{nom}</span>
-                    <span className="ml-auto">{nb}</span>
+                    <span
+                      className="min-w-0 flex-1 truncate text-left"
+                      title={nom}
+                    >
+                      {nom}
+                    </span>
+                    <span className="shrink-0">{nb}</span>
                   </Button>
                 </li>
               ))}

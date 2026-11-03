@@ -252,7 +252,7 @@ export const quand = (v: string) => {
 export function formaterPeriodeCatalogue(
   dateDebut: string,
   dateFin: string,
-): string {
+): React.ReactNode {
   const debut = new Date(dateDebut)
   const fin = new Date(dateFin)
   const debutJour = new Date(
@@ -274,7 +274,12 @@ export function formaterPeriodeCatalogue(
     timeZone: TIME_ZONE,
   })
 
-  return `${heureDebut} - ${heureFin} • ${nombreJours} jours`
+  return (
+    <>
+      {heureDebut} - {heureFin}
+      <span className="text-primary text-lg"> • </span> {nombreJours} jours{' '}
+    </>
+  )
 }
 
 export function formaternombrejours(

@@ -1,7 +1,15 @@
 import { useMemo, useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { MoreHorizontal, Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import {
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  ChevronDown,
+  Check,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/integrations/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -113,6 +121,8 @@ function Page() {
   const [edite, setEdite] = useState<number | null>(null)
   const [form, setForm] = useState(vide)
   const [detail, setDetail] = useState<Session | null>(null)
+  const [rechercheFormation, setRechercheFormation] = useState('')
+  const [selectFormationOuvert, setSelectFormationOuvert] = useState(false)
 
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ['admin-sessions'],
@@ -139,6 +149,12 @@ function Page() {
       return data ?? []
     },
   })
+
+  const formationsFiltrees = useMemo(() => {
+    return formations.filter((f) =>
+      f.titre.toLowerCase().includes(rechercheFormation.toLowerCase().trim()),
+    )
+  }, [formations, rechercheFormation])
 
   const { data: formateurs = [] } = useQuery({
     queryKey: ['liste-formateurs'],
@@ -545,25 +561,109 @@ function Page() {
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div>
+              <div className="relative">
                 <label className={labelClass}>
                   Formation
                   <LabelObligatoire />
                 </label>
-                <select
-                  className={`${selectClass} w-full`}
-                  value={form.formation_id}
-                  onChange={(e) =>
-                    setForm({ ...form, formation_id: e.target.value })
-                  }
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectFormationOuvert((ouvert) => !ouvert)
+                    setRechercheFormation('')
+                  }}
+                  className={`${selectClass} flex w-full items-center justify-between gap-2 text-left`}
                 >
-                  <option value="">Choisir…</option>
-                  {formations.map((f) => (
-                    <option key={f.formation_id} value={f.formation_id}>
-                      {f.titre}
-                    </option>
-                  ))}
-                </select>
+                  <span className="truncate">
+                    {formations.find(
+                      (f) =>
+                        String(f.formation_id) === String(form.formation_id),
+                    )?.titre ?? 'Choisir…'}
+                  </span>
+
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 transition-transform ${
+                      selectFormationOuvert ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                {selectFormationOuvert && (
+                  <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card shadow-lg">
+                    <div className="border-b border-border p-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <input
+                          type="text"
+                          value={rechercheFormation}
+                          onChange={(e) =>
+                            setRechercheFormation(e.target.value)
+                          }
+                          placeholder="Rechercher une formation..."
+                          autoFocus
+                          className="w-full rounded-md border border-border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:border-primary"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="max-h-[320px] overflow-y-auto p-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForm({ ...form, formation_id: '' })
+                          setSelectFormationOuvert(false)
+                          setRechercheFormation('')
+                        }}
+                        className="flex w-full items-center rounded-md px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted"
+                      >
+                        Choisir…
+                      </button>
+
+                      {formationsFiltrees.length > 0 ? (
+                        formationsFiltrees.map((f) => {
+                          const selectionnee =
+                            String(form.formation_id) === String(f.formation_id)
+
+                          return (
+                            <button
+                              key={f.formation_id}
+                              type="button"
+                              onClick={() => {
+                                setForm({
+                                  ...form,
+                                  formation_id: String(f.formation_id),
+                                })
+                                setSelectFormationOuvert(false)
+                                setRechercheFormation('')
+                              }}
+                              className={`flex w-full items-center justify-between gap-3 rounded-md px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted ${
+                                selectionnee
+                                  ? 'bg-orange-50 text-primary'
+                                  : 'text-foreground'
+                              }`}
+                            >
+                              <span className="min-w-0 truncate">
+                                {f.titre}
+                              </span>
+                              {selectionnee && (
+                                <Check className="h-4 w-4 shrink-0 text-primary" />
+                              )}
+                            </button>
+                          )
+                        })
+                      ) : (
+                        <p className="px-3 py-6 text-center text-sm text-muted-foreground">
+                          Aucune formation trouvée.
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
+                      {formationsFiltrees.length} formation(s) trouvée(s)
+                    </div>
+                  </div>
+                )}
               </div>
               <div>
                 <label className={labelClass}>Formateur</label>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ImageStockee } from '@/components/app/ImageStockee'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -19,7 +19,11 @@ import {
   UserX,
   Users,
   X,
+  Download,
+  ChevronDown,
+  Check,
 } from 'lucide-react'
+import { genererFichePresencePdf } from '@/lib/presence-pdf'
 import { toast } from 'sonner'
 import { supabase } from '@/integrations/supabase/client'
 import { ScannerQr } from '@/components/app/ScannerQr'
@@ -133,6 +137,8 @@ function Presence() {
   const [remarque, setRemarque] = useState('')
   const [badgeOuvert, setBadgeOuvert] = useState(false)
 
+  const [rechercheSession, setRechercheSession] = useState('')
+  const [selectSessionOuvert, setSelectSessionOuvert] = useState(false)
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions-presence'],
     queryFn: async () => {
@@ -144,6 +150,14 @@ function Presence() {
       return (data ?? []) as SessionItem[]
     },
   })
+
+  const sessionsFiltrees = useMemo(() => {
+    return sessions.filter((s) =>
+      s.nom_session
+        .toLowerCase()
+        .includes(rechercheSession.toLowerCase().trim()),
+    )
+  }, [sessions, rechercheSession])
 
   const { data: lignes = [], isLoading } = useQuery({
     queryKey: ['presences', sessionId],
@@ -186,12 +200,6 @@ function Presence() {
     }
     return out
   }, [sessionActive])
-
-  useEffect(() => {
-    if (jours.length > 0 && jour === 'Toutes') {
-      setJour(jours[0]!)
-    }
-  }, [jours, jour])
 
   const presenceDe = useCallback(
     (l: Ligne): PresenceLigne | null => {
@@ -341,22 +349,90 @@ function Presence() {
         </div>
 
         <div className="flex flex-wrap items-center gap-4 rounded-lg border border-border bg-card p-4">
-          <label className="min-w-64 flex-1">
+          <div className="relative min-w-64 flex-1">
             <span className="mb-1 block text-xs font-semibold tracking-wide text-muted-foreground">
               Session
             </span>
-            <select
-              className={`${selectClass} w-full`}
-              value={sessionId ?? ''}
-              onChange={(e) => setSessionId(Number(e.target.value))}
+
+            {/* Bouton de sélection */}
+            <button
+              type="button"
+              onClick={() => {
+                setSelectSessionOuvert((ouvert) => !ouvert)
+                setRechercheSession('')
+              }}
+              className={`${selectClass} flex w-full items-center justify-between gap-2 text-left`}
             >
-              {sessions.map((s) => (
-                <option key={s.session_id} value={s.session_id}>
-                  {s.nom_session}
-                </option>
-              ))}
-            </select>
-          </label>
+              <span className="truncate">
+                {sessionActive?.nom_session ?? 'Sélectionner une session'}
+              </span>
+
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 transition-transform ${
+                  selectSessionOuvert ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {selectSessionOuvert && (
+              <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card shadow-lg">
+                {/* Recherche */}
+                <div className="border-b border-border p-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+                    <input
+                      type="text"
+                      value={rechercheSession}
+                      onChange={(e) => setRechercheSession(e.target.value)}
+                      placeholder="Rechercher une session..."
+                      autoFocus
+                      className="w-full rounded-md border border-border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Résultats limités à 10 lignes visibles */}
+                <div className="max-h-[320px] overflow-y-auto p-1">
+                  {sessionsFiltrees.length > 0 ? (
+                    sessionsFiltrees.map((s) => (
+                      <button
+                        key={s.session_id}
+                        type="button"
+                        onClick={() => {
+                          setSessionId(s.session_id)
+                          setSelectSessionOuvert(false)
+                          setRechercheSession('')
+                        }}
+                        className={`flex w-full items-center justify-between gap-3 rounded-md px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted ${
+                          sessionId === s.session_id
+                            ? 'bg-orange-50 text-primary'
+                            : 'text-foreground'
+                        }`}
+                      >
+                        <span className="min-w-0 truncate">
+                          {s.nom_session}
+                        </span>
+
+                        {sessionId === s.session_id && (
+                          <Check className="h-4 w-4 shrink-0 text-primary" />
+                        )}
+                      </button>
+                    ))
+                  ) : (
+                    <p className="px-3 py-6 text-center text-sm text-muted-foreground">
+                      Aucune session trouvée.
+                    </p>
+                  )}
+                </div>
+
+                <div className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
+                  {sessionsFiltrees.length} session(s) trouvée(s)
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4" />
@@ -497,6 +573,38 @@ function Presence() {
             <Filter className="h-4 w-4" />
             {affichees.length} résultat(s)
           </span>
+          <button
+            type="button"
+            disabled={!sessionActive}
+            onClick={() => {
+              if (!sessionActive) return
+              const joursPdf = jour === 'Toutes' ? jours : [jour]
+              genererFichePresencePdf({
+                session: sessionActive.nom_session,
+                dateDebut: sessionActive.date_debut,
+                dateFin: sessionActive.date_fin,
+                jours: joursPdf,
+                lignes: affichees.map((l) => {
+                  const u = l.participant?.utilisateur
+                  const statuts: Record<string, Statut> = {}
+                  ;(l.presence ?? []).forEach((p) => {
+                    statuts[p.date_presence.slice(0, 10)] = p.statut
+                  })
+                  return {
+                    nom: u?.nom ?? '',
+                    prenoms: u?.prenoms ?? '',
+                    contact: u?.telephone ?? '',
+                    email: u?.email ?? '',
+                    statuts,
+                  }
+                }),
+              })
+            }}
+            className="flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          >
+            <Download className="h-4 w-4" />
+            Exporter PDF
+          </button>
         </div>
 
         <div className="rounded-lg border border-border bg-card">
