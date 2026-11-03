@@ -54,7 +54,6 @@ type Attestation = {
   jeton_verification: string | null
   delivree_le: string
   statut: 'Valide' | 'Invalide' | 'Annulée'
-  url_fichier: string | null
   inscription: {
     participant: { utilisateur: { nom: string; prenoms: string } | null } | null
     session: {
@@ -111,7 +110,6 @@ function Attestations() {
         jeton_verification,
         delivree_le,
         statut,
-        url_fichier,
         inscription:inscription!inner(
           participant_id,
           participant:participant(

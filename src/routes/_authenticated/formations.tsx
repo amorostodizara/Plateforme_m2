@@ -100,6 +100,14 @@ const vide = {
   categorie_id: '' as string,
 }
 
+function tronquerDescription(description: string | null, limite = 100) {
+  if (!description) return '—'
+  const texte = description.trim()
+  return texte.length > limite
+    ? texte.slice(0, limite).trimEnd() + '...'
+    : texte
+}
+
 function Page() {
   const queryClient = useQueryClient()
   const [recherche, setRecherche] = useState('')
@@ -344,8 +352,11 @@ function Page() {
                   >
                     <td className="px-3 py-3">
                       <p className="font-semibold text-foreground">{f.titre}</p>
-                      <p className="line-clamp-1 text-xs text-muted-foreground">
-                        {f.description}
+                      <p
+                        className="line-clamp-1 text-xs text-muted-foreground"
+                        title={f.description ?? ''}
+                      >
+                        {tronquerDescription(f.description)}
                       </p>
                     </td>
                     <td className="px-3 py-3 text-xs">

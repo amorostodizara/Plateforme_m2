@@ -145,13 +145,11 @@ function AssistantIA() {
 
       const resultat = await demander({ data: { question: texte, historique } })
 
-      const { error: eIa } = await supabase
-        .from('message_ia')
-        .insert({
-          conversation_id: id,
-          role_message: 'assistant',
-          contenu: resultat.reponse,
-        })
+      const { error: eIa } = await supabase.from('message_ia').insert({
+        conversation_id: id,
+        role_message: 'assistant',
+        contenu: resultat.reponse,
+      })
       if (eIa) throw eIa
 
       await supabase
@@ -177,16 +175,14 @@ function AssistantIA() {
       type: 'Positive' | 'Négative'
     }) => {
       if (!profil) throw new Error('Profil introuvable.')
-      const { error } = await supabase
-        .from('retour_ia')
-        .upsert(
-          {
-            message_id: messageId,
-            utilisateur_id: profil.utilisateur_id,
-            type_retour: type,
-          },
-          { onConflict: 'message_id,utilisateur_id' },
-        )
+      const { error } = await supabase.from('retour_ia').upsert(
+        {
+          message_id: messageId,
+          utilisateur_id: profil.utilisateur_id,
+          type_retour: type,
+        },
+        { onConflict: 'message_id,utilisateur_id' },
+      )
       if (error) throw error
     },
     onSuccess: () => {
@@ -408,6 +404,7 @@ function AssistantIA() {
             ref={champRef}
             value={question}
             rows={1}
+            maxLength={5000}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -420,7 +417,9 @@ function AssistantIA() {
           />
           <button
             type="submit"
-            disabled={envoyer.isPending}
+            disabled={
+              envoyer.isPending || !question.trim() || question.length > 5000
+            }
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-60"
             aria-label="Envoyer"
           >

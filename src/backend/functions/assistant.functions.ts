@@ -3,9 +3,8 @@ import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
 import { z } from 'zod'
 import OpenAI from 'openai'
 import type { ResponseInputItem } from 'openai/resources/responses/responses'
-// import { GoogleGenAI } from "@google/genai";
 const Entree = z.object({
-  question: z.string().min(1),
+  question: z.string().trim().min(1).max(5000),
   historique: z
     .array(
       z.object({ role: z.enum(['user', 'assistant']), contenu: z.string() }),
@@ -20,9 +19,8 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .validator((input: unknown) => Entree.parse(input))
   .handler(async ({ data, context }) => {
-    const cle = process.env['OPENAI_API_KEY']
-    // const cle = process.env["GEMINI_API_KEY"];
-    if (!cle)
+    const APIKey = process.env['OPENAI_API_KEY']
+    if (!APIKey)
       throw new Error(
         'Assistant  ne repond pas pour le moment. Veuillez patienter...',
       )
@@ -60,6 +58,7 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
         roles: codesRole,
       },
     }
+
     const [formations, evenements] = await Promise.all([
       supabase
         .from('formation')
@@ -67,11 +66,13 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
           'formation_id, titre, description, niveau, statut, categorie:categorie_formation(nom_categorie), session_formation(session_id, nom_session, date_debut, date_fin, lieu, statut)',
         )
         .limit(40),
-      supabase
-        .from('evenement')
-        .select('titre, type_evenement, date_debut, date_fin, lieu, statut')
-        .order('date_debut', { ascending: true })
-        .limit(30),
+      codesRole.some((role) => ['RESPONSABLE', 'ADMINISTRATEUR'].includes(role))
+        ? supabase
+            .from('evenement')
+            .select('titre, type_evenement, date_debut, date_fin, lieu, statut')
+            .order('date_debut', { ascending: true })
+            .limit(30)
+        : Promise.resolve({ data: [] }),
     ])
     contexte['formations'] = formations.data ?? []
     contexte['agenda'] = evenements.data ?? []
@@ -115,7 +116,7 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
       "Si une information est absente du contexte ou si l'utilisateur n'y a pas droit, tu le dis clairement et tu n'inventes rien.",
       "Tu peux expliquer le fonctionnement de la plateforme : inscriptions, sessions, présences, évaluations, attestations, agenda, fil d'actualité.",
       `Rôles de l'utilisateur : ${codesRole.join(', ') || 'PARTICIPANT'}.`,
-      `Contexte JSON : ${JSON.stringify(contexte).slice(0, 60000)}`,
+      `Contexte JSON : ${JSON.stringify(contexte).slice(0, 50000)}`,
     ].join('\n')
 
     const messages: ResponseInputItem[] = [
@@ -133,7 +134,7 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
       },
     ]
     const openai = new OpenAI({
-      apiKey: cle,
+      apiKey: APIKey,
     })
     try {
       const stream = await openai.responses.create({

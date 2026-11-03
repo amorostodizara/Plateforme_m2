@@ -509,6 +509,8 @@ CREATE TABLE orange.presence (
 GRANT SELECT, INSERT, UPDATE, DELETE ON orange.presence TO authenticated;
 GRANT ALL ON orange.presence TO service_role;
 ALTER TABLE orange.presence ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orange.presence
+ALTER COLUMN statutSET DEFAULT 'Absent';
 CREATE POLICY "presence lecture" ON orange.presence FOR SELECT TO authenticated USING (true);
 CREATE POLICY "presence gestion" ON orange.presence FOR ALL TO authenticated
   USING (orange.a_role(auth.uid(), 'ADMINISTRATEUR') OR orange.a_role(auth.uid(), 'RESPONSABLE') OR orange.a_role(auth.uid(), 'FORMATEUR'))
@@ -550,11 +552,11 @@ WITH CHECK (
 
 CREATE TABLE orange.evenement (
   evenement_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  titre VARCHAR NOT NULL,
+  titre VARCHAR (200) NOT NULL,
   type_evenement orange.type_evenement_enum NOT NULL DEFAULT 'Autre',
   date_debut TIMESTAMPTZ NOT NULL,
   date_fin TIMESTAMPTZ NOT NULL,
-  lieu VARCHAR,
+  lieu(200) VARCHAR,
   statut orange.statut_evenement_enum NOT NULL DEFAULT 'Planifié',
   description TEXT,
   cree_par BIGINT REFERENCES orange.utilisateur(utilisateur_id) ON DELETE SET NULL,
@@ -1038,7 +1040,7 @@ CREATE TABLE IF NOT EXISTS orange.notification (
   notification_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   utilisateur_id BIGINT NOT NULL REFERENCES orange.utilisateur(utilisateur_id) ON DELETE CASCADE,
   type_notification orange.type_notification_enum NOT NULL DEFAULT 'SYSTEME',
-  titre VARCHAR(30) NOT NULL,
+  titre VARCHAR(255) NOT NULL,
   message TEXT NOT NULL,
   lien VARCHAR(100),
   lu BOOLEAN NOT NULL DEFAULT false,
