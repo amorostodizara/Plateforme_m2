@@ -1240,34 +1240,210 @@ END $$;
 
 
 
+-- CREATE OR REPLACE FUNCTION orange.notif_presence()
+--  RETURNS trigger
+--  LANGUAGE plpgsql
+--  SECURITY DEFINER
+--  SET search_path TO 'orange'
+-- AS $function$
+-- DECLARE
+--   u_id BIGINT;
+--   nom_complet TEXT;
+--   nom_session TEXT;
+-- BEGIN
+--   SELECT p.utilisateur_id, (us.prenoms || ' ' || us.nom), s.nom_session
+--     INTO u_id, nom_complet, nom_session
+--   FROM orange.inscription i
+--   JOIN orange.participant p ON p.participant_id = i.participant_id
+--   JOIN orange.utilisateur us ON us.utilisateur_id = p.utilisateur_id
+--   JOIN orange.session_formation s ON s.session_id = i.session_id
+--   WHERE i.inscription_id = NEW.inscription_id;
+
+--   PERFORM orange.creer_notification(u_id, 'PRESENCE', 'Présence enregistrée',
+--     'Votre présence du ' || to_char(NEW.date_presence, 'DD/MM/YYYY') || ' est enregistrée : ' || NEW.statut::text || '.', '/presence');
+
+--   PERFORM orange.notifier_gestionnaires('PRESENCE', 'Présence ' || lower(NEW.statut::text) || ' enregistrée',
+--     COALESCE(nom_complet, 'Un participant') || ' — ' || COALESCE(nom_session, 'session') || ' le '
+--     || to_char(NEW.date_presence, 'DD/MM/YYYY') || ' (' || NEW.methode::text || ').', '/presence');
+
+--   RETURN NEW;
+-- END $function$;
+
+
+
+-- BEGIN;
+
+-- -- 1. Fonction de génération des présences
+-- CREATE OR REPLACE FUNCTION orange.generer_presences_inscription(
+--     p_inscription_id BIGINT
+-- )
+-- RETURNS VOID
+-- LANGUAGE plpgsql
+-- AS $$
+-- BEGIN
+--     INSERT INTO orange.presence (
+--         inscription_id,
+--         date_presence,
+--         present,
+--         statut,
+--         methode
+--     )
+--     SELECT
+--         i.inscription_id,
+--         d::date,
+--         FALSE,
+--         'Absent'::orange.statut_presence_enum,
+--         'Système'::orange.methode_presence_enum
+--     FROM orange.inscription i
+--     JOIN orange.session_formation s
+--         ON s.session_id = i.session_id
+--     CROSS JOIN LATERAL generate_series(
+--         s.date_debut::date,
+--         s.date_fin::date,
+--         INTERVAL '1 day'
+--     ) AS d
+--     WHERE i.inscription_id = p_inscription_id
+--       AND i.statut = 'Acceptée'
+--     ON CONFLICT (inscription_id, date_presence)
+--     DO NOTHING;
+-- END;
+-- $$;
+
+
+-- -- 2. Fonction déclenchée lors de l'acceptation
+-- CREATE OR REPLACE FUNCTION orange.trg_generer_presences()
+-- RETURNS TRIGGER
+-- LANGUAGE plpgsql
+-- AS $$
+-- BEGIN
+--     IF NEW.statut = 'Acceptée' THEN
+--         PERFORM orange.generer_presences_inscription(
+--             NEW.inscription_id
+--         );
+--     END IF;
+
+--     RETURN NEW;
+-- END;
+-- $$;
+
+
+-- -- 3. Création du déclencheur sur les inscriptions
+-- DROP TRIGGER IF EXISTS
+--     trigger_generer_presences
+-- ON orange.inscription;
+
+-- CREATE TRIGGER trigger_generer_presences
+-- AFTER INSERT OR UPDATE OF statut
+-- ON orange.inscription
+-- FOR EACH ROW
+-- EXECUTE FUNCTION orange.trg_generer_presences();
+
+
+-- -- 4. Génération des présences pour les inscriptions
+-- -- déjà acceptées avant la création du déclencheur
+-- DO $$
+-- DECLARE
+--     r RECORD;
+-- BEGIN
+--     FOR r IN
+--         SELECT inscription_id
+--         FROM orange.inscription
+--         WHERE statut = 'Acceptée'
+--     LOOP
+--         PERFORM orange.generer_presences_inscription(
+--             r.inscription_id
+--         );
+--     END LOOP;
+-- END;
+-- $$;
+
+-- COMMIT;
+
+
+
+-- CREATE OR REPLACE FUNCTION orange.actualiser_enregistre_le()
+-- RETURNS TRIGGER
+-- LANGUAGE plpgsql
+-- AS $$
+-- BEGIN
+--     NEW.enregistre_le := NOW();
+--     RETURN NEW;
+-- END;
+-- $$;
+
+-- DROP TRIGGER IF EXISTS trigger_actualiser_enregistre_le
+-- ON orange.presence;
+
+-- CREATE TRIGGER trigger_actualiser_enregistre_le
+-- BEFORE UPDATE ON orange.presence
+-- FOR EACH ROW
+-- EXECUTE FUNCTION orange.actualiser_enregistre_le();
+
+
+
 CREATE OR REPLACE FUNCTION orange.notif_presence()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'orange'
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'orange'
 AS $function$
 DECLARE
   u_id BIGINT;
   nom_complet TEXT;
   nom_session TEXT;
 BEGIN
-  SELECT p.utilisateur_id, (us.prenoms || ' ' || us.nom), s.nom_session
-    INTO u_id, nom_complet, nom_session
+
+  -- Ne pas notifier lors de la création automatique
+  -- d'une présence initialisée à Absent.
+  IF TG_OP = 'INSERT' AND NEW.methode = 'Système' THEN
+    RETURN NEW;
+  END IF;
+
+  SELECT
+    p.utilisateur_id,
+    (us.prenoms || ' ' || us.nom),
+    s.nom_session
+  INTO u_id, nom_complet, nom_session
   FROM orange.inscription i
-  JOIN orange.participant p ON p.participant_id = i.participant_id
-  JOIN orange.utilisateur us ON us.utilisateur_id = p.utilisateur_id
-  JOIN orange.session_formation s ON s.session_id = i.session_id
+  JOIN orange.participant p
+    ON p.participant_id = i.participant_id
+  JOIN orange.utilisateur us
+    ON us.utilisateur_id = p.utilisateur_id
+  JOIN orange.session_formation s
+    ON s.session_id = i.session_id
   WHERE i.inscription_id = NEW.inscription_id;
 
-  PERFORM orange.creer_notification(u_id, 'PRESENCE', 'Présence enregistrée',
-    'Votre présence du ' || to_char(NEW.date_presence, 'DD/MM/YYYY') || ' est enregistrée : ' || NEW.statut::text || '.', '/presence');
+  PERFORM orange.creer_notification(
+    u_id,
+    'PRESENCE',
+    'Présence enregistrée',
+    'Votre présence du '
+      || to_char(NEW.date_presence, 'DD/MM/YYYY')
+      || ' est enregistrée : '
+      || NEW.statut::text || '.',
+    '/presence'
+  );
 
-  PERFORM orange.notifier_gestionnaires('PRESENCE', 'Présence ' || lower(NEW.statut::text) || ' enregistrée',
-    COALESCE(nom_complet, 'Un participant') || ' — ' || COALESCE(nom_session, 'session') || ' le '
-    || to_char(NEW.date_presence, 'DD/MM/YYYY') || ' (' || NEW.methode::text || ').', '/presence');
+  PERFORM orange.notifier_gestionnaires(
+    'PRESENCE',
+    'Présence ' || lower(NEW.statut::text) || ' enregistrée',
+    COALESCE(nom_complet, 'Un participant')
+      || ' — '
+      || COALESCE(nom_session, 'session')
+      || ' le '
+      || to_char(NEW.date_presence, 'DD/MM/YYYY')
+      || ' ('
+      || NEW.methode::text
+      || ').',
+    '/presence'
+  );
 
   RETURN NEW;
-END $function$;
+END;
+$function$;
+
+
+
 
 CREATE OR REPLACE FUNCTION orange.notif_paiement()
  RETURNS trigger

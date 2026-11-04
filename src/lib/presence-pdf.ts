@@ -5,7 +5,6 @@ export type LignePresencePdf = {
   prenoms: string
   contact: string
   email: string
-  /** statut par date ISO (YYYY-MM-DD) */
   statuts: Record<string, 'Présent' | 'Absent' | undefined>
 }
 
@@ -84,7 +83,7 @@ export function genererFichePresencePdf(opts: {
     )
     // légende
     let x = L - M
-    ;(['Non enregistré', 'Absent', 'Présent'] as const).forEach((s) => {
+    ;(['Absent', 'Présent'] as const).forEach((s) => {
       const w = doc.getTextWidth(s) + 6
       x -= w
       const c = COULEURS[s]

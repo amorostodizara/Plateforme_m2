@@ -80,7 +80,7 @@ export const poserQuestionAssistant = createServerFn({ method: 'POST' })
       supabase
         .from('formation')
         .select(
-          'formation_id, titre, description, niveau, statut, categorie:categorie_formation(nom_categorie), session_formation(session_id, nom_session, date_debut, date_fin, lieu, statut)',
+          'formation_id, titre, description, niveau, statut, categorie:categorie_formation(nom), session_formation(session_id, nom_session, date_debut, date_fin, lieu, statut)',
         )
         .limit(40),
       supabase
