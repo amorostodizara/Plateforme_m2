@@ -519,7 +519,7 @@ function Dashboard() {
               </ResponsiveContainer>
             </Bloc>
 
-            <Bloc titre="Inscrits et bénéficiaires par mois">
+            <Bloc titre="Inscrits et Particpants par mois">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={parMois}
@@ -542,7 +542,7 @@ function Dashboard() {
                   <Area
                     type="monotone"
                     dataKey="beneficiaires"
-                    name="Bénéficiaires"
+                    name="Particpants"
                     stroke="#5F6368"
                     fill="#000000"
                     fillOpacity={0.15}
