@@ -5,7 +5,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   BadgeCheck,
   CalendarDays,
-  ClipboardCheck,
   Filter,
   GraduationCap,
   Mail,
@@ -129,9 +128,7 @@ function Presence() {
   const queryClient = useQueryClient()
   const [sessionId, setSessionId] = useState<number | null>(null)
   const [jour, setJour] = useState<string>('Toutes')
-  const [filtreStatut, setFiltreStatut] = useState<
-    'Tous' | Statut | 'Non enregistré'
-  >('Tous')
+  const [filtreStatut, setFiltreStatut] = useState<'Tous' | Statut>('Tous')
   const [recherche, setRecherche] = useState('')
   const [detail, setDetail] = useState<Ligne | null>(null)
   const [remarque, setRemarque] = useState('')
@@ -205,7 +202,16 @@ function Presence() {
     (l: Ligne): PresenceLigne | null => {
       if (jour === 'Toutes') return null
 
-      return (l.presence ?? []).find((p) => p.date_presence === jour) ?? null
+      return (
+        (l.presence ?? []).find((p) => p.date_presence === jour) ?? {
+          presence_id: 0,
+          date_presence: jour,
+          enregistre_le: jour,
+          statut: 'Absent',
+          methode: 'Système',
+          remarque: null,
+        }
+      )
     },
     [jour],
   )
@@ -291,13 +297,17 @@ function Presence() {
   const affichees = useMemo(() => {
     return lignes.filter((l) => {
       const p = presenceDe(l)
-      if (filtreStatut === 'Non enregistré' && p) return false
-      if (
-        filtreStatut !== 'Tous' &&
-        filtreStatut !== 'Non enregistré' &&
-        p?.statut !== filtreStatut
-      )
+      // if (filtreStatut === 'Non enregistré' && p) return false
+      // if (
+      //   filtreStatut !== 'Tous' &&
+      //   filtreStatut !== 'Non enregistré' &&
+      //   p?.statut !== filtreStatut
+      // )
+      //   return false
+
+      if (filtreStatut !== 'Tous' && p?.statut !== filtreStatut) {
         return false
+      }
       if (recherche) {
         const u = l.participant?.utilisateur
         const champ =
@@ -315,7 +325,7 @@ function Presence() {
   const absents = lignes.filter(
     (l) => presenceDe(l)?.statut === 'Absent',
   ).length
-  const nonEnregistres = total - presents - absents
+  // const nonEnregistres = total - presents - absents
   const pct = (n: number) =>
     total ? `${Math.round((n / total) * 100)}%` : '0%'
 
@@ -450,7 +460,7 @@ function Presence() {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {/* Total participants */}
           <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-muted-foreground">
@@ -500,27 +510,6 @@ function Presence() {
               </p>
             </div>
           </div>
-
-          {/* Non enregistrés */}
-          <div className="flex items-center gap-3 rounded-lg border border-border bg-secondary p-4">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-muted-foreground">
-              <ClipboardCheck className="h-5 w-5" />
-            </span>
-
-            <div>
-              <p className="text-xs font-semibold tracking-wide text-muted-foreground">
-                Non enregistrés
-              </p>
-
-              <p className="text-2xl font-bold text-foreground">
-                {nonEnregistres}
-              </p>
-
-              <p className="text-xs font-semibold text-muted-foreground">
-                {pct(nonEnregistres)}
-              </p>
-            </div>
-          </div>
         </div>
 
         <ScannerQr onCode={surCode} />
@@ -549,7 +538,6 @@ function Presence() {
               <option value="Tous">Tous</option>
               <option value="Présent">Présent</option>
               <option value="Absent">Absent</option>
-              <option value="Non enregistré">Non enregistré</option>
             </select>
           </label>
           <label>
@@ -618,7 +606,7 @@ function Presence() {
                   {entetes.map(({ libelle, icone: Icone }) => (
                     <th
                       key={libelle}
-                      className="whitespace-nowrap px-3 py-3 text-xs font-bold tracking-wide text-muted-foreground"
+                      className=" px-3 py-3 text-xs font-bold tracking-wide text-muted-foreground"
                     >
                       <span className="flex items-center gap-1.5">
                         <Icone className="h-3.5 w-3.5" />
@@ -650,7 +638,7 @@ function Presence() {
                         }}
                         className="cursor-pointer border-t border-border hover:bg-secondary/60"
                       >
-                        <td className="whitespace-nowrap px-3 py-3">
+                        <td className=" px-3 py-3">
                           <span className="block font-medium text-foreground">
                             {u ? `${u.prenoms} ${u.nom}` : '—'}
                           </span>
@@ -658,7 +646,7 @@ function Presence() {
                             {u?.telephone ?? '—'}
                           </span>
                         </td>
-                        <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
+                        <td className=" px-3 py-3 text-muted-foreground">
                           {u?.email ?? '—'}
                         </td>
                         <td className="px-3 py-3 text-muted-foreground">
@@ -667,23 +655,17 @@ function Presence() {
                         <td className="px-3 py-3 text-muted-foreground">
                           {l.session?.nom_session ?? '—'}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
+                        <td className=" px-3 py-3 text-muted-foreground">
                           {p ? dateHeureFr(p.enregistre_le) : '—'}
                         </td>
                         <td className="px-3 py-3">
-                          {p ? (
-                            <span
-                              className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${couleurStatut[p.statut]}`}
-                            >
-                              {p.statut}
-                            </span>
-                          ) : (
-                            <span className="whitespace-nowrap rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-muted-foreground">
-                              Non enregistré
-                            </span>
-                          )}
+                          <span
+                            className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${couleurStatut[p?.statut ?? 'Absent']}`}
+                          >
+                            {p?.statut ?? '———'}
+                          </span>
                         </td>
-                        <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
+                        <td className=" px-3 py-3 text-muted-foreground">
                           <span className="flex items-center gap-1.5">
                             {p?.methode === 'QR Code' ? (
                               <QrCode className="h-4 w-4" />
@@ -765,17 +747,13 @@ function Presence() {
                 {detail.participant?.utilisateur?.prenoms}{' '}
                 {detail.participant?.utilisateur?.nom}
               </p>
-              {detailPresence ? (
-                <span
-                  className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${couleurStatut[detailPresence.statut]}`}
-                >
-                  {detailPresence.statut}
-                </span>
-              ) : (
-                <span className="mt-1 inline-block rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-muted-foreground">
-                  Non enregistré
-                </span>
-              )}
+              <span
+                className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                  couleurStatut[detailPresence?.statut ?? 'Absent']
+                }`}
+              >
+                {detailPresence?.statut ?? 'Absent'}
+              </span>
             </div>
           </div>
 
@@ -861,7 +839,7 @@ function Presence() {
               </p>
               <select
                 className={`${selectClass} mt-1 w-full`}
-                value={detailPresence?.statut ?? ''}
+                value={detailPresence?.statut ?? 'Absent'}
                 onChange={(e) =>
                   enregistrer.mutate({
                     inscriptionId: detail.inscription_id,
@@ -870,9 +848,6 @@ function Presence() {
                   })
                 }
               >
-                <option value="" disabled>
-                  Non enregistré
-                </option>
                 <option value="Présent">Présent</option>
                 <option value="Absent">Absent</option>
               </select>
@@ -893,7 +868,7 @@ function Presence() {
                   enregistrer.mutate(
                     {
                       inscriptionId: detail.inscription_id,
-                      statut: detailPresence?.statut ?? 'Présent',
+                      statut: detailPresence?.statut ?? 'Absent',
                       methode: detailPresence?.methode ?? 'Manuel',
                       remarque,
                     },

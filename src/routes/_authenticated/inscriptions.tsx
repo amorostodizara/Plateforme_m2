@@ -51,7 +51,7 @@ export const Route = createFileRoute('/_authenticated/inscriptions')({
     ],
   }),
   component: () => (
-    <AccesReserve roles={['ADMINISTRATEUR', 'RESPONSABLE']}>
+    <AccesReserve roles={['ADMINISTRATEUR', 'RESPONSABLE', 'FORMATEUR']}>
       <Inscriptions />
     </AccesReserve>
   ),
@@ -547,7 +547,7 @@ function Inscriptions() {
 
           <section className="mt-5 space-y-2">
             <p className="text-xs font-bold tracking-wide text-muted-foreground">
-              DEMANDE
+              MOTIVATION
             </p>
             <p className="text-sm text-muted-foreground">
               {detail.motivation ?? 'Aucune motivation renseignée.'}
