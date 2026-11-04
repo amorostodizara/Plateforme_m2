@@ -28,6 +28,8 @@ import {
 } from '@/components/app/AdminKit'
 import { Switch } from '@/components/ui/switch'
 import { AccesReserve } from '@/components/app/Acces'
+import { SelectRecherche } from '@/components/auth/select-recherche'
+
 export const Route = createFileRoute('/_authenticated/responsables')({
   head: () => ({
     meta: [
@@ -391,25 +393,20 @@ function Page() {
           </DialogHeader>
           <div className="space-y-3">
             {edite ? null : (
-              <div>
-                <label className={labelClass}>
-                  Compte utilisateur <LabelObligatoire />
-                </label>
-                <select
-                  className={`${selectClass} w-full`}
-                  value={form.utilisateur_id}
-                  onChange={(e) =>
-                    setForm({ ...form, utilisateur_id: e.target.value })
-                  }
-                >
-                  <option value="">Choisir…</option>
-                  {libres.map((c) => (
-                    <option key={c.utilisateur_id} value={c.utilisateur_id}>
-                      {c.prenoms} {c.nom} — {c.email}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectRecherche
+                label="Compte utilisateur"
+                required
+                placeholder="Choisir..."
+                placeholderRecherche="Rechercher par nom, prénom ou email..."
+                options={libres.map((c) => ({
+                  value: String(c.utilisateur_id),
+                  label: `${c.prenoms} ${c.nom} - ${c.email}`,
+                }))}
+                value={String(form.utilisateur_id ?? '')}
+                onChange={(value) =>
+                  setForm({ ...form, utilisateur_id: value })
+                }
+              />
             )}
             <div>
               <label className={labelClass}>

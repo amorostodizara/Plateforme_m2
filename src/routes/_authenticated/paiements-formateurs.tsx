@@ -44,7 +44,7 @@ import {
   selectClass,
   LabelObligatoire,
 } from '@/components/app/AdminKit'
-
+import { SelectRecherche } from '@/components/auth/select-recherche'
 export const Route = createFileRoute('/_authenticated/paiements-formateurs')({
   head: () => ({
     meta: [
@@ -216,7 +216,7 @@ function Page() {
       dateDebut: p.session?.date_debut ?? null,
       dateFin: p.session?.date_fin ?? null,
       motif:
-        `Formation ${p.session?.formation?.titre ?? ''}${p.session ? ` — ${p.session.nom_session}` : ''}`.trim(),
+        `Formation : ${p.session ? ` ${p.session.nom_session}` : ''}`.trim(),
       validateur: p.validateur?.utilisateur
         ? {
             nom: p.validateur.utilisateur.nom,
@@ -715,47 +715,38 @@ function Page() {
           </DialogHeader>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className={labelClass}>
-                Formateur <LabelObligatoire />
-              </label>
-              <select
-                className={`${selectClass} w-full`}
-                value={form.formateur_id}
-                onChange={(e) =>
+              <SelectRecherche
+                label="Formateur"
+                required
+                placeholder="Choisir..."
+                placeholderRecherche="Rechercher un formateur..."
+                options={formateurs.map((f) => ({
+                  value: String(f.formateur_id),
+                  label: `${f.utilisateur?.prenoms ?? ''} ${f.utilisateur?.nom ?? ''} - ${f.utilisateur?.email ?? ''}`,
+                }))}
+                value={String(form.formateur_id ?? '')}
+                onChange={(value) =>
                   setForm({
                     ...form,
-                    formateur_id: e.target.value,
+                    formateur_id: value,
                     session_id: '',
                   })
                 }
-              >
-                <option value="">Choisir…</option>
-                {formateurs.map((f) => (
-                  <option key={f.formateur_id} value={f.formateur_id}>
-                    {f.utilisateur?.prenoms} {f.utilisateur?.nom} —{' '}
-                    {f.utilisateur?.email}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div className="sm:col-span-2">
-              <label className={labelClass}>
-                Session animée <LabelObligatoire />
-              </label>
-              <select
-                className={`${selectClass} w-full`}
-                value={form.session_id}
-                onChange={(e) =>
-                  setForm({ ...form, session_id: e.target.value })
-                }
-              >
-                <option value="">Sans session</option>
-                {sessionsDuFormateur.map((s) => (
-                  <option key={s.session_id} value={s.session_id}>
-                    {s.formation?.titre} — {s.nom_session}
-                  </option>
-                ))}
-              </select>
+              <SelectRecherche
+                label="Session animée"
+                required
+                placeholder="Choisir une session..."
+                placeholderRecherche="Rechercher une session..."
+                options={sessionsDuFormateur.map((s) => ({
+                  value: String(s.session_id),
+                  label: `${s.nom_session}`,
+                }))}
+                value={String(form.session_id ?? '')}
+                onChange={(value) => setForm({ ...form, session_id: value })}
+              />
             </div>
             <div>
               <label className={labelClass}>
@@ -841,25 +832,18 @@ function Page() {
               </div>
             )}
             <div className="sm:col-span-2">
-              <label className={labelClass}>
-                Validé par (responsable)
-                <LabelObligatoire />
-              </label>
-              <select
-                className={`${selectClass} w-full`}
-                value={form.valide_par}
-                onChange={(e) =>
-                  setForm({ ...form, valide_par: e.target.value })
-                }
-              >
-                <option value="">Non validé</option>
-                {responsables.map((r) => (
-                  <option key={r.responsable_id} value={r.responsable_id}>
-                    {r.utilisateur?.prenoms} {r.utilisateur?.nom}
-                    {r.intitule_poste ? ` — ${r.intitule_poste}` : ''}
-                  </option>
-                ))}
-              </select>
+              <SelectRecherche
+                label="Validé par (responsable)"
+                required
+                placeholder="Non validé"
+                placeholderRecherche="Rechercher un responsable..."
+                options={responsables.map((r) => ({
+                  value: String(r.responsable_id),
+                  label: `${r.utilisateur?.prenoms ?? ''} ${r.utilisateur?.nom ?? ''}${r.intitule_poste ? ` — ${r.intitule_poste}` : ''}`,
+                }))}
+                value={String(form.valide_par ?? '')}
+                onChange={(value) => setForm({ ...form, valide_par: value })}
+              />
             </div>
             <div className="sm:col-span-2">
               <label className={labelClass}>Remarque</label>

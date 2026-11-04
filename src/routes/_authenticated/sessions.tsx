@@ -1,15 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  MoreHorizontal,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-  ChevronDown,
-  Check,
-} from 'lucide-react'
+import { MoreHorizontal, Pencil, Plus, Search, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/integrations/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -43,6 +35,9 @@ import {
   LabelObligatoire,
 } from '@/components/app/AdminKit'
 import { AccesReserve } from '@/components/app/Acces'
+
+import { SelectRecherche } from '@/components/auth/select-recherche'
+
 export const Route = createFileRoute('/_authenticated/sessions')({
   head: () => ({
     meta: [
@@ -121,8 +116,6 @@ function Page() {
   const [edite, setEdite] = useState<number | null>(null)
   const [form, setForm] = useState(vide)
   const [detail, setDetail] = useState<Session | null>(null)
-  const [rechercheFormation, setRechercheFormation] = useState('')
-  const [selectFormationOuvert, setSelectFormationOuvert] = useState(false)
 
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ['admin-sessions'],
@@ -149,12 +142,6 @@ function Page() {
       return data ?? []
     },
   })
-
-  const formationsFiltrees = useMemo(() => {
-    return formations.filter((f) =>
-      f.titre.toLowerCase().includes(rechercheFormation.toLowerCase().trim()),
-    )
-  }, [formations, rechercheFormation])
 
   const { data: formateurs = [] } = useQuery({
     queryKey: ['liste-formateurs'],
@@ -561,7 +548,7 @@ function Page() {
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="relative">
+              {/* <div className="relative">
                 <label className={labelClass}>
                   Formation
                   <LabelObligatoire />
@@ -664,7 +651,21 @@ function Page() {
                     </div>
                   </div>
                 )}
-              </div>
+              </div> */}
+
+              <SelectRecherche
+                label="Formation"
+                required
+                placeholder="Choisir une formation..."
+                placeholderRecherche="Rechercher une formation..."
+                options={formations.map((f) => ({
+                  value: String(f.formation_id),
+                  label: f.titre,
+                }))}
+                value={String(form.formation_id ?? '')}
+                onChange={(value) => setForm({ ...form, formation_id: value })}
+              />
+
               <div>
                 <label className={labelClass}>Formateur</label>
                 <select

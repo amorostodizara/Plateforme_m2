@@ -46,6 +46,8 @@ import {
   televerserFichier,
 } from '@/lib/fichiers'
 import { AccesReserve } from '@/components/app/Acces'
+import { SelectRecherche } from '@/components/auth/select-recherche'
+
 const champFichierClass =
   'block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-cream file:px-3 file:py-2 file:text-sm file:font-semibold file:text-primary'
 
@@ -1050,28 +1052,25 @@ function Page() {
           </DialogHeader>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className={labelClass}>
-                Compte utilisateur <LabelObligatoire />
-              </label>
-              <select
-                className={`${selectClass} w-full`}
-                value={nouveau.utilisateur_id}
-                onChange={(e) =>
-                  setNouveau({ ...nouveau, utilisateur_id: e.target.value })
-                }
-              >
-                <option value="">Choisir…</option>
-                {comptes
+              <SelectRecherche
+                label="Compte utilisateur"
+                required
+                placeholder="Choisir..."
+                placeholderRecherche="Rechercher par nom, prénom ou email..."
+                options={comptes
                   .filter(
                     (c) =>
                       !formateurs.some((f) => f.utilisateur?.email === c.email),
                   )
-                  .map((c) => (
-                    <option key={c.utilisateur_id} value={c.utilisateur_id}>
-                      {c.prenoms} {c.nom} — {c.email}
-                    </option>
-                  ))}
-              </select>
+                  .map((c) => ({
+                    value: String(c.utilisateur_id),
+                    label: `${c.prenoms} ${c.nom} - ${c.email}`,
+                  }))}
+                value={String(nouveau.utilisateur_id ?? '')}
+                onChange={(value) =>
+                  setNouveau({ ...nouveau, utilisateur_id: value })
+                }
+              />
             </div>
             <div>
               <label className={labelClass}>
@@ -1127,7 +1126,7 @@ function Page() {
             </div>
             <div className="sm:col-span-2">
               <label className={labelClass}>
-                Curriculum vitae (fichier PDF, 1 Mo maximum)
+                Curriculum vitae (fichier PDF, 5 Mo maximum)
               </label>
               <input
                 type="file"
