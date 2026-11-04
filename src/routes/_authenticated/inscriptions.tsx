@@ -287,20 +287,24 @@ function Inscriptions() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
-        <SelectRecherche
-          placeholder="Toutes les sessions"
-          placeholderRecherche="Rechercher une session..."
-          clearable={false}
-          options={[
-            { value: 'Toutes les sessions', label: 'Toutes les sessions' },
-            ...sessions.map((s) => ({
-              value: s,
-              label: s,
-            })),
-          ]}
-          value={session}
-          onChange={setSession}
-        />
+        <div>
+          {' '}
+          <SelectRecherche
+            placeholder="Toutes les sessions"
+            placeholderRecherche="Rechercher une session..."
+            clearable={false}
+            options={[
+              { value: 'Toutes les sessions', label: 'Toutes les sessions' },
+              ...sessions.map((s) => ({
+                value: s,
+                label: s,
+              })),
+            ]}
+            value={session}
+            onChange={setSession}
+          />
+        </div>
+
         <div className="relative min-w-56 flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
