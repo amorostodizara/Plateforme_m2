@@ -34,10 +34,9 @@ import {
   champClass,
   dateHeureFr,
   labelClass,
-  selectClass,
   LabelObligatoire,
 } from '@/components/app/AdminKit'
-
+import { SelectRecherche } from '@/components/auth/select-recherche'
 export const Route = createFileRoute('/_authenticated/supports')({
   head: () => ({
     meta: [
@@ -300,18 +299,21 @@ function Page() {
           />
         </div>
         {peutGerer ? (
-          <select
-            className={`${selectClass} w-full sm:w-64`}
+          <SelectRecherche
+            className="w-full sm:w-64"
+            placeholder="Toutes les sessions"
+            placeholderRecherche="Rechercher une session..."
+            clearable={false}
+            options={[
+              { value: 'Toutes', label: 'Toutes les sessions' },
+              ...sessions.map((s) => ({
+                value: String(s.session_id),
+                label: s.nom_session,
+              })),
+            ]}
             value={sessionFiltre}
-            onChange={(e) => setSessionFiltre(e.target.value)}
-          >
-            <option value="Toutes">Toutes les sessions</option>
-            {sessions.map((s) => (
-              <option key={s.session_id} value={String(s.session_id)}>
-                {s.nom_session}
-              </option>
-            ))}
-          </select>
+            onChange={setSessionFiltre}
+          />
         ) : null}
       </div>
 
@@ -438,26 +440,18 @@ function Page() {
             </div>
             {!edite ? (
               <>
-                <div>
-                  <label className={labelClass}>
-                    Session concernée
-                    <LabelObligatoire />
-                  </label>
-                  <select
-                    className={`${selectClass} w-full`}
-                    value={form.session_id}
-                    onChange={(e) =>
-                      setForm({ ...form, session_id: e.target.value })
-                    }
-                  >
-                    <option value="">Choisir une session</option>
-                    {sessionsGerables.map((s) => (
-                      <option key={s.session_id} value={String(s.session_id)}>
-                        {s.nom_session} — {s.formation?.titre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SelectRecherche
+                  label="Session concernée"
+                  required
+                  placeholder="Choisir une session..."
+                  placeholderRecherche="Rechercher une session..."
+                  options={sessionsGerables.map((s) => ({
+                    value: String(s.session_id),
+                    label: s.nom_session,
+                  }))}
+                  value={String(form.session_id ?? '')}
+                  onChange={(value) => setForm({ ...form, session_id: value })}
+                />
                 <div>
                   <label className={labelClass}>
                     Fichier (20 Mo maximum)

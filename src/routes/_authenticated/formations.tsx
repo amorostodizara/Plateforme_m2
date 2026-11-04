@@ -45,7 +45,7 @@ import {
   tailleLisible,
   televerserFichier,
 } from '@/lib/fichiers'
-
+import { SelectRecherche } from '@/components/auth/select-recherche'
 const champFichierClass =
   'block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-cream file:px-3 file:py-2 file:text-sm file:font-semibold file:text-primary'
 
@@ -469,23 +469,17 @@ function Page() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <label className={labelClass}>Catégorie</label>
-                <select
-                  className={`${selectClass} w-full`}
-                  value={form.categorie_id}
-                  onChange={(e) =>
-                    setForm({ ...form, categorie_id: e.target.value })
-                  }
-                >
-                  <option value="">Sans catégorie</option>
-                  {categories.map((c) => (
-                    <option key={c.categorie_id} value={c.categorie_id}>
-                      {c.nom}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectRecherche
+                label="Catégorie"
+                placeholder="Sans catégorie"
+                placeholderRecherche="Rechercher une catégorie..."
+                options={categories.map((c) => ({
+                  value: String(c.categorie_id),
+                  label: c.nom,
+                }))}
+                value={String(form.categorie_id ?? '')}
+                onChange={(value) => setForm({ ...form, categorie_id: value })}
+              />
               <div>
                 <label className={labelClass}>
                   Niveau

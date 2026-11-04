@@ -324,7 +324,7 @@ function Page() {
             cv.type === 'application/pdf' ||
             cv.name.toLowerCase().endsWith('.pdf')
           if (!estPdf) throw new Error('Le CV doit être un fichier PDF.')
-          cheminCv = await televerserFichier('cv-formateurs', cv, 1)
+          cheminCv = await televerserFichier('cv-formateurs', cv, 5)
         }
         const { error } = await supabase
           .from('formateur')

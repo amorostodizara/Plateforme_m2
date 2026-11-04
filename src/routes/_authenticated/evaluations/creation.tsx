@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { supabase } from '@/integrations/supabase/client'
 import { LabelObligatoire } from '@/components/app/AdminKit'
 import { AccesReserve } from '@/components/app/Acces'
+import { SelectRecherche } from '@/components/auth/select-recherche'
 export const Route = createFileRoute('/_authenticated/evaluations/creation')({
   validateSearch: (search: Record<string, unknown>) => ({
     evaluationId:
@@ -403,26 +404,18 @@ function Creation() {
       </div>
 
       <div className="space-y-4 rounded-lg border-t-4 border-primary bg-card p-5 shadow-sm">
-        <label className="block">
-          <span className="mb-1 block text-xs font-semibold tracking-wide text-muted-foreground">
-            Session
-            <LabelObligatoire />
-          </span>
-          <select
-            className={champ}
-            value={sessionId ?? ''}
-            onChange={(e) => setSessionId(Number(e.target.value))}
-          >
-            <option value="" disabled>
-              Choisir une session
-            </option>
-            {sessions.map((s) => (
-              <option key={s.session_id} value={s.session_id}>
-                {s.nom_session}
-              </option>
-            ))}
-          </select>
-        </label>
+        <SelectRecherche
+          label="Session"
+          required
+          placeholder="Choisir une session..."
+          placeholderRecherche="Rechercher une session..."
+          options={sessions.map((s) => ({
+            value: String(s.session_id),
+            label: s.nom_session,
+          }))}
+          value={String(sessionId ?? '')}
+          onChange={(value) => setSessionId(value ? Number(value) : null)}
+        />
         <label className="block">
           <span className="mb-1 block text-xs font-semibold tracking-wide text-muted-foreground">
             Titre de l’évaluation

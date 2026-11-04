@@ -19,8 +19,6 @@ import {
   Users,
   X,
   Download,
-  ChevronDown,
-  Check,
 } from 'lucide-react'
 import { genererFichePresencePdf } from '@/lib/presence-pdf'
 import { toast } from 'sonner'
@@ -37,7 +35,7 @@ import { SqueletteLignesTableau } from '@/components/app/Squelette'
 import { BadgeQr } from '@/components/app/BadgeQr'
 import { dateHeureFr, dateFr } from '@/components/app/AdminKit'
 import { AccesReserve } from '@/components/app/Acces'
-
+import { SelectRecherche } from '@/components/auth/select-recherche'
 export const Route = createFileRoute('/_authenticated/presence')({
   head: () => ({
     meta: [
@@ -134,8 +132,6 @@ function Presence() {
   const [remarque, setRemarque] = useState('')
   const [badgeOuvert, setBadgeOuvert] = useState(false)
 
-  const [rechercheSession, setRechercheSession] = useState('')
-  const [selectSessionOuvert, setSelectSessionOuvert] = useState(false)
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions-presence'],
     queryFn: async () => {
@@ -147,14 +143,6 @@ function Presence() {
       return (data ?? []) as SessionItem[]
     },
   })
-
-  const sessionsFiltrees = useMemo(() => {
-    return sessions.filter((s) =>
-      s.nom_session
-        .toLowerCase()
-        .includes(rechercheSession.toLowerCase().trim()),
-    )
-  }, [sessions, rechercheSession])
 
   const { data: lignes = [], isLoading } = useQuery({
     queryKey: ['presences', sessionId],
@@ -297,13 +285,6 @@ function Presence() {
   const affichees = useMemo(() => {
     return lignes.filter((l) => {
       const p = presenceDe(l)
-      // if (filtreStatut === 'Non enregistré' && p) return false
-      // if (
-      //   filtreStatut !== 'Tous' &&
-      //   filtreStatut !== 'Non enregistré' &&
-      //   p?.statut !== filtreStatut
-      // )
-      //   return false
 
       if (filtreStatut !== 'Tous' && p?.statut !== filtreStatut) {
         return false
@@ -360,87 +341,18 @@ function Presence() {
 
         <div className="flex flex-wrap items-center gap-4 rounded-lg border border-border bg-card p-4">
           <div className="relative min-w-64 flex-1">
-            <span className="mb-1 block text-xs font-semibold tracking-wide text-muted-foreground">
-              Session
-            </span>
-
-            {/* Bouton de sélection */}
-            <button
-              type="button"
-              onClick={() => {
-                setSelectSessionOuvert((ouvert) => !ouvert)
-                setRechercheSession('')
-              }}
-              className={`${selectClass} flex w-full items-center justify-between gap-2 text-left`}
-            >
-              <span className="truncate">
-                {sessionActive?.nom_session ?? 'Sélectionner une session'}
-              </span>
-
-              <ChevronDown
-                className={`h-4 w-4 shrink-0 transition-transform ${
-                  selectSessionOuvert ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-
-            {selectSessionOuvert && (
-              <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card shadow-lg">
-                {/* Recherche */}
-                <div className="border-b border-border p-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
-                    <input
-                      type="text"
-                      value={rechercheSession}
-                      onChange={(e) => setRechercheSession(e.target.value)}
-                      placeholder="Rechercher une session..."
-                      autoFocus
-                      className="w-full rounded-md border border-border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:border-primary"
-                    />
-                  </div>
-                </div>
-
-                {/* Résultats limités à 10 lignes visibles */}
-                <div className="max-h-[320px] overflow-y-auto p-1">
-                  {sessionsFiltrees.length > 0 ? (
-                    sessionsFiltrees.map((s) => (
-                      <button
-                        key={s.session_id}
-                        type="button"
-                        onClick={() => {
-                          setSessionId(s.session_id)
-                          setSelectSessionOuvert(false)
-                          setRechercheSession('')
-                        }}
-                        className={`flex w-full items-center justify-between gap-3 rounded-md px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted ${
-                          sessionId === s.session_id
-                            ? 'bg-orange-50 text-primary'
-                            : 'text-foreground'
-                        }`}
-                      >
-                        <span className="min-w-0 truncate">
-                          {s.nom_session}
-                        </span>
-
-                        {sessionId === s.session_id && (
-                          <Check className="h-4 w-4 shrink-0 text-primary" />
-                        )}
-                      </button>
-                    ))
-                  ) : (
-                    <p className="px-3 py-6 text-center text-sm text-muted-foreground">
-                      Aucune session trouvée.
-                    </p>
-                  )}
-                </div>
-
-                <div className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
-                  {sessionsFiltrees.length} session(s) trouvée(s)
-                </div>
-              </div>
-            )}
+            <SelectRecherche
+              label="Session"
+              placeholder="Sélectionner une session"
+              placeholderRecherche="Rechercher une session..."
+              clearable={false}
+              options={sessions.map((s) => ({
+                value: String(s.session_id),
+                label: s.nom_session,
+              }))}
+              value={String(sessionId ?? '')}
+              onChange={(value) => setSessionId(Number(value))}
+            />
           </div>
 
           <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">

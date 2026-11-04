@@ -33,6 +33,8 @@ import {
 } from '@/components/app/Squelette'
 import { AccesReserve } from '@/components/app/Acces'
 import { CarteDash } from '@/components/app/AdminKit'
+
+import { SelectRecherche } from '@/components/auth/select-recherche'
 export const Route = createFileRoute('/_authenticated/tableau-de-bord')({
   head: () => ({
     meta: [
@@ -399,21 +401,26 @@ function Dashboard() {
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1">
+        <div className="flex w-full max-w-[280px] flex-col gap-1">
           <span className="text-xs font-semibold tracking-wide text-muted-foreground">
             Formation
           </span>
-          <select
-            className={selectClass}
-            value={formation}
-            onChange={(e) => setFormation(e.target.value)}
-          >
-            <option>Toutes</option>
-            {formations.map((f) => (
-              <option key={f.formation_id}>{f.titre}</option>
-            ))}
-          </select>
-        </label>
+
+          <SelectRecherche
+            placeholder="Toutes"
+            placeholderRecherche="Rechercher une formation..."
+            clearable={false}
+            options={[
+              { value: 'Toutes', label: 'Toutes' },
+              ...formations.map((f) => ({
+                value: f.titre,
+                label: f.titre,
+              })),
+            ]}
+            value={formation || 'Toutes'}
+            onChange={setFormation}
+          />
+        </div>
 
         <button
           onClick={() => setFiltres({ annee, mois, categorie, formation })}
