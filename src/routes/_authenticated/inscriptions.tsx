@@ -30,7 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SqueletteLignesTableau } from '@/components/app/Squelette'
-
+import { SelectRecherche } from '@/components/auth/select-recherche'
 export const Route = createFileRoute('/_authenticated/inscriptions')({
   head: () => ({
     meta: [
@@ -287,16 +287,24 @@ function Inscriptions() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
-        <select
-          className={selectClass}
-          value={session}
-          onChange={(e) => setSession(e.target.value)}
-        >
-          <option>Toutes les sessions</option>
-          {sessions.map((s) => (
-            <option key={s}>{s}</option>
-          ))}
-        </select>
+        <div>
+          {' '}
+          <SelectRecherche
+            placeholder="Toutes les sessions"
+            placeholderRecherche="Rechercher une session..."
+            clearable={false}
+            options={[
+              { value: 'Toutes les sessions', label: 'Toutes les sessions' },
+              ...sessions.map((s) => ({
+                value: s,
+                label: s,
+              })),
+            ]}
+            value={session}
+            onChange={setSession}
+          />
+        </div>
+
         <div className="relative min-w-56 flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
