@@ -315,13 +315,19 @@ function Page() {
       session: p.session?.nom_session,
     })),
   )
-  const attestations = parcours.flatMap((p) =>
-    (p.attestations ?? []).map((a) => ({
+  const attestations = parcours.flatMap((p) => {
+    const liste = Array.isArray(p.attestations)
+      ? p.attestations
+      : p.attestations
+        ? [p.attestations]
+        : []
+
+    return liste.map((a) => ({
       ...a,
       formation: p.session?.formation?.titre,
       session: p.session?.nom_session,
-    })),
-  )
+    }))
+  })
   const pro = detail?.profil_professionnel?.[0]
   return (
     <div className="space-y-5">

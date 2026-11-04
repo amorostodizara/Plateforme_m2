@@ -278,9 +278,9 @@ function Dashboard() {
 
         filtrees.forEach((i) => {
           const date = new Date(i.date_inscription)
-
           if (
             date.getMonth() === index &&
+            i.statut === 'Acceptée' &&
             i.session?.formation?.titre === titre &&
             i.participant?.participant_id
           ) {
@@ -566,7 +566,6 @@ function Dashboard() {
                         ]}
                       />
 
-                      {/* Légende volontairement simplifiée */}
                       <Legend
                         content={() => (
                           <div className="flex items-center justify-center gap-6 pt-2 text-sm">
