@@ -144,7 +144,11 @@ function Presence() {
     },
   })
 
-  const { data: lignes = [], isLoading } = useQuery({
+  const {
+    data: lignes = [],
+    isLoading,
+    isFetching: actualisationEnCours,
+  } = useQuery({
     queryKey: ['presences', sessionId],
     enabled: sessionId !== null,
     queryFn: async () => {
@@ -251,11 +255,40 @@ function Presence() {
         if (error) throw error
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['presences', sessionId] })
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: ['presences', sessionId],
+        exact: true,
+        type: 'active',
+      })
     },
     onError: (e: Error) => toast.error(e.message),
   })
+
+  // const surCode = useCallback(
+  //   (code: string) => {
+  //     const cible = lignes.find(
+  //       (l) =>
+  //         l.participant?.codeqr_jeton === code ||
+  //         String(l.participant?.participant_id) === code ||
+  //         String(l.inscription_id) === code,
+  //     )
+  //     if (!cible) {
+  //       toast.error(`Badge non reconnu pour cette session : ${code}`)
+  //       return
+  //     }
+  //     enregistrer.mutate({
+  //       inscriptionId: cible.inscription_id,
+  //       statut: 'Présent',
+  //       methode: 'QR Code',
+  //     })
+  //     const u = cible.participant?.utilisateur
+  //     toast.success(
+  //       `Présence enregistrée : ${u?.prenoms ?? ''} ${u?.nom ?? ''}`.trim(),
+  //     )
+  //   },
+  //   [lignes, enregistrer],
+  // )
 
   const surCode = useCallback(
     (code: string) => {
@@ -265,19 +298,20 @@ function Presence() {
           String(l.participant?.participant_id) === code ||
           String(l.inscription_id) === code,
       )
+
       if (!cible) {
         toast.error(`Badge non reconnu pour cette session : ${code}`)
         return
       }
+      const u = cible.participant?.utilisateur
+      toast.success(
+        `Badge reconnu : ${u?.prenoms ?? ''} ${u?.nom ?? ''}`.trim(),
+      )
       enregistrer.mutate({
         inscriptionId: cible.inscription_id,
         statut: 'Présent',
         methode: 'QR Code',
       })
-      const u = cible.participant?.utilisateur
-      toast.success(
-        `Présence enregistrée : ${u?.prenoms ?? ''} ${u?.nom ?? ''}`.trim(),
-      )
     },
     [lignes, enregistrer],
   )
@@ -475,7 +509,9 @@ function Presence() {
           </span>
           <button
             type="button"
-            disabled={!sessionActive}
+            disabled={
+              !sessionActive || actualisationEnCours || enregistrer.isPending
+            }
             onClick={() => {
               if (!sessionActive) return
               const joursPdf = jour === 'Toutes' ? jours : [jour]
@@ -503,7 +539,9 @@ function Presence() {
             className="flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
           >
             <Download className="h-4 w-4" />
-            Exporter PDF
+            {actualisationEnCours || enregistrer.isPending
+              ? 'Synchronisation...'
+              : 'Exporter PDF'}
           </button>
         </div>
 

@@ -145,7 +145,6 @@ function Inscriptions() {
         .update({ statut: valeur })
         .eq('inscription_id', id)
       if (error) throw error
-      // Email pour les incriptions acceptés
       // if (valeur === 'Acceptée') {
       //   await emailInscriptionAcceptee({
       //     data: { inscriptionId: id },
