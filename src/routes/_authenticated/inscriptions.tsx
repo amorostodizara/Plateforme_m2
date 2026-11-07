@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { emailInscriptionAcceptee } from '@/backend/functions/email-auth.functions'
+// import { emailInscriptionAcceptee } from '@/backend/functions/email-auth.functions'
 import {
   ArrowUpDown,
   BadgeCheck,
@@ -145,11 +145,11 @@ function Inscriptions() {
         .update({ statut: valeur })
         .eq('inscription_id', id)
       if (error) throw error
-      if (valeur === 'Acceptée') {
-        await emailInscriptionAcceptee({
-          data: { inscriptionId: id },
-        })
-      }
+      // if (valeur === 'Acceptée') {
+      //   await emailInscriptionAcceptee({
+      //     data: { inscriptionId: id },
+      //   })
+      // }
     },
     onSuccess: () => {
       toast.success('Statut mis à jour.')
