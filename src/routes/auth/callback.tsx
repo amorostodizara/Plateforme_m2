@@ -44,7 +44,7 @@ function AuthCallback() {
 
   return (
     <div className="flex min-h-screen items-center justify-center text-xl text-primary">
-      Connexion en cours...
+      Chargement en cours...
     </div>
   )
 }

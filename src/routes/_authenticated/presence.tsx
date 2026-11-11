@@ -265,31 +265,6 @@ function Presence() {
     onError: (e: Error) => toast.error(e.message),
   })
 
-  // const surCode = useCallback(
-  //   (code: string) => {
-  //     const cible = lignes.find(
-  //       (l) =>
-  //         l.participant?.codeqr_jeton === code ||
-  //         String(l.participant?.participant_id) === code ||
-  //         String(l.inscription_id) === code,
-  //     )
-  //     if (!cible) {
-  //       toast.error(`Badge non reconnu pour cette session : ${code}`)
-  //       return
-  //     }
-  //     enregistrer.mutate({
-  //       inscriptionId: cible.inscription_id,
-  //       statut: 'Présent',
-  //       methode: 'QR Code',
-  //     })
-  //     const u = cible.participant?.utilisateur
-  //     toast.success(
-  //       `Présence enregistrée : ${u?.prenoms ?? ''} ${u?.nom ?? ''}`.trim(),
-  //     )
-  //   },
-  //   [lignes, enregistrer],
-  // )
-
   const surCode = useCallback(
     (code: string) => {
       const cible = lignes.find(

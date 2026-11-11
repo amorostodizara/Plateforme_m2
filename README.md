@@ -2,7 +2,7 @@
 
 Application web permettant de gérer et de suivre les activités de formation, depuis la création des formations et des sessions jusqu'au suivi des inscriptions, des présences, des évaluations et à la délivrance des attestations.
 
-## 🎯 Objectif du projet
+## Objectif du projet
 
 La plateforme a pour objectif de centraliser la gestion et le suivi des activités de formation au sein d'une même application.
 
@@ -23,39 +23,9 @@ Elle permet notamment de :
 
 ---
 
-## 🏗️ Architecture générale
-
-L'application est développée avec une architecture moderne basée sur :
-
-```text
-┌─────────────────────────────────────────────┐
-│                 Frontend                    │
-│            React + TypeScript               │
-│                                             │
-│       TanStack Start + TanStack Router      │
-└──────────────────────┬──────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────┐
-│              Services Backend               │
-│                                             │
-│       TanStack Start Server Functions       │
-│                                             │
-│  Supabase Auth │ Supabase API │ OpenAI API  │
-└──────────────────────┬──────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────┐
-│                  Supabase                   │
-│                                             │
-│ PostgreSQL │ Auth │ Storage │ Row Level     │
-│                         Security (RLS)       │
-└─────────────────────────────────────────────┘
-```
-
 ---
 
-## 🛠️ Technologies utilisées
+## Technologies utilisées
 
 ### Frontend
 
@@ -95,7 +65,7 @@ L'application est développée avec une architecture moderne basée sur :
 
 ---
 
-## 👥 Rôles utilisateurs
+## Rôles utilisateurs
 
 La plateforme prévoit plusieurs rôles :
 
@@ -110,7 +80,7 @@ Les accès aux fonctionnalités sont contrôlés par un système de rôles et de
 
 ---
 
-## 🚀 Déploiement
+## Déploiement
 
 Avant un déploiement en production :
 
@@ -125,7 +95,7 @@ Avant un déploiement en production :
 
 ---
 
-## 📌 État du projet
+## État du projet
 
 Projet en cours de développement.
 
@@ -133,6 +103,6 @@ Les différentes fonctionnalités sont progressivement intégrées et testées a
 
 ---
 
-## 📄 Licence
+## Licence
 
 Projet développé dans le cadre d'un projet académique et professionnel.
